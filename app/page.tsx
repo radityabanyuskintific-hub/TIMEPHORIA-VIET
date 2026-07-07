@@ -36,7 +36,7 @@ const promos: Promo[] = [
     detail:
       "Makin Banyak Belanja Timephoria, Makin besar Kesempatan Memenangkan Total Hadiah Ratusan Juta Rupiah!.",
     category: "lips",
-    finish: "It's Gloss Time",
+    finish: "GLOSS IT BETTER",
     discount: "GET THE REWARD",
     artwork: "/promos/bts-concert-experience.webp",
     registrationUrl: "https://docs.google.com/forms/u/0/",
@@ -47,7 +47,7 @@ const promos: Promo[] = [
     kicker: "Shade finder promo",
     detail: "Buy cushion or powder and get a setting spray bundle offer.",
     category: "face",
-    finish: "SKIN PERFECTED",
+    finish: "SKIN FINISH PERFECTED",
     discount: "BUNDLE DEAL",
   },
   {
@@ -55,7 +55,7 @@ const promos: Promo[] = [
     kicker: "Waterproof edit",
     detail: "Special price for brow and liner routines after tapping.",
     category: "eyes",
-    finish: "BROW",
+    finish: "BROWS, BUT BETTER",
     discount: "SET PRICE",
   },
   {
@@ -63,7 +63,7 @@ const promos: Promo[] = [
     kicker: "Contour and cheek",
     detail: "Save on Pandora Cheek and Eclipse Spark complexion enhancers.",
     category: "face",
-    finish: "BLUSH AND CONTOUR",
+    finish: "FLAWLESS FLUSHED CHEEKS",
     discount: "SAVE 15%",
   },
 ];
@@ -87,7 +87,11 @@ const categories: Record<
     headline: "Find your perfect finish",
     intro:
       "High pigment color, glossy shine, blurred velvet texture, and transfer-proof wear for every lip mood.",
-    finishes: ["It's Gloss Time", "Cloud Feel, All Day Stain", "Upgrade Your Tinted Game"],
+    finishes: [
+      "TINTED TO GO",
+      "GLOSS IT BETTER",
+      "NO TOUCH-UPS NEEDED / ITS MATTE TO LAST",
+    ],
     color: "#ffffff",
     image: "/product-pages/lunara-frost-thumbnail.png",
     video: "/videos/header-hero_lips.mp4",
@@ -98,7 +102,7 @@ const categories: Record<
     headline: "Define, lift, and illuminate",
     intro:
       "Waterproof definition, effortless brow shaping, luminous jelly shine, and long-lasting eye color.",
-    finishes: ["BROW", "LASHES"],
+    finishes: ["BROWS, BUT BETTER", "EYE GAME STRONG"],
     color: "#d8d8d8",
     image: "/product-pages/illumina-jelly-thumbnail.png",
     video: "/videos/header-hero_eyes.mp4",
@@ -109,7 +113,7 @@ const categories: Record<
     headline: "Color, contour, base",
     intro:
       "Complexion, cheek color, contour, and blur products for every face step.",
-    finishes: ["SKIN PERFECTED", "BLUSH AND CONTOUR"],
+    finishes: ["SKIN FINISH PERFECTED", "FLAWLESS FLUSHED CHEEKS"],
     color: "#f2f2f2",
     image: "/product-pages/pandora-cheek-thumbnail.png",
     video: "/videos/header-hero_face.mp4",
@@ -118,16 +122,16 @@ const categories: Record<
 
 const products: Product[] = [
   {
-    name: "Timeless Lumina Matte Cover Cushion",
-    shortName: "Lumina Cushion",
+    name: "LUMINA MATTE CUSHION",
+    shortName: "LUMINA MATTE CUSHION",
     category: "face",
-    finish: "Cushion",
+    finish: "SKIN FINISH PERFECTED",
     price: "IDR 199.000",
     size: "11 g",
     image: "/product-pages/page-13.png",
     description:
       "A lightweight full-coverage cushion with a natural flawless finish for up to 12 hours. Color-locking pigment helps absorb excess oil and prevent oxidation.",
-    claims: ["Full coverage", "12H fresh skin", "Oil control", "8 shades"],
+    claims: ["Full coverage", "12H fresh skin", "Oil control"],
     shades: [
       "000 Bare",
       "001 Creme",
@@ -140,243 +144,265 @@ const products: Product[] = [
     ],
   },
   {
-    name: "Timeless Optima Cover-Blur Skin Perfection Powder Foundation",
-    shortName: "Optima Powder",
+    name: "OPTIMA POWDER FOUNDATION",
+    shortName: "OPTIMA POWDER FOUNDATION",
     category: "face",
-    finish: "Powder",
+    finish: "SKIN FINISH PERFECTED",
     price: "IDR 0",
     size: "8.5 g",
     image: "/product-pages/page-21.png",
     description:
       "Ultra-lightweight powder foundation for perfect cover and blur in one swipe. Flux-Matte technology gives up to 16 hours of oil control.",
-    claims: ["Blur matte", "Full coverage", "16H oil control", "Non-comedogenic"],
+    claims: ["Blur matte", "Full coverage", "16H oil control"],
     shades: ["01 Ivory", "02 Light", "03 Medium", "04 Natural", "05 Sand", "06 Tan"],
   },
   {
-    name: "Timeless Supernova Matte Setting Spray",
-    shortName: "Supernova Spray",
+    name: "SUPERNOVA SETTING SPRAY",
+    shortName: "SUPERNOVA SETTING SPRAY",
     category: "face",
-    finish: "Spray",
+    finish: "SKIN FINISH PERFECTED",
     price: "IDR 99.000",
     size: "60 ml",
     image: "/product-pages/page-29.png",
     description:
       "Ultra-fine setting spray that instantly mattifies, blurs pores, and keeps makeup fresh, smudge-proof, and shine-free for up to 12 hours.",
-    claims: ["Get set matte", "Airbrushed finish", "12H hold", "Oily skin friendly"],
+    claims: ["Get set matte", "Airbrushed finish", "12H hold"],
     shades: ["Universal"],
   },
   {
-    name: "Timephoria Timeless Utopia Glow Perfection Cushion SPF50 PA+++",
-    shortName: "Utopia Glow Cushion",
+    name: "UTOPIA GLOW CUSHION",
+    shortName: "UTOPIA GLOW CUSHION",
     category: "face",
-    finish: "Cushion",
+    finish: "SKIN FINISH PERFECTED",
     price: "IDR 00.000",
     size: "Cushion compact",
     image: "/product-pages/page-34.png",
     description:
       "A hydrating glow cushion that creates a soft-blurring base makeup look with sun protection and a comfortable luminous finish.",
-    claims: ["SPF50 PA+++", "Hydrating glow", "Soft-blur base", "BPOM registered"],
+    claims: ["SPF50 PA+++", "Hydrating glow", "Soft-blur base"],
     shades: ["Light", "Natural", "Medium", "Warm", "Tan"],
   },
   {
-    name: "Timeless Fixion All Day Perfection Skin Tint Stick",
-    shortName: "Fixion Tint Stick",
+    name: "FIXION SKIN TINT STICK",
+    shortName: "FIXION SKIN TINT STICK",
     category: "face",
-    finish: "Conceal",
+    finish: "SKIN FINISH PERFECTED",
     price: "IDR 00.000",
     size: "10 g",
     image: "/product-pages/page-42.png",
     description:
       "Creamy skin tint stick with medium-to-full coverage in one swipe. It blends into a satin second-skin finish for up to 8 hours.",
-    claims: ["One-swipe base", "8H wear", "Satin finish", "No oxidation"],
+    claims: ["One-swipe base", "8H wear", "Satin finish"],
     shades: ["01 Creme", "02 Birch", "03 Fawn", "04 Beige", "05 Tan", "06 Cacao"],
   },
   {
-    name: "Timeless Valora Fit Perfection Concealer",
-    shortName: "Valora Concealer",
+    name: "VALORA CONCEALER",
+    shortName: "VALORA CONCEALER",
     category: "face",
-    finish: "Conceal",
+    finish: "SKIN FINISH PERFECTED",
     price: "IDR 00.000",
     size: "5 ml",
     image: "/product-pages/page-49.png",
     description:
       "High-coverage concealer that blurs dark circles and imperfections with a lightweight crease-resistant finish lasting up to 12 hours.",
-    claims: ["High coverage", "12H crease resistant", "Soft matte", "Hydrating feel"],
+    claims: ["High coverage", "12H crease resistant", "Soft matte"],
     shades: ["01 Light", "02 Neutral", "03 Medium", "04 Warm", "05 Tan"],
   },
   {
-    name: "Pandora Cheek Liquid Blush",
-    shortName: "Pandora Cheek",
+    name: "PANDORA CHEEK LIQUID BLUSH",
+    shortName: "PANDORA CHEEK LIQUID BLUSH",
     category: "face",
-    finish: "Blush",
+    finish: "FLAWLESS FLUSHED CHEEKS",
     price: "IDR 199.000",
     size: "5 g",
     image: "/product-pages/page-57.png",
     description:
       "High color payoff liquid blush with an ultra-blendable lightweight feel, dewy-to-soft-matte finish, and all-day wear.",
-    claims: ["Highly pigmented", "Ultra-blendable", "Long-lasting", "7 shades"],
+    claims: ["Highly pigmented", "Ultra-blendable", "Long-lasting"],
     shades: ["Peony", "Rosy", "Coral", "Berry", "Mauve", "Terracotta", "Nude"],
   },
   {
-    name: "Eclipse Spark 2-in-1 Face Contour",
-    shortName: "Eclipse Contour",
+    name: "ECLIPSE 2 IN 1 FACE CONTOUR",
+    shortName: "ECLIPSE 2 IN 1 FACE CONTOUR",
     category: "face",
-    finish: "Contour",
+    finish: "FLAWLESS FLUSHED CHEEKS",
     price: "IDR 199.000",
     size: "7 g",
     image: "/product-pages/page-66.png",
     description:
       "Dual-ended contour stick with a built-in hygienic brush, ultra-creamy blendable formula, and silky powder-soft finish.",
-    claims: ["Dual-ended", "Cream-to-powder", "Built-in brush", "8H comfort"],
+    claims: ["Dual-ended", "Cream-to-powder", "Built-in brush"],
     shades: ["Warm contour", "Neutral contour", "Deep contour"],
   },
   {
-    name: "Orbita Lip and Cheek Blurring Pot",
-    shortName: "Orbita Pot",
+    name: "ORBITA 3 IN 1 BLURRING POT",
+    shortName: "ORBITA 3 IN 1 BLURRING POT",
     category: "face",
-    finish: "Blurring",
+    finish: "FLAWLESS FLUSHED CHEEKS",
     price: "IDR 199.000",
     size: "4 g",
     image: "/product-pages/page-74.png",
     description:
       "Multifunction bouncy velvet mud for eyes, cheeks, and lips with a cloud-like blurring effect and intense buildable color.",
-    claims: ["Blurring", "High pigment", "Built-in applicator", "Multi-use"],
+    claims: ["Blurring", "High pigment", "Built-in applicator"],
     shades: ["Nude orbit", "Rose orbit", "Coral orbit", "Berry orbit"],
   },
   {
-    name: "Stellar Dust Lip Stain",
-    shortName: "Stellar Dust",
+    name: "STELLAR DUST LIP STAIN",
+    shortName: "STELLAR DUST LIP STAIN",
     category: "lips",
-    finish: "Upgrade Your Tinted Game",
+    finish: "TINTED TO GO",
     price: "IDR 119.000",
     size: "5 g",
     image: "/product-pages/page-84.png",
     description:
       "Hybrid lip emulsion with rich one-swipe coverage, long-lasting transfer-proof color, and comfortable hydration.",
-    claims: ["High shine", "12H long-lasting", "Transfer-proof", "22 shades"],
+    claims: ["High shine", "12H long-lasting", "Transfer-proof"],
     shades: ["Nude comet", "Rose star", "Coral flare", "Berry nova", "Red orbit"],
   },
   {
-    name: "Nebula Velvet Lip Cream",
-    shortName: "Nebula Velvet",
+    name: "NEBULA LIP CREAM",
+    shortName: "NEBULA LIP CREAM",
     category: "lips",
-    finish: "Cloud Feel, All Day Stain",
+    finish: "NO TOUCH-UPS NEEDED / ITS MATTE TO LAST",
     price: "IDR 119.000",
     size: "4 g",
     image: "/product-pages/page-104.png",
     description:
       "Velvet-matte lip color with a lightweight creamy texture, color-lock technology, hydration, and blurred lip lines.",
-    claims: ["Blurs", "Smooth", "High pigment", "22 shades"],
+    claims: ["Blurs", "Smooth", "High pigment"],
     shades: ["Soft nude", "Warm rose", "Spiced coral", "Mocha", "Deep berry"],
   },
   {
-    name: "Eternal Lip Matte",
-    shortName: "Eternal Matte",
+    name: "ETERNAL LIP MATTE",
+    shortName: "ETERNAL LIP MATTE",
     category: "lips",
-    finish: "Cloud Feel, All Day Stain",
+    finish: "NO TOUCH-UPS NEEDED / ITS MATTE TO LAST",
     price: "IDR 119.000",
     size: "4 ml",
     image: "/product-pages/page-119.png",
     description:
       "Highly pigmented matte lip color with intense one-swipe coverage, feather-light texture, and comfortable non-drying wear.",
-    claims: ["Long wear", "High pigment", "Transfer-proof", "17 shades"],
+    claims: ["Long wear", "High pigment", "Transfer-proof"],
     shades: ["Bare rose", "Brick time", "Mauve eclipse", "Ruby", "Cocoa"],
   },
   {
-    name: "Lunara Frost 3D Lip Gloss",
-    shortName: "Lunara Frost",
+    name: "LUNARA 3D LIP GLOSS",
+    shortName: "LUNARA 3D LIP GLOSS",
     category: "lips",
-    finish: "It's Gloss Time",
+    finish: "GLOSS IT BETTER",
     price: "IDR 199.000",
     size: "5 g",
     image: "/product-pages/page-131.png",
     description:
       "Cushiony gel lip gloss with hyper-shine color, mirror finish, cooling feel, and 3D plumping effect.",
-    claims: ["High shine", "3D plump", "24H hydration", "Fresh chill"],
+    claims: ["High shine", "3D plump", "24H hydration"],
     shades: ["Clear frost", "Pink ice", "Peach beam", "Berry glass"],
   },
   {
-    name: "Spectra Ultra Stay-Shine Transfer Proof Lip Vinyl",
-    shortName: "Spectra Vinyl",
+    name: "SPECTRA LIP VINYL",
+    shortName: "SPECTRA LIP VINYL",
     category: "lips",
-    finish: "It's Gloss Time",
+    finish: "NO TOUCH-UPS NEEDED / ITS MATTE TO LAST",
     price: "IDR 00.000",
     size: "Lip vinyl",
     image: "/product-pages/page-144.png",
     description:
       "Shine-lock lip vinyl built for glossy color that sets, stays bright, and resists transfer through the day.",
-    claims: ["Stay-shine", "Transfer-proof", "Vinyl gloss", "Bold color"],
+    claims: ["Stay-shine", "Transfer-proof", "Vinyl gloss"],
     shades: ["Nude glare", "Rose signal", "Red spectrum", "Deep shine"],
   },
   {
-    name: "Altera Blurring Lip Tint",
-    shortName: "Altera Tint",
+    name: "ALTERA LIP TINT",
+    shortName: "ALTERA LIP TINT",
     category: "lips",
-    finish: "Upgrade Your Tinted Game",
+    finish: "TINTED TO GO",
     price: "IDR 00.000",
     size: "Lip tint",
     image: "/product-pages/page-164.png",
     description:
       "Innovative lip color that shifts from glossy to soft blurry finish with pure blur technology and weightless hydration.",
-    claims: ["Gloss-to-blur", "Long stain", "Hydrating", "Non-sticky"],
+    claims: ["Gloss-to-blur", "Long stain", "Hydrating"],
     shades: ["Soft pink", "Apricot", "Warm rose", "Berry mist"],
   },
   {
-    name: "Genesis Superstay Eyebrow Pencil",
-    shortName: "Genesis Brow",
+    name: "GENESIS EYEBROW PENCIL",
+    shortName: "GENESIS EYEBROW PENCIL",
     category: "eyes",
-    finish: "Brow",
+    finish: "BROWS, BUT BETTER",
     price: "IDR 00.000",
     size: "0.5 g",
     image: "/product-pages/page-231.png",
     description:
       "Slanted oval-tip eyebrow pencil with powder-to-wax payoff for soft natural definition that stays through sweat and humidity.",
-    claims: ["Good pigment", "Smooth", "Waterproof", "Beginner friendly"],
+    claims: ["Good pigment", "Smooth", "Waterproof"],
     shades: ["Ash brown", "Natural brown", "Dark brown", "Grey brown"],
   },
   {
-    name: "Dune Hyper-Precision Superstay Eyeliner",
-    shortName: "Dune Eyeliner",
+    name: "DUNE EYELINER",
+    shortName: "DUNE EYELINER",
     category: "eyes",
-    finish: "Liner",
+    finish: "EYE GAME STRONG",
     price: "IDR 199.000",
     size: "0.5 g",
     image: "/product-pages/page-237.png",
     description:
       "Thin precise applicator with an easy-set formula for smooth intense color, waterproof wear, and clean lines all day.",
-    claims: ["Thin", "Precise", "Waterproof", "Sweat-resistant"],
+    claims: ["Thin", "Precise", "Waterproof"],
     shades: ["Black", "Brown"],
   },
   {
-    name: "Revela Tinted Eyebrow Mascara",
-    shortName: "Revela Brow",
+    name: "REVELA BROW MASCARA",
+    shortName: "REVELA BROW MASCARA",
     category: "eyes",
-    finish: "Brow",
+    finish: "BROWS, BUT BETTER",
     price: "IDR 00.000",
     size: "Brow mascara",
     image: "/product-pages/page-243.png",
     description:
       "Anti-clump tinted brow gel with a 30 degree fine-tip brush for intense color, waterproof hold, and up to 12 hours of definition.",
-    claims: ["Good pigment", "Hold", "Longwear", "Anti-clump"],
+    claims: ["Good pigment", "Hold", "Longwear"],
     shades: ["Soft brown", "Natural brown", "Dark brown"],
   },
   {
-    name: "Illumina Jelly Eyeshadow Stick",
-    shortName: "Illumina Jelly",
+    name: "ILLUMINA EYESHADOW STICK",
+    shortName: "ILLUMINA EYESHADOW STICK",
     category: "eyes",
-    finish: "Shadow",
+    finish: "EYE GAME STRONG",
     price: "IDR 00.000",
     size: "Eyeshadow stick",
     image: "/product-pages/page-249.png",
     description:
       "Jelly eyeshadow stick with lightweight high-impact sparkle, hydra-metallic shine, cool cushion feel, and crease-free wear.",
-    claims: ["Jelly texture", "High pigment", "Long-lasting shine", "No creasing"],
+    claims: ["Jelly texture", "High pigment", "Long-lasting shine"],
     shades: ["Champagne", "Rose chrome", "Copper", "Galaxy", "Moonlit"],
   },
 ];
 
+const productAssetSlugs: Record<string, string> = {
+  "ALTERA LIP TINT": "altera-tint",
+  "DUNE EYELINER": "dune-eyeliner",
+  "ECLIPSE 2 IN 1 FACE CONTOUR": "eclipse-contour",
+  "ETERNAL LIP MATTE": "eternal-matte",
+  "FIXION SKIN TINT STICK": "fixion-tint-stick",
+  "GENESIS EYEBROW PENCIL": "genesis-brow",
+  "ILLUMINA EYESHADOW STICK": "illumina-jelly",
+  "LUMINA MATTE CUSHION": "lumina-cushion",
+  "LUNARA 3D LIP GLOSS": "lunara-frost",
+  "NEBULA LIP CREAM": "nebula-velvet",
+  "OPTIMA POWDER FOUNDATION": "optima-powder",
+  "ORBITA 3 IN 1 BLURRING POT": "orbita-pot",
+  "PANDORA CHEEK LIQUID BLUSH": "pandora-cheek",
+  "REVELA BROW MASCARA": "revela-brow",
+  "SPECTRA LIP VINYL": "spectra-vinyl",
+  "STELLAR DUST LIP STAIN": "stellar-dust",
+  "SUPERNOVA SETTING SPRAY": "supernova-spray",
+  "UTOPIA GLOW CUSHION": "utopia-glow-cushion",
+  "VALORA CONCEALER": "valora-concealer",
+};
+
 function assetSlug(product: Product) {
-  return product.shortName
+  return (productAssetSlugs[product.name] ?? product.shortName)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
@@ -391,16 +417,6 @@ function productSwatchImage(product: Product) {
 }
 
 function productGroup(product: Product) {
-  if (product.category === "eyes") {
-    return product.finish === "Brow" ? "BROW" : "LASHES";
-  }
-
-  if (product.category === "face") {
-    return ["Cushion", "Powder", "Spray", "Conceal"].includes(product.finish)
-      ? "SKIN PERFECTED"
-      : "BLUSH AND CONTOUR";
-  }
-
   return product.finish;
 }
 
@@ -431,7 +447,7 @@ function ProductCard({
         <h3>{product.shortName}</h3>
         <p>{product.description}</p>
         <div className="claim-row" aria-label={`${product.name} claims`}>
-          {product.claims.slice(0, 4).map((claim) => (
+          {product.claims.slice(0, 3).map((claim) => (
             <span key={claim}>{claim}</span>
           ))}
         </div>
@@ -728,7 +744,7 @@ export default function Home() {
               style={{ "--accent": category.color } as React.CSSProperties}
             >
               <span>{category.label}</span>
-              <h2>{finish === "All" ? category.headline : `${finish} finish`}</h2>
+              <h2>{finish === "All" ? category.headline : finish}</h2>
               <p>{category.intro}</p>
               {activePromo ? (
                 <div className="active-promo">
