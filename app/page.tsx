@@ -646,18 +646,22 @@ export default function Home() {
             </div>
 
             {currentPromo.registrationUrl && currentPromo.artwork ? (
-              <a
-                className="promo-placeholder bts-promo-artwork"
-                href={currentPromo.registrationUrl}
-                rel="noreferrer"
-                target="_blank"
-              >
-                <img
-                  src={currentPromo.artwork}
-                  alt={`${currentPromo.title} promo artwork`}
-                />
-                <span>{currentPromo.registrationLabel}</span>
-              </a>
+              <div className="promo-placeholder bts-promo-artwork">
+                <div className="bts-promo-scroll">
+                  <img
+                    src={currentPromo.artwork}
+                    alt={`${currentPromo.title} promo artwork`}
+                  />
+                </div>
+                <a
+                  className="bts-register-button"
+                  href={currentPromo.registrationUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  {currentPromo.registrationLabel}
+                </a>
+              </div>
             ) : (
               <button
                 className="promo-placeholder"

@@ -315,7 +315,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow-y: auto;
+  overflow: hidden;
   padding-bottom: 22px;
 }
 
@@ -324,6 +324,7 @@ button {
   background: #101010;
   border: 1px solid var(--line);
   border-radius: 22px;
+  flex: 0 0 auto;
   min-height: 168px;
   overflow: hidden;
   padding: 24px;
@@ -367,10 +368,10 @@ button {
 
 .promo-page-hero h2 {
   font-family: var(--font-condensed), "Segoe UI Condensed", "Arial Narrow", sans-serif;
-  font-size: 42px;
+  font-size: 30px;
   font-weight: 700;
-  line-height: 0.92;
-  margin: 16px 0 10px;
+  line-height: 1;
+  margin: 12px 0 10px;
   text-transform: uppercase;
 }
 
@@ -396,23 +397,28 @@ button {
 .promo-selector {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 22px;
-  display: flex;
-  gap: 7px;
-  overflow-x: auto;
-  padding: 8px;
+  border-radius: 16px;
+  display: grid;
+  flex: 0 0 auto;
+  gap: 6px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: visible;
+  padding: 6px;
 }
 
 .promo-selector button {
   background: rgba(255, 255, 255, 0.11);
   border: 1px solid rgba(255, 255, 255, 0.13);
-  border-radius: 999px;
+  border-radius: 12px;
   color: #fff;
   cursor: pointer;
-  flex: 0 0 auto;
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 900;
-  padding: 9px 12px;
+  line-height: 1.15;
+  min-height: 34px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: 7px 8px;
   text-transform: uppercase;
 }
 
@@ -437,6 +443,9 @@ button {
 .promo-placeholder.bts-promo-artwork {
   border-color: rgba(222, 75, 208, 0.76);
   box-shadow: 0 0 28px rgba(222, 75, 208, 0.2);
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .promo-placeholder::before {
@@ -458,36 +467,46 @@ button {
   width: 100%;
 }
 
-.bts-promo-artwork img {
-  height: auto;
-  position: static;
+.bts-promo-scroll {
+  height: 100%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-.bts-promo-artwork span {
+.bts-promo-scroll img {
+  display: block;
+  height: auto;
+  position: static;
+  width: 100%;
+}
+
+.bts-register-button {
   align-items: center;
   backdrop-filter: blur(10px);
   background:
     radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.36), transparent 58%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(12, 10, 16, 0.88));
   border: 2px solid rgba(255, 255, 255, 0.58);
-  border-radius: 24px;
-  bottom: 48px;
+  border-radius: 18px;
+  bottom: 18px;
   box-shadow:
     inset 0 0 18px rgba(255, 255, 255, 0.3),
     0 0 18px rgba(255, 255, 255, 0.18);
   color: #fff;
   display: flex;
   font-family: var(--font-condensed), "Segoe UI Condensed", "Arial Narrow", sans-serif;
-  font-size: 26px;
+  font-size: 20px;
   font-weight: 700;
   justify-content: center;
-  left: 44px;
-  line-height: 0.98;
-  padding: 17px 18px 18px;
+  left: 20px;
+  line-height: 1;
+  padding: 12px 14px;
   position: absolute;
   text-align: center;
+  text-decoration: none;
   text-transform: uppercase;
-  width: 158px;
+  width: 124px;
 }
 
 .category-stack {
