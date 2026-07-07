@@ -24,23 +24,30 @@ type Promo = {
   category: CategoryKey;
   finish: string;
   discount: string;
+  artwork?: string;
+  registrationUrl?: string;
+  registrationLabel?: string;
 };
 
 const promos: Promo[] = [
   {
-    title: "Gloss Finish Deal",
-    kicker: "Tap to unlock",
-    detail: "20% off Lunara Frost and Spectra Vinyl glossy lip picks.",
+    title: "BUY TIMEPHORIA, WIN BTS CONCERT EXPERIENCE !",
+    kicker: "Grand prize promo",
+    detail:
+      "Makin Banyak Belanja Timephoria, Makin besar Kesempatan Memenangkan Total Hadiah Ratusan Juta Rupiah!.",
     category: "lips",
-    finish: "Gloss",
-    discount: "20% OFF GLOSS",
+    finish: "It's Gloss Time",
+    discount: "GET THE REWARD",
+    artwork: "/promos/bts-concert-experience.webp",
+    registrationUrl: "https://docs.google.com/forms/u/0/",
+    registrationLabel: "Tap to register",
   },
   {
     title: "Complexion Match",
     kicker: "Shade finder promo",
     detail: "Buy cushion or powder and get a setting spray bundle offer.",
     category: "face",
-    finish: "Cushion",
+    finish: "SKIN PERFECTED",
     discount: "BUNDLE DEAL",
   },
   {
@@ -48,7 +55,7 @@ const promos: Promo[] = [
     kicker: "Waterproof edit",
     detail: "Special price for brow and liner routines after tapping.",
     category: "eyes",
-    finish: "Brow",
+    finish: "BROW",
     discount: "SET PRICE",
   },
   {
@@ -56,7 +63,7 @@ const promos: Promo[] = [
     kicker: "Contour and cheek",
     detail: "Save on Pandora Cheek and Eclipse Spark complexion enhancers.",
     category: "face",
-    finish: "Blush",
+    finish: "BLUSH AND CONTOUR",
     discount: "SAVE 15%",
   },
 ];
@@ -71,6 +78,7 @@ const categories: Record<
     finishes: string[];
     color: string;
     image: string;
+    video: string;
   }
 > = {
   lips: {
@@ -79,9 +87,10 @@ const categories: Record<
     headline: "Find your perfect finish",
     intro:
       "High pigment color, glossy shine, blurred velvet texture, and transfer-proof wear for every lip mood.",
-    finishes: ["Gloss", "Velvet", "Matte", "Tint"],
+    finishes: ["It's Gloss Time", "Cloud Feel, All Day Stain", "Upgrade Your Tinted Game"],
     color: "#ffffff",
-    image: "/product-pages/page-131.png",
+    image: "/product-pages/lunara-frost-thumbnail.png",
+    video: "/videos/header-hero_lips.mp4",
   },
   eyes: {
     label: "Eyes",
@@ -89,9 +98,10 @@ const categories: Record<
     headline: "Define, lift, and illuminate",
     intro:
       "Waterproof definition, effortless brow shaping, luminous jelly shine, and long-lasting eye color.",
-    finishes: ["Brow", "Liner", "Lash", "Shadow"],
+    finishes: ["BROW", "LASHES"],
     color: "#d8d8d8",
-    image: "/product-pages/page-249.png",
+    image: "/product-pages/illumina-jelly-thumbnail.png",
+    video: "/videos/header-hero_eyes.mp4",
   },
   face: {
     label: "Face",
@@ -99,9 +109,10 @@ const categories: Record<
     headline: "Color, contour, base",
     intro:
       "Complexion, cheek color, contour, and blur products for every face step.",
-    finishes: ["Cushion", "Powder", "Spray", "Conceal", "Blush", "Contour", "Blurring"],
+    finishes: ["SKIN PERFECTED", "BLUSH AND CONTOUR"],
     color: "#f2f2f2",
-    image: "/product-pages/page-57.png",
+    image: "/product-pages/pandora-cheek-thumbnail.png",
+    video: "/videos/header-hero_face.mp4",
   },
 };
 
@@ -236,7 +247,7 @@ const products: Product[] = [
     name: "Stellar Dust Lip Stain",
     shortName: "Stellar Dust",
     category: "lips",
-    finish: "Tint",
+    finish: "Upgrade Your Tinted Game",
     price: "IDR 119.000",
     size: "5 g",
     image: "/product-pages/page-84.png",
@@ -249,7 +260,7 @@ const products: Product[] = [
     name: "Nebula Velvet Lip Cream",
     shortName: "Nebula Velvet",
     category: "lips",
-    finish: "Velvet",
+    finish: "Cloud Feel, All Day Stain",
     price: "IDR 119.000",
     size: "4 g",
     image: "/product-pages/page-104.png",
@@ -262,7 +273,7 @@ const products: Product[] = [
     name: "Eternal Lip Matte",
     shortName: "Eternal Matte",
     category: "lips",
-    finish: "Matte",
+    finish: "Cloud Feel, All Day Stain",
     price: "IDR 119.000",
     size: "4 ml",
     image: "/product-pages/page-119.png",
@@ -275,7 +286,7 @@ const products: Product[] = [
     name: "Lunara Frost 3D Lip Gloss",
     shortName: "Lunara Frost",
     category: "lips",
-    finish: "Gloss",
+    finish: "It's Gloss Time",
     price: "IDR 199.000",
     size: "5 g",
     image: "/product-pages/page-131.png",
@@ -288,7 +299,7 @@ const products: Product[] = [
     name: "Spectra Ultra Stay-Shine Transfer Proof Lip Vinyl",
     shortName: "Spectra Vinyl",
     category: "lips",
-    finish: "Gloss",
+    finish: "It's Gloss Time",
     price: "IDR 00.000",
     size: "Lip vinyl",
     image: "/product-pages/page-144.png",
@@ -301,7 +312,7 @@ const products: Product[] = [
     name: "Altera Blurring Lip Tint",
     shortName: "Altera Tint",
     category: "lips",
-    finish: "Tint",
+    finish: "Upgrade Your Tinted Game",
     price: "IDR 00.000",
     size: "Lip tint",
     image: "/product-pages/page-164.png",
@@ -364,6 +375,39 @@ const products: Product[] = [
   },
 ];
 
+function assetSlug(product: Product) {
+  return product.shortName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function productThumbnail(product: Product) {
+  return `/product-pages/${assetSlug(product)}-thumbnail.png`;
+}
+
+function productSwatchImage(product: Product) {
+  return `/swatches/swatches-${assetSlug(product)}.jpg`;
+}
+
+function productGroup(product: Product) {
+  if (product.category === "eyes") {
+    return product.finish === "Brow" ? "BROW" : "LASHES";
+  }
+
+  if (product.category === "face") {
+    return ["Cushion", "Powder", "Spray", "Conceal"].includes(product.finish)
+      ? "SKIN PERFECTED"
+      : "BLUSH AND CONTOUR";
+  }
+
+  return product.finish;
+}
+
+function promoVisual(promo: Promo) {
+  return promo.artwork ?? categories[promo.category].image;
+}
+
 function ProductCard({
   product,
   promoLabel,
@@ -377,7 +421,7 @@ function ProductCard({
     <article className="product-card">
       {promoLabel ? <div className="promo-badge">{promoLabel}</div> : null}
       <div className="product-visual">
-        <img src={product.image} alt={`${product.name} product knowledge page`} />
+        <img src={productThumbnail(product)} alt={`${product.name} product knowledge page`} />
       </div>
       <div className="product-copy">
         <div className="product-meta">
@@ -406,8 +450,8 @@ function ProductCard({
           <div className="shade-content-inner">
             <div className="swatch-preview">
               <img
-                src="/swatches/complexion-tone-chart.jpg"
-                alt="Timephoria complexion tone chart"
+                src={productSwatchImage(product)}
+                alt={`${product.name} swatch chart`}
               />
             </div>
           </div>
@@ -419,7 +463,7 @@ function ProductCard({
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("lips");
-  const [view, setView] = useState<"home" | "category" | "products">("home");
+  const [view, setView] = useState<"home" | "category" | "promo" | "products">("home");
   const [finish, setFinish] = useState("All");
   const [promoIndex, setPromoIndex] = useState(0);
   const [activePromo, setActivePromo] = useState<Promo | null>(null);
@@ -458,9 +502,10 @@ export default function Home() {
     () =>
       finish === "All"
         ? categoryProducts
-        : categoryProducts.filter((product) => product.finish === finish),
+        : categoryProducts.filter((product) => productGroup(product) === finish),
     [categoryProducts, finish],
   );
+  const currentPromo = activePromo ?? promos[promoIndex];
 
   function chooseCategory(key: CategoryKey, target: "category" | "products") {
     setActiveCategory(key);
@@ -470,6 +515,12 @@ export default function Home() {
   }
 
   function applyPromo(promo: Promo) {
+    setActivePromo(promo);
+    setPromoIndex(promos.findIndex((item) => item.title === promo.title));
+    setView("promo");
+  }
+
+  function viewPromoProducts(promo: Promo) {
     setActiveCategory(promo.category);
     setFinish(promo.finish);
     setActivePromo(promo);
@@ -515,6 +566,12 @@ export default function Home() {
                 onClick={() => applyPromo(promos[promoIndex])}
                 type="button"
               >
+                <img
+                  className="promo-main-visual"
+                  src={promoVisual(promos[promoIndex])}
+                  alt=""
+                  aria-hidden="true"
+                />
                 <span>{promos[promoIndex].kicker}</span>
                 <strong>{promos[promoIndex].title}</strong>
                 <em>{promos[promoIndex].detail}</em>
@@ -558,12 +615,76 @@ export default function Home() {
           </div>
         ) : null}
 
+        {view === "promo" ? (
+          <div className="promo-screen">
+            <header className="promo-page-hero">
+              <img
+                src={promoVisual(currentPromo)}
+                alt=""
+                aria-hidden="true"
+              />
+              <span>{currentPromo.kicker}</span>
+              <h2>{currentPromo.title}</h2>
+              <p>{currentPromo.detail}</p>
+              <small>{currentPromo.discount}</small>
+            </header>
+
+            <div className="promo-selector" aria-label="Promo selector">
+              {promos.map((promo, index) => (
+                <button
+                  key={promo.title}
+                  className={currentPromo.title === promo.title ? "selected" : ""}
+                  onClick={() => {
+                    setActivePromo(promo);
+                    setPromoIndex(index);
+                  }}
+                  type="button"
+                >
+                  {promo.title}
+                </button>
+              ))}
+            </div>
+
+            {currentPromo.registrationUrl && currentPromo.artwork ? (
+              <a
+                className="promo-placeholder bts-promo-artwork"
+                href={currentPromo.registrationUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <img
+                  src={currentPromo.artwork}
+                  alt={`${currentPromo.title} promo artwork`}
+                />
+                <span>{currentPromo.registrationLabel}</span>
+              </a>
+            ) : (
+              <button
+                className="promo-placeholder"
+                onClick={() => viewPromoProducts(currentPromo)}
+                type="button"
+              >
+                <img
+                  src="/promos/promo-placeholder.png"
+                  alt={`${currentPromo.title} promo artwork`}
+                />
+              </button>
+            )}
+          </div>
+        ) : null}
+
         {view === "category" ? (
           <div className="category-screen">
             <header className="category-hero">
               <div className="category-video-layer" aria-hidden="true">
-                <img src={category.image} alt="" />
-                <img src={category.image} alt="" />
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  poster={category.image}
+                  src={category.video}
+                />
               </div>
               <span>{category.eyebrow}</span>
               <h2>{category.label}</h2>
@@ -647,7 +768,7 @@ export default function Home() {
                   promoLabel={
                     activePromo &&
                     product.category === activePromo.category &&
-                    product.finish === activePromo.finish
+                    productGroup(product) === activePromo.finish
                       ? activePromo.discount
                       : undefined
                   }
