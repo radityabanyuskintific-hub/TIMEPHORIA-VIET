@@ -525,12 +525,14 @@ button {
 }
 
 .category-tile {
+  align-items: center;
   animation: card-fade-up 620ms ease both;
   background: #111;
   border: 1px solid var(--line);
   border-radius: 24px;
   color: #fff;
   cursor: pointer;
+  display: flex;
   justify-self: start;
   min-height: 0;
   overflow: hidden;
@@ -1007,6 +1009,7 @@ button {
 }
 
 .shade-toggle span {
+  flex: 1;
   font-weight: 400;
 }
 
@@ -1046,14 +1049,53 @@ button {
 
 .swatch-preview {
   background: #fff;
-  padding: 10px;
+  padding: 0;
+  position: relative;
 }
 
-.swatch-preview img {
-  border: 1px solid rgba(0, 0, 0, 0.12);
+.swatch-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.swatch-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.swatch-carousel img {
   display: block;
+  flex: 0 0 100%;
   height: auto;
+  scroll-snap-align: center;
   width: 100%;
+}
+
+.swatch-dots {
+  align-items: center;
+  bottom: 8px;
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+.swatch-dots span {
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 999px;
+  display: block;
+  height: 5px;
+  width: 5px;
+}
+
+.swatch-dots span.active {
+  background: #fff;
+  width: 13px;
 }
 
 .tone-note {
