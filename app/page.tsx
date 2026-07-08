@@ -94,7 +94,7 @@ const categories: Record<
       "NO TOUCH-UPS NEEDED / ITS MATTE TO LAST",
     ],
     color: "#ffffff",
-    image: "/product-pages/lunara-frost-thumbnail.png",
+    image: "/homepage-category/category-lips.jpg",
     video: "/videos/header-hero_lips.mp4",
   },
   eyes: {
@@ -105,7 +105,7 @@ const categories: Record<
       "Waterproof definition, effortless brow shaping, luminous jelly shine, and long-lasting eye color.",
     finishes: ["BROWS, BUT BETTER", "EYE GAME STRONG"],
     color: "#d8d8d8",
-    image: "/product-pages/illumina-jelly-thumbnail.png",
+    image: "/homepage-category/category-eyes.jpg",
     video: "/videos/header-hero_eyes.mp4",
   },
   face: {
@@ -116,7 +116,7 @@ const categories: Record<
       "Complexion, cheek color, contour, and blur products for every face step.",
     finishes: ["SKIN FINISH PERFECTED", "FLAWLESS FLUSHED CHEEKS"],
     color: "#f2f2f2",
-    image: "/product-pages/pandora-cheek-thumbnail.png",
+    image: "/homepage-category/category-face.jpg",
     video: "/videos/header-hero_face.mp4",
   },
 };
