@@ -15,6 +15,7 @@ type Product = {
   description: string;
   claims: string[];
   shades: string[];
+  swatchSlides?: string[];
 };
 
 type Promo = {
@@ -39,7 +40,7 @@ const promos: Promo[] = [
     finish: "GLOSS IT BETTER",
     discount: "GET THE REWARD",
     artwork: "/promos/bts-concert-experience.webp",
-    registrationUrl: "https://docs.google.com/forms/u/0/",
+    registrationUrl: "https://ggl.link/test-link",
     registrationLabel: "Tap to register",
   },
   {
@@ -300,6 +301,86 @@ const products: Product[] = [
     shades: ["Clear frost", "Pink ice", "Peach beam", "Berry glass"],
   },
   {
+    name: "MILKYWAY MELTING LIP BALM",
+    shortName: "MILKYWAY MELTING LIP BALM",
+    category: "lips",
+    finish: "GLOSS IT BETTER",
+    price: "IDR 00.000",
+    size: "2.1 g",
+    image: "/product-pages/page-180-product.png",
+    description:
+      "A 5D shine melting balm with a refreshing cooling sensation that glides on like butter, delivering vibrant color and a mirror-like glossy finish while nourishing lips.",
+    claims: ["5D Shine", "Melts Like Butter", "Nourish"],
+    shades: [
+      "001 Ardent",
+      "002 Moondrip",
+      "003 Bella",
+      "004 Noirelle",
+      "005 Muse",
+      "006 Galacta",
+      "007 Roselle",
+      "008 Caelia",
+      "009 Vesper",
+      "010 Ravelle",
+      "011 Topazia",
+      "012 Amberra",
+      "013 Creamira",
+      "014 Stellune",
+      "015 Kyra",
+      "016 Venara",
+    ],
+  },
+  {
+    name: "APHRODITE EVERLASTING GLOSSY TINT",
+    shortName: "APHRODITE EVERLASTING GLOSSY TINT",
+    category: "lips",
+    finish: "GLOSS IT BETTER",
+    price: "IDR 00.000",
+    size: "4 g",
+    image: "/product-pages/page-216-product.png",
+    description:
+      "A juicy glossy tint with vibrant color payoff, glass-like shine, and a lasting water-lock stain while keeping lips comfortable and hydrated.",
+    claims: ["Juicy Tint", "Water Lock Stain", "Ultra Comfort"],
+    shades: [
+      "001 Freya",
+      "002 Thea",
+      "003 Thalassa",
+      "004 Amora",
+      "005 Isadora",
+      "006 Juno",
+      "007 Heatflare",
+      "008 Clio",
+      "009 Sora",
+      "010 Cyprus",
+    ],
+  },
+  {
+    name: "ELIXIR VELVET-SHINE SWITCHING LIP CREAM",
+    shortName: "ELIXIR VELVET-SHINE SWITCHING LIP CREAM",
+    category: "lips",
+    finish: "GLOSS IT BETTER",
+    price: "IDR 00.000",
+    size: "3.5 g",
+    image: "/product-pages/page-205-product.png",
+    description:
+      "A dual-finish lip velvet that creates a soft velvet effect in one layer and enhanced shine when layered, with color-lock wear and cushioned comfort.",
+    claims: ["Two Customizable Finish", "High Pigment", "Ultra Comfort"],
+    shades: [
+      "001 Fable",
+      "002 Potion",
+      "003 Rubium",
+      "004 Terranox",
+      "005 Kalion",
+      "006 Cerillium",
+      "007 Eclipta",
+      "008 Fanox",
+      "009 Vinx",
+      "010 Xenon",
+      "011 Auralis",
+      "012 Mauvorious",
+    ],
+  },
+  {
     name: "SPECTRA LIP VINYL",
     shortName: "SPECTRA LIP VINYL",
     category: "lips",
@@ -313,6 +394,32 @@ const products: Product[] = [
     shades: ["Nude glare", "Rose signal", "Red spectrum", "Deep shine"],
   },
   {
+    name: "ORION CLOUD MATTE LIPSTICK",
+    shortName: "ORION CLOUD MATTE LIPSTICK",
+    category: "lips",
+    finish: "NO TOUCH-UPS NEEDED / ITS MATTE TO LAST",
+    price: "IDR 00.000",
+    size: "2.5 g",
+    image: "/product-pages/page-195-product.png",
+    description:
+      "A highly pigmented blurring matte lipstick that glides on smoothly, diffuses lip lines, and sets transfer-proof for up to 12 hours of soft matte wear.",
+    claims: ["Soft Blur Matte", "Butter Texture", "Transferproof"],
+    shades: [
+      "001 Axiom",
+      "002 Araminta",
+      "003 Xena",
+      "004 Althea",
+      "005 Elladora",
+      "006 Violetta",
+      "007 Pegasus",
+      "008 Vela",
+      "009 Lunette",
+      "010 Serpentis",
+      "011 Enchanta",
+      "012 Narcissa",
+    ],
+  },
+  {
     name: "ALTERA LIP TINT",
     shortName: "ALTERA LIP TINT",
     category: "lips",
@@ -324,6 +431,34 @@ const products: Product[] = [
       "Innovative lip color that shifts from glossy to soft blurry finish with pure blur technology and weightless hydration.",
     claims: ["Gloss-to-blur", "Long stain", "Hydrating"],
     shades: ["Soft pink", "Apricot", "Warm rose", "Berry mist"],
+  },
+  {
+    name: "AION SUPERSTAIN LIP TATTOO INK",
+    shortName: "AION SUPERSTAIN LIP TATTOO INK",
+    category: "lips",
+    finish: "TINTED TO GO",
+    price: "IDR 00.000",
+    size: "4 g",
+    image: "/product-pages/page-226-product.png",
+    description:
+      "An intense watery gel lip tattoo ink with 3x concentrated pigments, rich full-pigment coverage, and a vibrant stain that lasts up to 24 hours.",
+    claims: ["High Pigment", "Non Peel", "Longlasting"],
+    shades: [
+      "001 Helia",
+      "002 Calliope",
+      "003 Eliara",
+      "004 Nyssa",
+      "005 Ione",
+      "006 Delphina",
+      "007 Theia",
+      "008 Astrelle",
+      "009 Chrysa",
+      "010 Aera",
+      "011 Calina",
+      "012 Elistra",
+      "013 Lunelle",
+      "014 Rosia",
+    ],
   },
   {
     name: "GENESIS EYEBROW PENCIL",
@@ -377,6 +512,19 @@ const products: Product[] = [
     claims: ["Jelly texture", "High pigment", "Long-lasting shine"],
     shades: ["Champagne", "Rose chrome", "Copper", "Galaxy", "Moonlit"],
   },
+  {
+    name: "NAVI EYESHADOW PALETTE",
+    shortName: "NAVI EYESHADOW PALETTE",
+    category: "eyes",
+    finish: "EYE GAME STRONG",
+    price: "IDR 00.000",
+    size: "0.9 g x 8",
+    image: "/product-pages/page-274-product.png",
+    description:
+      "An 8-shade eyeshadow palette with matte, satin, and shimmer finishes that blend seamlessly for long-lasting day-to-night looks with minimal fallout.",
+    claims: ["High Pigment", "Effortless Blend", "Longwear"],
+    shades: ["Abyss Brown Palette", "Siren Pink Palette"],
+  },
 ];
 
 const productAssetSlugs: Record<string, string> = {
@@ -401,6 +549,100 @@ const productAssetSlugs: Record<string, string> = {
   "VALORA CONCEALER": "valora-concealer",
 };
 
+const productThumbnailSlugs: Record<string, string> = {
+  "AION SUPERSTAIN LIP TATTOO INK": "aion",
+  "ALTERA LIP TINT": "altera",
+  "APHRODITE EVERLASTING GLOSSY TINT": "aphrodite",
+  "DUNE EYELINER": "dune",
+  "ECLIPSE 2 IN 1 FACE CONTOUR": "eclipse",
+  "ELIXIR VELVET-SHINE SWITCHING LIP CREAM": "elixir",
+  "ETERNAL LIP MATTE": "eternal",
+  "FIXION SKIN TINT STICK": "fixion",
+  "GENESIS EYEBROW PENCIL": "genesis",
+  "ILLUMINA EYESHADOW STICK": "illumina",
+  "LUMINA MATTE CUSHION": "lumina",
+  "LUNARA 3D LIP GLOSS": "lunara",
+  "MILKYWAY MELTING LIP BALM": "milkyway",
+  "NAVI EYESHADOW PALETTE": "navi",
+  "NEBULA LIP CREAM": "nebula",
+  "OPTIMA POWDER FOUNDATION": "optima",
+  "ORBITA 3 IN 1 BLURRING POT": "orbita",
+  "ORION CLOUD MATTE LIPSTICK": "orion",
+  "PANDORA CHEEK LIQUID BLUSH": "pandora",
+  "REVELA BROW MASCARA": "revela",
+  "SPECTRA LIP VINYL": "spectra",
+  "STELLAR DUST LIP STAIN": "stellar",
+  "SUPERNOVA SETTING SPRAY": "supernova",
+  "UTOPIA GLOW CUSHION": "utopia",
+  "VALORA CONCEALER": "valora",
+};
+
+const productSwatchSlides: Record<string, string[]> = {
+  "AION SUPERSTAIN LIP TATTOO INK": [
+    "/swatches/swatches-lips/swatches-aion/swatches-aion-1.jpg",
+    "/swatches/swatches-lips/swatches-aion/swatches-aion-2.jpg",
+  ],
+  "ALTERA LIP TINT": [
+    "/swatches/swatches-lips/swatches-altera/swatches-altera-1.jpg",
+    "/swatches/swatches-lips/swatches-altera/swatches-altera-2.jpg",
+  ],
+  "APHRODITE EVERLASTING GLOSSY TINT": [
+    "/swatches/swatches-lips/swatches-aphrodite/swatches-aphrodite-1.jpg",
+    "/swatches/swatches-lips/swatches-aphrodite/swatches-aphrodite-2.jpg",
+  ],
+  "DUNE EYELINER": ["/swatches/swatches-eye/swatches-dune/swatches-dune.jpg"],
+  "ELIXIR VELVET-SHINE SWITCHING LIP CREAM": [
+    "/swatches/swatches-lips/swatches-elixir/swatches-elixir-1.jpg",
+  ],
+  "ETERNAL LIP MATTE": [
+    "/swatches/swatches-lips/swatches-eternal/swatches-eternal-1.jpg",
+    "/swatches/swatches-lips/swatches-eternal/swatches-eternal-2.jpg",
+    "/swatches/swatches-lips/swatches-eternal/swatches-eternal-3.jpg",
+  ],
+  "GENESIS EYEBROW PENCIL": [
+    "/swatches/swatches-eye/swatches-genesis/swatches-genesis-1.jpg",
+  ],
+  "ILLUMINA EYESHADOW STICK": [
+    "/swatches/swatches-eye/swatches-illumina/swatches-illumina-1.jpg",
+  ],
+  "LUNARA 3D LIP GLOSS": [
+    "/swatches/swatches-lips/swatches-lunara/swatches-lunara-1.jpg",
+    "/swatches/swatches-lips/swatches-lunara/swatches-lunara-2.jpg",
+  ],
+  "MILKYWAY MELTING LIP BALM": [
+    "/swatches/swatches-lips/swatches-milkyway/swatches-milkyway-1.jpg",
+    "/swatches/swatches-lips/swatches-milkyway/swatches-milkyway-2.jpg",
+  ],
+  "NAVI EYESHADOW PALETTE": [
+    "/swatches/swatches-eye/swatches-navi/swatches-navi-1.jpg",
+    "/swatches/swatches-eye/swatches-navi/swatches-navi-2.jpg",
+    "/swatches/swatches-eye/swatches-navi/swatches-navi-3.jpg",
+    "/swatches/swatches-eye/swatches-navi/swatches-navi-4.jpg",
+  ],
+  "NEBULA LIP CREAM": [
+    "/swatches/swatches-lips/swatches-nebula/swatches-nebula-1.jpg",
+    "/swatches/swatches-lips/swatches-nebula/swatches-nebula-2.jpg",
+    "/swatches/swatches-lips/swatches-nebula/swatches-nebula-3.jpg",
+  ],
+  "ORION CLOUD MATTE LIPSTICK": [
+    "/swatches/swatches-lips/swatches-orion/swatches-orion.jpg",
+  ],
+  "REVELA BROW MASCARA": [
+    "/swatches/swatches-eye/swatches-revela/swatches-revela-1.jpg",
+  ],
+  "SPECTRA LIP VINYL": [
+    "/swatches/swatches-lips/swatches-spectra/swatches-spectra-1.jpg",
+    "/swatches/swatches-lips/swatches-spectra/swatches-spectra-2.jpg",
+    "/swatches/swatches-lips/swatches-spectra/swatches-spectra-3.jpg",
+  ],
+  "STELLAR DUST LIP STAIN": [
+    "/swatches/swatches-lips/swatches-stellar/swatches-stellar-1.jpg",
+    "/swatches/swatches-lips/swatches-stellar/swatches-stellar-2.jpg",
+    "/swatches/swatches-lips/swatches-stellar/swatches-stellar-3.jpg",
+    "/swatches/swatches-lips/swatches-stellar/swatches-stellar-4.jpg",
+  ],
+};
+
 function assetSlug(product: Product) {
   return (productAssetSlugs[product.name] ?? product.shortName)
     .toLowerCase()
@@ -409,11 +651,16 @@ function assetSlug(product: Product) {
 }
 
 function productThumbnail(product: Product) {
-  return `/product-pages/${assetSlug(product)}-thumbnail.png`;
+  const thumbnailSlug = productThumbnailSlugs[product.name] ?? assetSlug(product);
+  return `/product-pages/thumbnail-card/thumbnail-card-${thumbnailSlug}.jpg`;
 }
 
 function productSwatchImage(product: Product) {
   return `/swatches/swatches-${assetSlug(product)}.jpg`;
+}
+
+function productSwatches(product: Product) {
+  return productSwatchSlides[product.name] ?? product.swatchSlides ?? [productSwatchImage(product)];
 }
 
 function productGroup(product: Product) {
@@ -432,6 +679,13 @@ function ProductCard({
   promoLabel?: string;
 }) {
   const [isSwatchOpen, setIsSwatchOpen] = useState(false);
+  const [activeSwatchSlide, setActiveSwatchSlide] = useState(0);
+  const swatchSlides = productSwatches(product);
+
+  function updateActiveSwatchSlide(target: HTMLDivElement) {
+    const nextSlide = Math.round(target.scrollLeft / target.clientWidth);
+    setActiveSwatchSlide(Math.min(Math.max(nextSlide, 0), swatchSlides.length - 1));
+  }
 
   return (
     <article className="product-card">
@@ -459,16 +713,40 @@ function ProductCard({
           onClick={() => setIsSwatchOpen((open) => !open)}
           type="button"
         >
-          <span>Tap to see swatches</span>
-          <strong>Tone chart</strong>
+          {product.category === "lips" || product.category === "eyes" ? (
+            <span>TAP TO SEE The Finish and Shades</span>
+          ) : (
+            <>
+              <span>Tap to see swatches</span>
+              <strong>Tone chart</strong>
+            </>
+          )}
         </button>
         <div className="shade-content">
           <div className="shade-content-inner">
             <div className="swatch-preview">
-              <img
-                src={productSwatchImage(product)}
-                alt={`${product.name} swatch chart`}
-              />
+              <div
+                className="swatch-carousel"
+                onScroll={(event) => updateActiveSwatchSlide(event.currentTarget)}
+              >
+                {swatchSlides.map((slide, index) => (
+                  <img
+                    key={slide}
+                    src={slide}
+                    alt={`${product.name} swatch ${index + 1}`}
+                  />
+                ))}
+              </div>
+              {swatchSlides.length > 1 ? (
+                <div className="swatch-dots" aria-label="Swatch slides">
+                  {swatchSlides.map((slide, index) => (
+                    <span
+                      key={slide}
+                      className={index === activeSwatchSlide ? "active" : ""}
+                    />
+                  ))}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
@@ -622,7 +900,6 @@ export default function Home() {
                       alt=""
                       aria-hidden="true"
                     />
-                    <span>{categories[key].eyebrow}</span>
                     <strong>{categories[key].label}</strong>
                   </button>
                 ),
