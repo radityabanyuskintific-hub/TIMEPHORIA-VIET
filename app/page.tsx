@@ -591,6 +591,9 @@ const productSwatchSlides: Record<string, string[]> = {
     "/swatches/swatches-lips/swatches-aphrodite/swatches-aphrodite-2.jpg",
   ],
   "DUNE EYELINER": ["/swatches/swatches-eye/swatches-dune/swatches-dune.jpg"],
+  "ECLIPSE 2 IN 1 FACE CONTOUR": [
+    "/swatches/swatches-face/swatches-eclipse/swatches-eclipse-1.jpg",
+  ],
   "ELIXIR VELVET-SHINE SWITCHING LIP CREAM": [
     "/swatches/swatches-lips/swatches-elixir/swatches-elixir-1.jpg",
   ],
@@ -599,11 +602,17 @@ const productSwatchSlides: Record<string, string[]> = {
     "/swatches/swatches-lips/swatches-eternal/swatches-eternal-2.jpg",
     "/swatches/swatches-lips/swatches-eternal/swatches-eternal-3.jpg",
   ],
+  "FIXION SKIN TINT STICK": [
+    "/swatches/swatches-face/swatches-fixion/swatches-fixion-1.jpg",
+  ],
   "GENESIS EYEBROW PENCIL": [
     "/swatches/swatches-eye/swatches-genesis/swatches-genesis-1.jpg",
   ],
   "ILLUMINA EYESHADOW STICK": [
     "/swatches/swatches-eye/swatches-illumina/swatches-illumina-1.jpg",
+  ],
+  "LUMINA MATTE CUSHION": [
+    "/swatches/swatches-face/swatches-lumina/swatches-lumina-1.jpg",
   ],
   "LUNARA 3D LIP GLOSS": [
     "/swatches/swatches-lips/swatches-lunara/swatches-lunara-1.jpg",
@@ -624,8 +633,17 @@ const productSwatchSlides: Record<string, string[]> = {
     "/swatches/swatches-lips/swatches-nebula/swatches-nebula-2.jpg",
     "/swatches/swatches-lips/swatches-nebula/swatches-nebula-3.jpg",
   ],
+  "OPTIMA POWDER FOUNDATION": [
+    "/swatches/swatches-face/swatches-optima/swatches-optima-1.jpg",
+  ],
+  "ORBITA 3 IN 1 BLURRING POT": [
+    "/swatches/swatches-face/swatches-orbita/swatches-orbita-1.jpg",
+  ],
   "ORION CLOUD MATTE LIPSTICK": [
     "/swatches/swatches-lips/swatches-orion/swatches-orion.jpg",
+  ],
+  "PANDORA CHEEK LIQUID BLUSH": [
+    "/swatches/swatches-face/swatches-pandora/swatches-pandora-1.jpg",
   ],
   "REVELA BROW MASCARA": [
     "/swatches/swatches-eye/swatches-revela/swatches-revela-1.jpg",
@@ -640,6 +658,15 @@ const productSwatchSlides: Record<string, string[]> = {
     "/swatches/swatches-lips/swatches-stellar/swatches-stellar-2.jpg",
     "/swatches/swatches-lips/swatches-stellar/swatches-stellar-3.jpg",
     "/swatches/swatches-lips/swatches-stellar/swatches-stellar-4.jpg",
+  ],
+  "SUPERNOVA SETTING SPRAY": [
+    "/swatches/swatches-face/swatches-supernova/swatches-supernova-1.jpg",
+  ],
+  "UTOPIA GLOW CUSHION": [
+    "/swatches/swatches-face/swatches-utopia/swatches-utopia-1.jpg",
+  ],
+  "VALORA CONCEALER": [
+    "/swatches/swatches-face/swatches-valora/swatches-valora-1.jpg",
   ],
 };
 
@@ -761,6 +788,7 @@ export default function Home() {
   const [finish, setFinish] = useState("All");
   const [promoIndex, setPromoIndex] = useState(0);
   const [activePromo, setActivePromo] = useState<Promo | null>(null);
+  const [showMegaPromo, setShowMegaPromo] = useState(true);
   const [loaderState, setLoaderState] = useState<"loading" | "leaving" | "done">(
     "loading",
   );
@@ -800,6 +828,7 @@ export default function Home() {
     [categoryProducts, finish],
   );
   const currentPromo = activePromo ?? promos[promoIndex];
+  const megaPromo = promos[0];
 
   function chooseCategory(key: CategoryKey, target: "category" | "products") {
     setActiveCategory(key);
@@ -811,6 +840,7 @@ export default function Home() {
   function applyPromo(promo: Promo) {
     setActivePromo(promo);
     setPromoIndex(promos.findIndex((item) => item.title === promo.title));
+    setShowMegaPromo(false);
     setView("promo");
   }
 
@@ -836,6 +866,30 @@ export default function Home() {
             </div>
             <p>LOADING ....</p>
           </div>
+        </div>
+      ) : null}
+
+      {loaderState === "done" && showMegaPromo ? (
+        <div className="mega-promo-modal" role="dialog" aria-label={megaPromo.title}>
+          <button
+            className="mega-promo-card"
+            onClick={() => applyPromo(megaPromo)}
+            type="button"
+          >
+            <img src={promoVisual(megaPromo)} alt="" aria-hidden="true" />
+            <span>{megaPromo.kicker}</span>
+            <strong>{megaPromo.title}</strong>
+            <em>{megaPromo.detail}</em>
+            <small>{megaPromo.registrationLabel ?? megaPromo.discount}</small>
+          </button>
+          <button
+            className="mega-promo-close"
+            aria-label="Close promo popup"
+            onClick={() => setShowMegaPromo(false)}
+            type="button"
+          >
+            X
+          </button>
         </div>
       ) : null}
 
