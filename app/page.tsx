@@ -32,10 +32,10 @@ type Promo = {
 
 const promos: Promo[] = [
   {
-    title: "BUY TIMEPHORIA, WIN BTS CONCERT EXPERIENCE !",
+    title: "BELI TIME PHORIA, SIAP-SIAP BERANGKAT NONTON BTS! 💜",
     kicker: "Grand prize promo",
     detail:
-      "Makin Banyak Belanja Timephoria, Makin besar Kesempatan Memenangkan Total Hadiah Ratusan Juta Rupiah!.",
+      "Raih kesempatan memenangkan hadiah spektakuler RATUSAN JUTA hanya dari satu kali pembelian! Cukup scan QR Code, lengkapi formulir pendaftaran, unggah foto struk pembelian, lalu submit untuk resmi mengikuti undian.",
     category: "lips",
     finish: "GLOSS IT BETTER",
     discount: "GET THE REWARD",
