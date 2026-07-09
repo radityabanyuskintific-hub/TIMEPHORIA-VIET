@@ -23,13 +23,15 @@ html {
 body {
   background: #000;
   color: var(--foreground);
-  font-family: var(--font-open-sans), "Open Sans", "Segoe UI", Arial, Helvetica, sans-serif;
+  font-family: var(--font-montserrat), Montserrat, "Segoe UI", Arial, Helvetica, sans-serif;
+  letter-spacing: -0.01em;
   margin: 0;
   min-height: 100dvh;
 }
 
 button {
   font: inherit;
+  letter-spacing: inherit;
 }
 
 .loading-screen {
@@ -88,7 +90,7 @@ button {
   color: #fff;
   font-size: 13px;
   font-weight: 400;
-  letter-spacing: 0.08em;
+  letter-spacing: -0.01em;
   margin: -4px 0 0;
   text-align: center;
 }
@@ -157,7 +159,7 @@ button {
   color: #f5edf4;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 
@@ -165,7 +167,7 @@ button {
   display: block;
   font-size: clamp(30px, 9vw, 52px);
   font-weight: 500;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
   line-height: 0.96;
   margin-top: 12px;
   text-transform: uppercase;
@@ -234,14 +236,14 @@ button {
   display: block;
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.18em;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 
 .brand-panel h1 {
   font-size: clamp(42px, 7vw, 74px);
   font-weight: 500;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
   line-height: 0.88;
   margin: 18px 0 14px;
 }
@@ -306,6 +308,8 @@ button {
 .home-screen {
   display: grid;
   grid-template-rows: minmax(0, 2fr) minmax(0, 3fr);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   overflow-y: auto;
   padding-bottom: 22px;
 }
@@ -329,13 +333,28 @@ button {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  height: calc(100% - 34px);
+  height: calc(100% - 17px);
   justify-content: flex-end;
   min-height: 0;
   padding: 18px 20px 14px;
   position: relative;
   text-align: left;
   width: 100%;
+}
+
+.promo-tap-hint {
+  color: #fff;
+  font-size: 17px;
+  font-weight: 500;
+  left: 50%;
+  line-height: 1;
+  position: absolute;
+  text-align: center;
+  text-transform: none;
+  top: 16px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 2;
 }
 
 .promo-main::after {
@@ -374,7 +393,7 @@ button {
   color: #d8d2d3;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 
@@ -384,10 +403,10 @@ button {
 
 .promo-slider strong {
   display: block;
-  font-size: 28px;
+  font-size: 25px;
   font-weight: 500;
   line-height: 1;
-  margin-top: 12px;
+  margin-top: 9px;
   text-transform: uppercase;
 }
 
@@ -398,7 +417,7 @@ button {
   font-weight: 300;
   font-style: normal;
   line-height: 1.35;
-  margin-top: 8px;
+  margin-top: 7px;
 }
 
 .promo-slider small {
@@ -416,8 +435,8 @@ button {
   background: #fff;
   display: flex;
   gap: 1px;
-  height: 34px;
-  padding: 3px;
+  height: 17px;
+  padding: 2px;
 }
 
 .promo-bar button {
@@ -434,10 +453,13 @@ button {
 }
 
 .promo-screen {
+  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow: hidden;
+  overscroll-behavior: contain;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding-bottom: 22px;
 }
 
@@ -447,7 +469,7 @@ button {
   border: 1px solid var(--line);
   border-radius: 22px;
   flex: 0 0 auto;
-  min-height: 168px;
+  min-height: 188px;
   overflow: hidden;
   padding: 24px;
   position: relative;
@@ -475,7 +497,7 @@ button {
 .promo-page-hero span,
 .promo-page-hero h2,
 .promo-page-hero p,
-.promo-page-hero small {
+.promo-scroll-hint {
   position: relative;
   z-index: 1;
 }
@@ -484,7 +506,7 @@ button {
   color: #d8d2d3;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 
@@ -504,15 +526,28 @@ button {
   max-width: 92%;
 }
 
-.promo-page-hero small {
-  background: #fff;
-  color: #000;
-  display: inline-block;
+.promo-scroll-hint {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.promo-scroll-hint span {
+  color: #f2eeee;
   font-size: 11px;
-  font-weight: 900;
-  margin-top: 16px;
-  padding: 7px 9px;
-  text-transform: uppercase;
+  font-weight: 400;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.promo-scroll-hint i {
+  border-bottom: 2px solid #f2eeee;
+  border-right: 2px solid #f2eeee;
+  display: block;
+  height: 13px;
+  transform: rotate(45deg);
+  width: 13px;
 }
 
 .promo-selector {
@@ -539,7 +574,7 @@ button {
   color: #fff;
   cursor: pointer;
   flex: 0 0 176px;
-  font-family: var(--font-open-sans), "Open Sans", sans-serif;
+  font-family: var(--font-montserrat), Montserrat, sans-serif;
   font-size: 10px;
   font-weight: 400;
   height: 42px;
@@ -571,8 +606,10 @@ button {
 .promo-placeholder.bts-promo-artwork {
   border-color: rgba(222, 75, 208, 0.76);
   box-shadow: 0 0 28px rgba(222, 75, 208, 0.2);
+  display: flex;
   flex: 1 1 auto;
-  min-height: 0;
+  flex-direction: column;
+  min-height: 360px;
   overflow: hidden;
 }
 
@@ -586,23 +623,32 @@ button {
   display: none;
 }
 
+.promo-artwork-card {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 360px;
+}
+
+.promo-artwork-card::before {
+  display: none;
+}
+
 .promo-placeholder img {
-  height: 100%;
-  inset: 0;
-  object-fit: cover;
-  object-position: center;
-  position: absolute;
+  height: auto;
   width: 100%;
 }
 
-.bts-promo-scroll {
-  height: 100%;
+.promo-artwork-scroll {
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
   min-height: 0;
+  overscroll-behavior: contain;
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-.bts-promo-scroll img {
+.promo-artwork-scroll img {
   display: block;
   height: auto;
   position: static;
@@ -703,7 +749,7 @@ button {
   display: block;
   font-size: clamp(44px, 17vw, 78px);
   font-weight: 500;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
   line-height: 0.92;
   margin-top: 14px;
   text-transform: uppercase;
@@ -817,7 +863,7 @@ button {
 .section-title span {
   font-size: 13px;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 
@@ -858,6 +904,8 @@ button {
 }
 
 .products-screen {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   overflow-y: auto;
   padding-bottom: 22px;
 }
@@ -912,7 +960,7 @@ button {
 .active-promo span {
   color: #d5d5d5;
   font-size: 11px;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
   line-height: 1.35;
   text-transform: none;
 }
@@ -950,7 +998,7 @@ button {
   color: #fff;
   cursor: pointer;
   flex: 0 0 auto;
-  font-family: var(--font-open-sans), "Open Sans", sans-serif;
+  font-family: var(--font-montserrat), Montserrat, sans-serif;
   font-size: 12px;
   font-weight: 400;
   line-height: 1.15;

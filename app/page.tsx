@@ -880,7 +880,6 @@ export default function Home() {
             <span>{megaPromo.kicker}</span>
             <strong>{megaPromo.title}</strong>
             <em>{megaPromo.detail}</em>
-            <small>{megaPromo.registrationLabel ?? megaPromo.discount}</small>
           </button>
           <button
             className="mega-promo-close"
@@ -920,10 +919,10 @@ export default function Home() {
                   alt=""
                   aria-hidden="true"
                 />
+                <b className="promo-tap-hint">Tap To See Details</b>
                 <span>{promos[promoIndex].kicker}</span>
                 <strong>{promos[promoIndex].title}</strong>
                 <em>{promos[promoIndex].detail}</em>
-                <small>{promos[promoIndex].discount}</small>
               </button>
               <div className="promo-bar" aria-label="Promo slides">
                 {promos.map((promo, index) => (
@@ -973,7 +972,10 @@ export default function Home() {
               <span>{currentPromo.kicker}</span>
               <h2>{currentPromo.title}</h2>
               <p>{currentPromo.detail}</p>
-              <small>{currentPromo.discount}</small>
+              <div className="promo-scroll-hint">
+                <span>Scroll &amp; Tap to See Other Promo!</span>
+                <i aria-hidden="true" />
+              </div>
             </header>
 
             <div className="promo-selector" aria-label="Promo selector">
@@ -994,7 +996,7 @@ export default function Home() {
 
             {currentPromo.registrationUrl && currentPromo.artwork ? (
               <div className="promo-placeholder bts-promo-artwork">
-                <div className="bts-promo-scroll">
+                <div className="promo-artwork-scroll">
                   <img
                     src={currentPromo.artwork}
                     alt={`${currentPromo.title} promo artwork`}
@@ -1011,14 +1013,16 @@ export default function Home() {
               </div>
             ) : (
               <button
-                className="promo-placeholder"
+                className="promo-placeholder promo-artwork-card"
                 onClick={() => viewPromoProducts(currentPromo)}
                 type="button"
               >
-                <img
-                  src="/promos/promo-placeholder.png"
-                  alt={`${currentPromo.title} promo artwork`}
-                />
+                <div className="promo-artwork-scroll">
+                  <img
+                    src="/promos/promo-placeholder.png"
+                    alt={`${currentPromo.title} promo artwork`}
+                  />
+                </div>
               </button>
             )}
           </div>
@@ -1131,11 +1135,14 @@ export default function Home() {
 
         <footer className="mobile-footer">
           <button
-            onClick={() => setView("home")}
-            aria-label="Back to spaceship"
+            onClick={() => {
+              setView("home");
+              setShowMegaPromo(true);
+            }}
+            aria-label="Back to home"
             type="button"
           >
-            Back to Spaceship
+            Back to Home
           </button>
           <img
             className="footer-logo"
