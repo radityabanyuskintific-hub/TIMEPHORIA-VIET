@@ -41,7 +41,7 @@ const promos: Promo[] = [
     discount: "GET THE REWARD",
     artwork: "/promos/bts-concert-experience.webp",
     registrationUrl: "https://ggl.link/test-link",
-    registrationLabel: "Tap to register",
+    registrationLabel: "KLIK UNTUK IKUTAN",
   },
   {
     title: "Complexion Match",

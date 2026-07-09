@@ -669,7 +669,7 @@ button {
     0 0 18px rgba(255, 255, 255, 0.18);
   color: #fff;
   display: flex;
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 500;
   justify-content: center;
   left: 20px;
@@ -678,6 +678,9 @@ button {
   position: absolute;
   text-align: center;
   text-decoration: none;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.72),
+    0 0 16px rgba(196, 82, 255, 0.42);
   text-transform: uppercase;
   width: 124px;
 }
