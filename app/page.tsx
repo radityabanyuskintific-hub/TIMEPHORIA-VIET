@@ -40,7 +40,7 @@ const promos: Promo[] = [
     finish: "GLOSS IT BETTER",
     discount: "GET THE REWARD",
     artwork: "/promos/bts-concert-experience.webp",
-    registrationUrl: "https://ggl.link/test-link",
+    registrationUrl: "https://forms.gle/ChMJtWT7mReLJERs6",
     registrationLabel: "KLIK UNTUK IKUTAN",
   },
   {
