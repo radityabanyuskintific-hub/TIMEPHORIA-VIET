@@ -1465,9 +1465,11 @@ button {
 
 /* Revision 3 */
 .promo-slider {
-  border-color: rgba(255, 220, 235, 0.38);
+  border-color: rgba(255, 194, 218, 0.5);
   border-radius: 16px;
-  box-shadow: inset 0 0 22px rgba(255, 190, 220, 0.16);
+  box-shadow:
+    inset 0 0 13px rgba(255, 198, 221, 0.25),
+    0 0 8px rgba(255, 0, 0, 0.58);
 }
 
 .promo-main {
@@ -1483,13 +1485,13 @@ button {
 
 .promo-bar button {
   background: rgba(255, 255, 255, 0.24);
-  border: 1px solid rgba(255, 220, 235, 0.24);
+  border: 1px solid rgba(255, 194, 218, 0.5);
   border-radius: 6px;
 }
 
 .promo-bar button.active {
-  background: #f4c7d9;
-  box-shadow: 0 0 8px rgba(255, 190, 220, 0.48);
+  background: rgba(255, 0, 0, 0.58);
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.58);
 }
 
 .mega-promo-card {
@@ -1583,7 +1585,7 @@ button {
   border-color: rgba(255, 194, 218, 0.5);
   box-shadow:
     inset 0 0 13px rgba(255, 198, 221, 0.25),
-    0 0 8px rgba(255, 183, 214, 0.28);
+    0 0 8px rgba(255, 0, 0, 0.58);
 }
 
 .category-tile::after {
