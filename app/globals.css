@@ -230,7 +230,6 @@ button {
   max-width: 360px;
 }
 
-.brand-panel p:first-child,
 .brand-panel span {
   color: #fff;
   display: block;
@@ -241,11 +240,12 @@ button {
 }
 
 .brand-panel h1 {
-  font-size: clamp(42px, 7vw, 74px);
+  font-size: 52px;
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 0.88;
   margin: 18px 0 14px;
+  white-space: nowrap;
 }
 
 .brand-panel p:last-child {
@@ -283,6 +283,8 @@ button {
 .home-screen,
 .category-screen,
 .promo-screen,
+.faq-screen,
+.stores-screen,
 .products-screen {
   flex: 1;
   min-height: 0;
@@ -1459,4 +1461,349 @@ button {
   .product-copy h3 {
     font-size: 20px;
   }
+}
+
+/* Revision 3 */
+.promo-slider {
+  border-color: rgba(255, 220, 235, 0.38);
+  border-radius: 16px;
+  box-shadow: inset 0 0 22px rgba(255, 190, 220, 0.16);
+}
+
+.promo-main {
+  animation: promo-slide-in 520ms ease both;
+}
+
+.promo-bar {
+  background: transparent;
+  gap: 7px;
+  height: 19px;
+  padding: 5px 10px;
+}
+
+.promo-bar button {
+  background: rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(255, 220, 235, 0.24);
+  border-radius: 6px;
+}
+
+.promo-bar button.active {
+  background: #f4c7d9;
+  box-shadow: 0 0 8px rgba(255, 190, 220, 0.48);
+}
+
+.mega-promo-card {
+  cursor: default;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.mega-promo-copy {
+  background: rgba(5, 5, 5, 0.95);
+  padding: 22px;
+  position: relative;
+  z-index: 3;
+}
+
+.mega-promo-card .mega-promo-copy strong {
+  font-size: clamp(22px, 6.8vw, 34px);
+  margin: 0;
+}
+
+.mega-promo-card .mega-promo-copy em {
+  font-size: 12px;
+}
+
+.mega-promo-copy a,
+.promo-hero-cta,
+.faq-link {
+  background: #fff;
+  border: 0;
+  border-radius: 8px;
+  color: #111;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  justify-content: center;
+  margin-top: 14px;
+  padding: 10px 14px;
+  text-decoration: none;
+}
+
+.promo-page-hero h2 {
+  font-size: 24px;
+}
+
+.promo-page-hero p {
+  font-size: 11px;
+}
+
+.promo-hero-cta {
+  position: relative;
+  z-index: 2;
+}
+
+.faq-link {
+  bottom: 18px;
+  left: 18px;
+  position: absolute;
+  z-index: 3;
+}
+
+.language-toggle {
+  background: rgba(8, 8, 8, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 18px;
+  box-shadow: 0 0 12px rgba(255, 210, 228, 0.36);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  z-index: 12;
+}
+
+.language-toggle span {
+  border-radius: 13px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 6px 8px;
+}
+
+.language-toggle span.active {
+  background: #fff;
+  color: #111;
+}
+
+.category-tile {
+  border-color: rgba(255, 194, 218, 0.5);
+  box-shadow:
+    inset 0 0 13px rgba(255, 198, 221, 0.25),
+    0 0 8px rgba(255, 183, 214, 0.28);
+}
+
+.category-tile::after {
+  display: none;
+}
+
+.footer-language-toggle {
+  flex: 0 0 auto;
+  gap: 2px;
+  padding: 2px;
+  position: static;
+}
+
+.mobile-footer .footer-language-toggle span {
+  padding: 5px 7px;
+}
+
+.footer-control-spacer {
+  width: 62px;
+}
+
+.footer-logo {
+  width: 180px;
+}
+
+.faq-screen {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  padding: 16px 16px 28px;
+}
+
+.faq-header {
+  padding: 42px 0 18px;
+}
+
+.faq-header button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 16px;
+  color: #fff;
+  cursor: pointer;
+  padding: 7px 12px;
+}
+
+.faq-header span {
+  display: block;
+  font-size: 10px;
+  margin-top: 24px;
+}
+
+.faq-header h2 {
+  font-size: 48px;
+  line-height: 1;
+  margin: 4px 0 0;
+}
+
+.faq-list {
+  display: grid;
+  gap: 8px;
+}
+
+.faq-list details {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  padding: 13px 14px;
+}
+
+.faq-list summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.faq-list p {
+  color: #d7d2d4;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 10px 0 0;
+}
+
+.store-directory-link {
+  background: #fff;
+  border: 0;
+  border-radius: 6px;
+  color: #111;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 800;
+  margin-top: 12px;
+  padding: 9px 11px;
+}
+
+.stores-screen {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  padding: 16px 16px 28px;
+}
+
+.stores-header {
+  padding: 42px 0 16px;
+}
+
+.stores-header > button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 16px;
+  color: #fff;
+  cursor: pointer;
+  padding: 7px 12px;
+}
+
+.stores-header span {
+  display: block;
+  font-size: 10px;
+  margin-top: 22px;
+}
+
+.stores-header h2 {
+  font-size: 34px;
+  line-height: 1;
+  margin: 5px 0 10px;
+}
+
+.stores-header p {
+  color: #d7d2d4;
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.store-tools {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) 142px;
+  position: sticky;
+  top: -16px;
+  z-index: 4;
+  background: #151515;
+  padding: 10px 0;
+}
+
+.store-tools input,
+.store-tools select {
+  background: #fff;
+  border: 0;
+  border-radius: 6px;
+  color: #111;
+  font-family: inherit;
+  font-size: 11px;
+  min-width: 0;
+  padding: 11px 10px;
+  width: 100%;
+}
+
+.store-result-count {
+  color: #c9c4c6;
+  font-size: 10px;
+  padding: 4px 2px 9px;
+  text-transform: uppercase;
+}
+
+.store-list {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.store-list article {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) 116px;
+  min-height: 46px;
+  padding: 9px 11px;
+}
+
+.store-list article:last-child {
+  border-bottom: 0;
+}
+
+.store-list strong {
+  font-size: 11px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.store-list span {
+  color: #cfc9cb;
+  font-size: 9px;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.store-empty {
+  color: #d7d2d4;
+  font-size: 12px;
+  padding: 22px;
+  text-align: center;
+}
+
+.store-empty button {
+  display: block;
+  margin: 12px auto 0;
+}
+
+@media (max-width: 390px) {
+  .store-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .store-list article {
+    grid-template-columns: minmax(0, 1fr) 94px;
+  }
+}
+
+@keyframes promo-slide-in {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: translateX(0); }
 }

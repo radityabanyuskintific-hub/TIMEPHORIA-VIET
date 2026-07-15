@@ -18,6 +18,18 @@ type Product = {
   swatchSlides?: string[];
 };
 
+type Language = "en" | "id";
+
+type ProductTranslation = {
+  description: string;
+  claims: string[];
+};
+
+type Store = {
+  name: string;
+  region: string;
+};
+
 type Promo = {
   title: string;
   kicker: string;
@@ -32,10 +44,10 @@ type Promo = {
 
 const promos: Promo[] = [
   {
-    title: "BELI TIME PHORIA, SIAP-SIAP BERANGKAT NONTON BTS! 💜",
+    title: "BUY 1 TIMEPHORIA PRODUCT, GET READY TO SEE BTS LIVE!",
     kicker: "Grand prize promo",
     detail:
-      "Raih kesempatan memenangkan hadiah spektakuler RATUSAN JUTA hanya dari satu kali pembelian! Cukup scan QR Code, lengkapi formulir pendaftaran, unggah foto struk pembelian, lalu submit untuk resmi mengikuti undian.",
+      "Scan the QR code, complete the registration form, and upload your receipt for a chance to win spectacular prizes worth hundreds of millions of rupiah.",
     category: "lips",
     finish: "GLOSS IT BETTER",
     discount: "GET THE REWARD",
@@ -68,6 +80,130 @@ const promos: Promo[] = [
     discount: "SAVE 15%",
   },
 ];
+
+const promoTranslation = {
+  title: "BELI 1 PRODUK TIMEPHORIA, SIAP-SIAP NONTON KONSER BTS!",
+  detail:
+    "Cukup scan QR Code, lengkapi formulir pendaftaran, unggah foto struk pembelianmu untuk resmi mengikuti undian dan kesempatan memenangkan hadiah spektakuler lainnya seharga RATUSAN JUTA!",
+};
+
+const finishTranslations: Record<string, string> = {
+  "SKIN FINISH PERFECTED": "KULIT AUTO FLAWLESS",
+  "FLAWLESS FLUSHED CHEEKS": "PIPI MERONA SEKETIKA",
+  "BROWS, BUT BETTER": "ALIS ANTI BADAI",
+  "EYE GAME STRONG": "EKSPLORASI EYE LOOK",
+  "TINTED TO GO": "STAIN SESUAI MOODMU",
+  "GLOSS IT BETTER": "GLOSSY TANPA BATAS",
+  "IT'S MATTE TO LAST": "BOLD SEHARIAN TANPA TOUCH UP",
+};
+
+const productTranslations: Record<string, ProductTranslation> = {
+  "ALTERA LIP TINT": { description: "Lip color inovatif yang berubah dari tampilan glossy menjadi soft blurry hanya dengan satu swipe.", claims: ["Blur Garis Bibir", "Stain Tahan Lama", "Warna Intens"] },
+  "ELIXIR VELVET-SHINE SWITCHING LIP CREAM": { description: "Lip velvet ringan dan melembapkan dengan dua hasil akhir dalam satu produk.", claims: ["2 Hasil Bibir", "Warna Intens", "Super Nyaman"] },
+  "ETERNAL LIP MATTE": { description: "Lip matte dengan warna super pigmented dengan hasil transferproof dan waterproof hingga 24 jam.", claims: ["Hasil Bold Matte", "Warna Intens", "Feel Ringan"] },
+  "NEBULA LIP CREAM": { description: "Lip bertekstur velvet-matte yang lembut, tidak membuat bibir terasa kering, dan menyamarkan garis bibir.", claims: ["Hasil Velvet Matte", "Anti Transfer", "Feel Ringan"] },
+  "STELLAR DUST LIP STAIN": { description: "Full coverage dalam sekali swipe dengan tekstur ringan yang mengunci pigmen agar tahan lama dan tidak mudah transfer.", claims: ["Stain Super Intens", "Kilau Maksimal", "Tahan Lama"] },
+  "SPECTRA LIP VINYL": { description: "Lip vinyl transfer-proof dengan warna ultra-intens dan full coverage hanya dalam satu swipe.", claims: ["Warna Intens", "Tahan 24 Jam", "Super Nyaman"] },
+  "ORION CLOUD MATTE LIPSTICK": { description: "Lipstik matte blurring berpigmentasi tinggi dengan full coverage dan hasil transferproof hingga 12 jam.", claims: ["Matte Blur Halus", "Tekstur Lembut", "Anti Transfer"] },
+  "ORBITA 3 IN 1 BLURRING POT": { description: "Bouncy velvet mud multifungsi untuk mata, pipi, dan bibir dengan aplikator silikon yang presisi.", claims: ["Hasil Velvet Blur", "Buildable", "Aplikator Praktis"] },
+  "MILKYWAY MELTING LIP BALM": { description: "5D Shine Melting Balm bertekstur buttery dengan sensasi dingin, warna vibrant, dan hasil glossy seperti cermin.", claims: ["Kilau 5D", "Selembut Butter", "Menutrisi"] },
+  "LUNARA 3D LIP GLOSS": { description: "Lip gloss bertekstur gel lembut dengan hasil high-shine seperti kaca.", claims: ["Efek Bibir 3D", "Anti Lengket", "Sensasi Dingin"] },
+  "APHRODITE EVERLASTING GLOSSY TINT": { description: "Tint bibir berkilau dengan warna cerah dan stain tahan lama yang menjaga bibir nyaman dan terhidrasi.", claims: ["Tekstur Juicy", "Stain Water Lock", "Super Nyaman"] },
+  "AION SUPERSTAIN LIP TATTOO INK": { description: "Tint gel cair dengan pigmen 3x lebih pekat yang memberikan warna intens hingga 24 jam.", claims: ["Warna Intens", "Tanpa Dikelupas", "Tahan Lama"] },
+  "UTOPIA GLOW CUSHION": { description: "Glow cushion ringan dan ultra-hydrating dengan hasil glow-radiant instan, medium-full coverage, dan ketahanan hingga 10 jam.", claims: ["Hasil Glowing", "Halus Seketika", "Melembapkan"] },
+  "LUMINA MATTE CUSHION": { description: "Cushion full coverage yang tetap ringan untuk tampilan natural dan flawless sepanjang hari.", claims: ["Hasil Natural", "Feel Ringan", "Anti Oksidasi"] },
+  "OPTIMA POWDER FOUNDATION": { description: "Powder foundation ekstra-ringan yang memberikan full coverage hanya dengan satu usapan.", claims: ["Hasil Blur Matte", "Kontrol Minyak", "Non-Komedogenik"] },
+  "PANDORA CHEEK LIQUID BLUSH": { description: "Blush berpigmentasi tinggi yang memberikan warna intens hanya dengan satu titik.", claims: ["Warna Intens", "Mudah di-Blend", "Tahan Lama"] },
+  "FIXION SKIN TINT STICK": { description: "Skin tint stick creamy dan ringan dengan medium hingga full coverage serta hasil second-skin hingga 8 jam.", claims: ["Hasil Satin", "Tekstur Creamy", "Ringan di Kulit"] },
+  "ECLIPSE 2 IN 1 FACE CONTOUR": { description: "Stik kontur wajah 2-in-1 dengan formula ultra-creamy dan warna intens yang mulus dalam satu swipe.", claims: ["Super Creamy", "Krim ke Powder", "Brush Lepas-Pasang"] },
+  "VALORA CONCEALER": { description: "Concealer coverage tinggi yang menyamarkan dark circle dan imperfection dengan hasil ringan dan tahan crease hingga 12 jam.", claims: ["Hasil Soft Matte", "Pigmen Intens", "Melembapkan"] },
+  "SUPERNOVA SETTING SPRAY": { description: "Setting spray dengan partikel powder halus dan merata untuk makeup yang instant matte dan shine-free.", claims: ["Hasil Matte", "Anti Luntur", "Kontrol Minyak"] },
+  "REVELA BROW MASCARA": { description: "Mascara alis dengan pigmen intens dan holding power yang kuat.", claims: ["Warna Intens", "Tahan 12 Jam", "Anti Gumpal"] },
+  "ILLUMINA EYESHADOW STICK": { description: "Eyeshadow stick bertekstur jelly yang ringan dan mudah diaplikasikan dengan warna intens dan high shine dalam sekali swipe.", claims: ["Tekstur Jelly", "Kilau Seketika", "Anti Fallout"] },
+  "DUNE EYELINER": { description: "Eyeliner dengan aplikator tipis dan presisi untuk membuat garis yang akurat dan rapi.", claims: ["Pigmen Bold", "Ujung Presisi", "Tahan Air"] },
+  "GENESIS EYEBROW PENCIL": { description: "Pensil alis berujung oval presisi untuk membingkai, mengisi, dan mendefinisikan alis natural maupun bold.", claims: ["Hasil Natural", "Ujung Oval", "Anti Luntur"] },
+  "NAVI EYESHADOW PALETTE": { description: "Palet eyeshadow 8 warna matte, satin, dan shimmer yang mudah dibaurkan untuk tampilan tahan lama.", claims: ["Warna Intens", "Mudah di-Blend", "Tahan Lama"] },
+};
+
+const faqItems = [
+  ["Bagaimana cara mengikuti program ini?", "Beli minimal 1 produk Timephoria di toko yang berpartisipasi, scan QR Code pada poster di toko, isi formulir, unggah foto struk, lalu submit."],
+  ["Apakah ada minimum pembelian?", "Setiap pembelian minimal 1 produk Timephoria berhak mengikuti program."],
+  ["Apakah satu struk bisa didaftarkan lebih dari satu kali?", "Tidak. Setiap struk pembelian hanya dapat digunakan untuk 1 kali pendaftaran."],
+  ["Jika membeli lebih dari satu produk, apakah peluang menang bertambah?", "Setiap struk yang berbeda dapat didaftarkan sebagai satu kesempatan mengikuti undian."],
+  ["Toko mana saja yang mengikuti program ini?", "Program tersedia di 314 toko pilihan Timephoria."],
+  ["Apakah pembelian online bisa ikut?", "Tidak. Program hanya berlaku untuk pembelian di toko yang berpartisipasi."],
+  ["Bagaimana jika foto struk tidak jelas?", "Pendaftaran dapat dianggap tidak valid apabila foto struk tidak terbaca atau tidak lengkap."],
+  ["Bagaimana saya tahu kalau pendaftaran berhasil?", "Setelah formulir berhasil dikirim, akan muncul halaman konfirmasi bahwa data telah diterima."],
+  ["Kapan pengumuman pemenang?", "Pengumuman dilakukan pada bulan November melalui Instagram resmi Timephoria dan website resmi program."],
+  ["Bagaimana pemenang dihubungi?", "Pemenang diumumkan melalui Instagram Story resmi Timephoria dan dihubungi melalui DM untuk proses verifikasi."],
+  ["Berapa lama batas konfirmasi?", "Maksimal 3 x 24 jam."],
+  ["Apakah hadiah dapat diuangkan?", "Tidak. Hadiah tidak dapat diuangkan maupun dipindahtangankan."],
+  ["Apakah saya dipungut biaya jika menang?", "Tidak. Seluruh proses program dan penyerahan hadiah tidak dipungut biaya."],
+  ["Bagaimana jika saya salah mengisi data?", "Pastikan seluruh data benar. Data yang telah dikirim tidak dapat diubah."],
+  ["Apakah tiket konser sudah termasuk transportasi dan akomodasi?", "Tidak. Hadiah hanya berupa tiket konser BTS. Biaya lain menjadi tanggung jawab pemenang."],
+  ["Bagaimana proses pengambilan tiket konser BTS?", "Waktu dan lokasi akan diberitahukan kepada pemenang. Pengambilan dilakukan di area sekitar GBK, Jakarta, dengan kartu identitas yang sesuai data pendaftaran."],
+  ["Apakah hadiah dapat diwakilkan pengambilannya?", "Tidak. Hadiah hanya dapat diterima oleh pemenang yang telah diverifikasi identitasnya."],
+];
+
+const faqItemsEnglish = [
+  ["How do I join?", "Buy at least one Timephoria product at a participating store, scan the QR code, complete the form, upload your receipt, and submit."],
+  ["Is there a minimum purchase?", "Every purchase of at least one Timephoria product is eligible."],
+  ["Can one receipt be registered more than once?", "No. Each receipt can only be used for one registration."],
+  ["Does buying more products increase my chance?", "Each different receipt can be registered as one entry in the draw."],
+  ["Which stores are participating?", "The program is available at 314 selected Timephoria stores."],
+  ["Are online purchases eligible?", "No. Only purchases from participating physical stores are eligible."],
+  ["What if my receipt photo is unclear?", "The registration may be invalid if the receipt is unreadable or incomplete."],
+  ["How do I know my registration succeeded?", "A confirmation page will appear after the form is submitted."],
+  ["When will winners be announced?", "Winners will be announced in November on Timephoria's official Instagram and program website."],
+  ["How will winners be contacted?", "Winners will be announced on Timephoria's official Instagram Story and contacted by DM for verification."],
+  ["How long is the confirmation period?", "A maximum of 3 x 24 hours."],
+  ["Can the prize be exchanged for cash?", "No. Prizes cannot be exchanged for cash or transferred."],
+  ["Will I be charged if I win?", "No. The program and prize handover process are free of charge."],
+  ["What if I entered incorrect data?", "Check all details before submitting. Submitted data cannot be changed."],
+  ["Does the concert ticket include transport and accommodation?", "No. The prize only includes the BTS concert ticket. Other expenses are the winner's responsibility."],
+  ["How do I collect the concert ticket?", "Collection details will be provided to the winner. Collection will be near GBK, Jakarta, with matching valid identification."],
+  ["Can someone collect the prize for me?", "No. The verified winner must receive the prize."],
+];
+
+function parseStoreCsv(csv: string): Store[] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let quoted = false;
+
+  for (let index = 0; index < csv.length; index += 1) {
+    const character = csv[index];
+
+    if (character === '"') {
+      if (quoted && csv[index + 1] === '"') {
+        field += '"';
+        index += 1;
+      } else {
+        quoted = !quoted;
+      }
+    } else if (character === "," && !quoted) {
+      row.push(field.trim());
+      field = "";
+    } else if ((character === "\n" || character === "\r") && !quoted) {
+      if (character === "\r" && csv[index + 1] === "\n") index += 1;
+      row.push(field.trim());
+      if (row.some(Boolean)) rows.push(row);
+      row = [];
+      field = "";
+    } else {
+      field += character;
+    }
+  }
+
+  if (field || row.length) {
+    row.push(field.trim());
+    rows.push(row);
+  }
+
+  return rows.slice(1).flatMap(([name, region]) =>
+    name && region ? [{ name, region }] : [],
+  );
+}
 
 const categories: Record<
   CategoryKey,
@@ -701,13 +837,18 @@ function promoVisual(promo: Promo) {
 function ProductCard({
   product,
   promoLabel,
+  language,
 }: {
   product: Product;
   promoLabel?: string;
+  language: Language;
 }) {
   const [isSwatchOpen, setIsSwatchOpen] = useState(false);
   const [activeSwatchSlide, setActiveSwatchSlide] = useState(0);
   const swatchSlides = productSwatches(product);
+  const translation = language === "id" ? productTranslations[product.name] : undefined;
+  const description = translation?.description ?? product.description;
+  const claims = translation?.claims ?? product.claims;
 
   function updateActiveSwatchSlide(target: HTMLDivElement) {
     const nextSlide = Math.round(target.scrollLeft / target.clientWidth);
@@ -722,13 +863,12 @@ function ProductCard({
       </div>
       <div className="product-copy">
         <div className="product-meta">
-          <span>{product.finish}</span>
-          <span>{product.price}</span>
+          <span>{language === "id" ? finishTranslations[product.finish] : product.finish}</span>
         </div>
         <h3>{product.shortName}</h3>
-        <p>{product.description}</p>
+        <p>{description}</p>
         <div className="claim-row" aria-label={`${product.name} claims`}>
-          {product.claims.slice(0, 3).map((claim) => (
+          {claims.slice(0, 3).map((claim) => (
             <span key={claim}>{claim}</span>
           ))}
         </div>
@@ -741,11 +881,11 @@ function ProductCard({
           type="button"
         >
           {product.category === "lips" || product.category === "eyes" ? (
-            <span>TAP TO SEE The Finish and Shades</span>
+              <span>{language === "id" ? "LIHAT HASIL DAN WARNA" : "TAP TO SEE THE FINISH AND SHADES"}</span>
           ) : (
             <>
-              <span>Tap to see swatches</span>
-              <strong>Tone chart</strong>
+              <span>{language === "id" ? "Lihat swatches" : "Tap to see swatches"}</span>
+              <strong>{language === "id" ? "Pilihan warna" : "Tone chart"}</strong>
             </>
           )}
         </button>
@@ -784,7 +924,12 @@ function ProductCard({
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("lips");
-  const [view, setView] = useState<"home" | "category" | "promo" | "products">("home");
+  const [view, setView] = useState<"home" | "category" | "promo" | "faq" | "stores" | "products">("home");
+  const [language, setLanguage] = useState<Language>("en");
+  const [stores, setStores] = useState<Store[]>([]);
+  const [storeQuery, setStoreQuery] = useState("");
+  const [storeRegion, setStoreRegion] = useState("All");
+  const [storeStatus, setStoreStatus] = useState<"idle" | "loading" | "error">("idle");
   const [finish, setFinish] = useState("All");
   const [promoIndex, setPromoIndex] = useState(0);
   const [activePromo, setActivePromo] = useState<Promo | null>(null);
@@ -796,10 +941,25 @@ export default function Home() {
   useEffect(() => {
     const timer = window.setInterval(() => {
       setPromoIndex((current) => (current + 1) % promos.length);
-    }, 3200);
+    }, 2000);
 
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (view !== "stores" || stores.length || storeStatus !== "loading") return;
+
+    fetch("/api/stores")
+      .then((response) => {
+        if (!response.ok) throw new Error("Unable to load stores");
+        return response.text();
+      })
+      .then((csv) => {
+        setStores(parseStoreCsv(csv));
+        setStoreStatus("idle");
+      })
+      .catch(() => setStoreStatus("error"));
+  }, [storeStatus, stores.length, view]);
 
   useEffect(() => {
     const fillTimer = window.setTimeout(() => {
@@ -829,6 +989,26 @@ export default function Home() {
   );
   const currentPromo = activePromo ?? promos[promoIndex];
   const megaPromo = promos[0];
+  const isIndonesian = language === "id";
+  const translatedPromo = currentPromo === promos[0] && isIndonesian
+    ? { ...currentPromo, ...promoTranslation }
+    : currentPromo;
+  const storeRegions = useMemo(
+    () => ["All", ...Array.from(new Set(stores.map((store) => store.region))).sort()],
+    [stores],
+  );
+  const visibleStores = useMemo(() => {
+    const query = storeQuery.trim().toLocaleLowerCase("id");
+
+    return stores.filter((store) =>
+      (storeRegion === "All" || store.region === storeRegion) &&
+      (!query || `${store.name} ${store.region}`.toLocaleLowerCase("id").includes(query)),
+    );
+  }, [storeQuery, storeRegion, stores]);
+
+  function toggleLanguage() {
+    setLanguage((current) => (current === "en" ? "id" : "en"));
+  }
 
   function chooseCategory(key: CategoryKey, target: "category" | "products") {
     setActiveCategory(key);
@@ -871,16 +1051,20 @@ export default function Home() {
 
       {loaderState === "done" && showMegaPromo ? (
         <div className="mega-promo-modal" role="dialog" aria-label={megaPromo.title}>
-          <button
-            className="mega-promo-card"
-            onClick={() => applyPromo(megaPromo)}
-            type="button"
-          >
+          <div className="mega-promo-card">
+            <div className="mega-promo-copy">
+              <strong>BELI 1 PRODUK TIMEPHORIA, SIAP-SIAP NONTON KONSER BTS!</strong>
+              <em>{promoTranslation.detail}</em>
+              <a
+                href={megaPromo.registrationUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                KLIK UNTUK IKUTAN
+              </a>
+            </div>
             <img src={promoVisual(megaPromo)} alt="" aria-hidden="true" />
-            <span>{megaPromo.kicker}</span>
-            <strong>{megaPromo.title}</strong>
-            <em>{megaPromo.detail}</em>
-          </button>
+          </div>
           <button
             className="mega-promo-close"
             aria-label="Close promo popup"
@@ -893,7 +1077,6 @@ export default function Home() {
       ) : null}
 
       <section className="brand-panel" aria-label="Timephoria brand story">
-        <p>Product web concept</p>
         <h1>TIMEPHORIA</h1>
         <span>Beauty beyond limits</span>
         <p>
@@ -909,6 +1092,7 @@ export default function Home() {
           <div className="home-screen">
             <div className="promo-slider">
               <button
+                key={promos[promoIndex].title}
                 className="promo-main"
                 onClick={() => applyPromo(promos[promoIndex])}
                 type="button"
@@ -921,7 +1105,7 @@ export default function Home() {
                 />
                 <b className="promo-tap-hint">Tap To See Details</b>
                 <span>{promos[promoIndex].kicker}</span>
-                <strong>{promos[promoIndex].title}</strong>
+                <strong>{promoIndex === 0 ? "BUY 1 TIMEPHORIA PRODUCT, GET READY TO SEE BTS LIVE!" : promos[promoIndex].title}</strong>
                 <em>{promos[promoIndex].detail}</em>
               </button>
               <div className="promo-bar" aria-label="Promo slides">
@@ -969,11 +1153,16 @@ export default function Home() {
                 alt=""
                 aria-hidden="true"
               />
-              <span>{currentPromo.kicker}</span>
-              <h2>{currentPromo.title}</h2>
-              <p>{currentPromo.detail}</p>
+              <span>{translatedPromo.kicker}</span>
+              <h2>{translatedPromo.title}</h2>
+              <p>{translatedPromo.detail}</p>
+              {currentPromo.registrationUrl ? (
+                <a className="promo-hero-cta" href={currentPromo.registrationUrl} rel="noreferrer" target="_blank">
+                  {isIndonesian ? "KLIK UNTUK IKUTAN" : "JOIN NOW"}
+                </a>
+              ) : null}
               <div className="promo-scroll-hint">
-                <span>Scroll &amp; Tap to See Other Promo!</span>
+                <span>{isIndonesian ? "Scroll dan lihat promo lainnya" : "Scroll & Tap to See Other Promo!"}</span>
                 <i aria-hidden="true" />
               </div>
             </header>
@@ -1002,14 +1191,9 @@ export default function Home() {
                     alt={`${currentPromo.title} promo artwork`}
                   />
                 </div>
-                <a
-                  className="bts-register-button"
-                  href={currentPromo.registrationUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  {currentPromo.registrationLabel}
-                </a>
+                <button className="faq-link" onClick={() => setView("faq")} type="button">
+                  {isIndonesian ? "LIHAT FAQ" : "VIEW FAQ"}
+                </button>
               </div>
             ) : (
               <button
@@ -1024,6 +1208,101 @@ export default function Home() {
                   />
                 </div>
               </button>
+            )}
+          </div>
+        ) : null}
+
+        {view === "faq" ? (
+          <div className="faq-screen">
+            <header className="faq-header">
+              <button onClick={() => setView("promo")} type="button">Back</button>
+              <span>TIMEPHORIA BTS GIVEAWAY</span>
+              <h2>FAQ</h2>
+            </header>
+            <div className="faq-list">
+              {(isIndonesian ? faqItems : faqItemsEnglish).map(([question, answer], index) => (
+                <details key={question} open={index === 0}>
+                  <summary>{question}</summary>
+                  <p>{answer}</p>
+                  {index === 4 ? (
+                    <button
+                      className="store-directory-link"
+                      onClick={() => {
+                        setStoreStatus("loading");
+                        setView("stores");
+                      }}
+                      type="button"
+                    >
+                      {isIndonesian ? "LIHAT 314 TOKO" : "VIEW 314 STORES"}
+                    </button>
+                  ) : null}
+                </details>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {view === "stores" ? (
+          <div className="stores-screen">
+            <header className="stores-header">
+              <button onClick={() => setView("faq")} type="button">Back</button>
+              <span>TIMEPHORIA BTS GIVEAWAY</span>
+              <h2>{isIndonesian ? "TOKO TERSEDIA" : "AVAILABLE STORES"}</h2>
+              <p>
+                {isIndonesian
+                  ? "Cari toko tempat promo Timephoria ini berlaku."
+                  : "Find a store where this Timephoria promotion is active."}
+              </p>
+            </header>
+
+            <div className="store-tools">
+              <input
+                aria-label={isIndonesian ? "Cari nama toko" : "Search store name"}
+                onChange={(event) => setStoreQuery(event.target.value)}
+                placeholder={isIndonesian ? "Cari nama toko..." : "Search store name..."}
+                type="search"
+                value={storeQuery}
+              />
+              <select
+                aria-label={isIndonesian ? "Pilih wilayah" : "Choose region"}
+                onChange={(event) => setStoreRegion(event.target.value)}
+                value={storeRegion}
+              >
+                {storeRegions.map((region) => (
+                  <option key={region} value={region}>
+                    {region === "All" && isIndonesian ? "Semua wilayah" : region}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="store-result-count" aria-live="polite">
+              {storeStatus === "loading"
+                ? (isIndonesian ? "Memuat daftar toko..." : "Loading stores...")
+                : `${visibleStores.length} ${isIndonesian ? "toko" : "stores"}`}
+            </div>
+
+            {storeStatus === "error" ? (
+              <div className="store-empty">
+                {isIndonesian ? "Daftar toko belum dapat dimuat." : "The store directory could not be loaded."}
+                <button onClick={() => setStoreStatus("loading")} type="button">
+                  {isIndonesian ? "COBA LAGI" : "TRY AGAIN"}
+                </button>
+              </div>
+            ) : (
+              <div className="store-list">
+                {visibleStores.map((store, index) => (
+                  <article key={`${store.name}-${store.region}-${index}`}>
+                    <strong>{store.name}</strong>
+                    <span>{store.region}</span>
+                  </article>
+                ))}
+                {storeStatus !== "loading" && visibleStores.length === 0 ? (
+                  <div className="store-empty">
+                    {isIndonesian ? "Toko tidak ditemukan." : "No stores found."}
+                  </div>
+                ) : null}
+              </div>
             )}
           </div>
         ) : null}
@@ -1043,12 +1322,12 @@ export default function Home() {
               </div>
               <span>{category.eyebrow}</span>
               <h2>{category.label}</h2>
-              <p>{category.intro}</p>
+              <p>{isIndonesian ? "Temukan warna, tekstur, dan hasil akhir Timephoria untuk setiap tampilan." : category.intro}</p>
             </header>
 
             <div className="section-title">
               <i />
-              <span>{category.headline}</span>
+              <span>{isIndonesian ? "PILIH HASIL AKHIR" : category.headline}</span>
               <i />
             </div>
 
@@ -1064,8 +1343,8 @@ export default function Home() {
                   }}
                   type="button"
                 >
-                  <span>{item}</span>
-                  <small>Tap to view products</small>
+                  <span>{isIndonesian ? finishTranslations[item] : item}</span>
+                  <small>{isIndonesian ? "Lihat produk" : "Tap to view products"}</small>
                 </button>
               ))}
             </div>
@@ -1079,8 +1358,8 @@ export default function Home() {
               style={{ "--accent": category.color } as React.CSSProperties}
             >
               <span>{category.label}</span>
-              <h2>{finish === "All" ? category.headline : finish}</h2>
-              <p>{category.intro}</p>
+              <h2>{finish === "All" ? (isIndonesian ? "PILIH PRODUK" : category.headline) : (isIndonesian ? finishTranslations[finish] : finish)}</h2>
+              <p>{isIndonesian ? "Temukan produk Timephoria untuk melengkapi setiap tampilan." : category.intro}</p>
               {activePromo ? (
                 <div className="active-promo">
                   <strong>{activePromo.discount}</strong>
@@ -1098,7 +1377,7 @@ export default function Home() {
                 }}
                 type="button"
               >
-                All
+                {isIndonesian ? "Semua" : "All"}
               </button>
               {category.finishes.map((item) => (
                 <button
@@ -1110,7 +1389,7 @@ export default function Home() {
                   }}
                   type="button"
                 >
-                  {item}
+                  {isIndonesian ? finishTranslations[item] : item}
                 </button>
               ))}
             </div>
@@ -1120,6 +1399,7 @@ export default function Home() {
                 <ProductCard
                   key={product.name}
                   product={product}
+                  language={language}
                   promoLabel={
                     activePromo &&
                     product.category === activePromo.category &&
@@ -1144,6 +1424,17 @@ export default function Home() {
           >
             Back to Home
           </button>
+          {view !== "home" ? (
+            <button
+              aria-label="Switch language"
+              className="language-toggle footer-language-toggle"
+              onClick={toggleLanguage}
+              type="button"
+            >
+              <span className={language === "en" ? "active" : ""}>EN</span>
+              <span className={language === "id" ? "active" : ""}>ID</span>
+            </button>
+          ) : <span className="footer-control-spacer" aria-hidden="true" />}
           <img
             className="footer-logo"
             src="/brand/timephoria-logo.png"
