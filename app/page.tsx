@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import VirtualLipTryOn from "./components/VirtualLipTryOn";
 import { lipTryOnShades } from "./lip-try-on-shades";
 
@@ -948,6 +948,7 @@ export default function Home() {
   const [loaderState, setLoaderState] = useState<"loading" | "leaving" | "done">(
     "loading",
   );
+  const closeTryOn = useCallback(() => setActiveTryOnProduct(null), []);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -1102,7 +1103,7 @@ export default function Home() {
         {activeTryOnProduct ? (
           <VirtualLipTryOn
             language={language}
-            onClose={() => setActiveTryOnProduct(null)}
+            onClose={closeTryOn}
             productImage={productThumbnail(activeTryOnProduct)}
             productName={activeTryOnProduct.name}
             shades={lipTryOnShades[activeTryOnProduct.name]}
