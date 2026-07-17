@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import VirtualLipTryOn from "./components/VirtualLipTryOn";
+import { lipTryOnShades } from "./lip-try-on-shades";
 
 type CategoryKey = "lips" | "eyes" | "face";
 
@@ -838,10 +840,12 @@ function ProductCard({
   product,
   promoLabel,
   language,
+  onTryOn,
 }: {
   product: Product;
   promoLabel?: string;
   language: Language;
+  onTryOn?: (product: Product) => void;
 }) {
   const [isSwatchOpen, setIsSwatchOpen] = useState(false);
   const [activeSwatchSlide, setActiveSwatchSlide] = useState(0);
@@ -873,6 +877,12 @@ function ProductCard({
           ))}
         </div>
       </div>
+      {onTryOn && lipTryOnShades[product.name]?.length ? (
+        <button className="tryon-card-action" onClick={() => onTryOn(product)} type="button">
+          <span>{language === "id" ? "COBA DI BIBIRMU" : "TRY IT ON"}</span>
+          <strong>LIVE CAMERA</strong>
+        </button>
+      ) : null}
       <div className={`shade-panel ${isSwatchOpen ? "open" : ""}`}>
         <button
           className="shade-toggle"
@@ -933,6 +943,7 @@ export default function Home() {
   const [finish, setFinish] = useState("All");
   const [promoIndex, setPromoIndex] = useState(0);
   const [activePromo, setActivePromo] = useState<Promo | null>(null);
+  const [activeTryOnProduct, setActiveTryOnProduct] = useState<Product | null>(null);
   const [showMegaPromo, setShowMegaPromo] = useState(true);
   const [loaderState, setLoaderState] = useState<"loading" | "leaving" | "done">(
     "loading",
@@ -1087,6 +1098,16 @@ export default function Home() {
 
       <section className={`phone-frame ${view}`} aria-label="Timephoria web app">
         <div className="space-background" />
+
+        {activeTryOnProduct ? (
+          <VirtualLipTryOn
+            language={language}
+            onClose={() => setActiveTryOnProduct(null)}
+            productImage={productThumbnail(activeTryOnProduct)}
+            productName={activeTryOnProduct.name}
+            shades={lipTryOnShades[activeTryOnProduct.name]}
+          />
+        ) : null}
 
         {view === "home" ? (
           <div className="home-screen">
@@ -1400,6 +1421,7 @@ export default function Home() {
                   key={product.name}
                   product={product}
                   language={language}
+                  onTryOn={product.category === "lips" ? setActiveTryOnProduct : undefined}
                   promoLabel={
                     activePromo &&
                     product.category === activePromo.category &&
@@ -1416,6 +1438,7 @@ export default function Home() {
         <footer className="mobile-footer">
           <button
             onClick={() => {
+              setActiveTryOnProduct(null);
               setView("home");
               setShowMegaPromo(true);
             }}
