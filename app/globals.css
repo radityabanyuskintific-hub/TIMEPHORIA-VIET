@@ -1911,7 +1911,7 @@ button {
 }
 
 .tryon-stage {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 5;
   background: #080808;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 20px;
@@ -2080,10 +2080,51 @@ button {
 .tryon-face-guide span {
   background: rgba(0, 0, 0, 0.68);
   border-radius: 999px;
-  bottom: 12px;
+  bottom: 58px;
   font-size: 9px;
   padding: 7px 10px;
   position: absolute;
+}
+
+.tryon-capture-button {
+  align-items: center;
+  backdrop-filter: blur(8px);
+  background: rgba(5, 5, 5, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.48);
+  border-radius: 999px;
+  bottom: 12px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  font-size: 8px;
+  font-weight: 800;
+  gap: 7px;
+  left: 50%;
+  letter-spacing: 0.04em;
+  padding: 6px 10px 6px 6px;
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 4;
+}
+
+.tryon-capture-button i {
+  background: #fff;
+  border: 2px solid #111;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.72);
+  display: block;
+  height: 22px;
+  width: 22px;
+}
+
+.tryon-capture-button.saved {
+  background: #fff;
+  color: #111;
+}
+
+.tryon-capture-button.saved i {
+  background: #f43c79;
 }
 
 .tryon-controls {

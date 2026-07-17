@@ -6,6 +6,7 @@ import type { LipTryOnShade } from "../lip-try-on-shades";
 
 type Language = "en" | "id";
 type TryOnStatus = "idle" | "loading" | "running" | "error";
+type CaptureStatus = "idle" | "saved" | "error";
 
 type VirtualLipTryOnProps = {
   language: Language;
@@ -48,6 +49,7 @@ export default function VirtualLipTryOn({
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
   const closeTimerRef = useRef<number | null>(null);
+  const captureTimerRef = useRef<number | null>(null);
   const isClosingRef = useRef(false);
   const mountedRef = useRef(true);
   const faceDetectedRef = useRef(false);
@@ -62,6 +64,7 @@ export default function VirtualLipTryOn({
   const [effectEnabled, setEffectEnabled] = useState(true);
   const [faceDetected, setFaceDetected] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [captureStatus, setCaptureStatus] = useState<CaptureStatus>("idle");
   const isGlossProduct = productFinish === "GLOSS IT BETTER" ||
     /GLOSS|GLOSSY|VINYL|BALM|VELVET-SHINE/i.test(productName);
 
@@ -80,6 +83,9 @@ export default function VirtualLipTryOn({
         effectOn: "HASIL AKTIF",
         effectOff: "LIHAT TANPA WARNA",
         retry: "COBA LAGI",
+        capture: "AMBIL FOTO",
+        captured: "FOTO TERSIMPAN",
+        captureError: "COBA LAGI",
         close: "Tutup virtual try-on",
         approximation: "Visualisasi warna. Hasil aktual dapat berbeda karena pencahayaan dan layar.",
       }
@@ -97,6 +103,9 @@ export default function VirtualLipTryOn({
         effectOn: "EFFECT ON",
         effectOff: "VIEW WITHOUT COLOR",
         retry: "TRY AGAIN",
+        capture: "CAPTURE",
+        captured: "PHOTO SAVED",
+        captureError: "TRY AGAIN",
         close: "Close virtual try-on",
         approximation: "Shade visualization only. Actual results vary with lighting and screen settings.",
       };
@@ -139,6 +148,7 @@ export default function VirtualLipTryOn({
       mountedRef.current = false;
       window.removeEventListener("keydown", handleKeyDown);
       if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current);
+      if (captureTimerRef.current !== null) window.clearTimeout(captureTimerRef.current);
       stopEverything();
     };
   }, [requestClose, stopEverything]);
@@ -412,9 +422,9 @@ export default function VirtualLipTryOn({
         audio: false,
         video: {
           facingMode: "user",
-          width: { ideal: 640 },
-          height: { ideal: 480 },
-          aspectRatio: { ideal: 4 / 3 },
+          width: { ideal: 720 },
+          height: { ideal: 900 },
+          aspectRatio: { ideal: 4 / 5 },
         },
       });
 
@@ -481,6 +491,93 @@ export default function VirtualLipTryOn({
     }
   }
 
+  function capturePhoto() {
+    const video = videoRef.current;
+    const overlayCanvas = canvasRef.current;
+    if (!video || !overlayCanvas || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+      setCaptureStatus("error");
+      return;
+    }
+
+    const outputWidth = 1080;
+    const outputHeight = 1350;
+    const targetAspectRatio = outputWidth / outputHeight;
+    const sourceWidth = video.videoWidth;
+    const sourceHeight = video.videoHeight;
+    const sourceAspectRatio = sourceWidth / sourceHeight;
+    let cropX = 0;
+    let cropY = 0;
+    let cropWidth = sourceWidth;
+    let cropHeight = sourceHeight;
+
+    if (sourceAspectRatio > targetAspectRatio) {
+      cropWidth = sourceHeight * targetAspectRatio;
+      cropX = (sourceWidth - cropWidth) / 2;
+    } else {
+      cropHeight = sourceWidth / targetAspectRatio;
+      cropY = (sourceHeight - cropHeight) / 2;
+    }
+
+    const photoCanvas = document.createElement("canvas");
+    photoCanvas.width = outputWidth;
+    photoCanvas.height = outputHeight;
+    const photoContext = photoCanvas.getContext("2d");
+    if (!photoContext) {
+      setCaptureStatus("error");
+      return;
+    }
+
+    photoContext.save();
+    photoContext.translate(outputWidth, 0);
+    photoContext.scale(-1, 1);
+    photoContext.drawImage(
+      video,
+      cropX,
+      cropY,
+      cropWidth,
+      cropHeight,
+      0,
+      0,
+      outputWidth,
+      outputHeight,
+    );
+    if (effectEnabledRef.current) {
+      photoContext.drawImage(
+        overlayCanvas,
+        cropX,
+        cropY,
+        cropWidth,
+        cropHeight,
+        0,
+        0,
+        outputWidth,
+        outputHeight,
+      );
+    }
+    photoContext.restore();
+
+    photoCanvas.toBlob((blob) => {
+      if (!blob || !mountedRef.current) {
+        if (mountedRef.current) setCaptureStatus("error");
+        return;
+      }
+
+      const safeProductName = productName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const objectUrl = URL.createObjectURL(blob);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = objectUrl;
+      downloadLink.download = `${safeProductName}-${selectedShade.code}-try-on.jpg`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+
+      setCaptureStatus("saved");
+      if (captureTimerRef.current !== null) window.clearTimeout(captureTimerRef.current);
+      captureTimerRef.current = window.setTimeout(() => setCaptureStatus("idle"), 1800);
+    }, "image/jpeg", 0.94);
+  }
+
   return (
     <section
       aria-label={`${productName} virtual try-on`}
@@ -532,6 +629,24 @@ export default function VirtualLipTryOn({
           </div>
         ) : null}
 
+        {status === "running" ? (
+          <button
+            aria-label={copy.capture}
+            className={`tryon-capture-button ${captureStatus}`}
+            onClick={capturePhoto}
+            type="button"
+          >
+            <i aria-hidden="true" />
+            <span aria-live="polite">
+              {captureStatus === "saved"
+                ? copy.captured
+                : captureStatus === "error"
+                  ? copy.captureError
+                  : copy.capture}
+            </span>
+          </button>
+        ) : null}
+
         {status === "error" ? (
           <div className="tryon-status-panel error" role="alert">
             <strong>{errorMessage}</strong>
@@ -570,7 +685,7 @@ export default function VirtualLipTryOn({
             <span>{copy.intensity}</span>
             <input
               aria-label={copy.intensity}
-              max="0.22"
+              max="0.30"
               min="0.01"
               onChange={(event) => changeIntensity(Number(event.target.value))}
               step="0.01"
