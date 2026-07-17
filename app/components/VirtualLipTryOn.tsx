@@ -10,6 +10,7 @@ type TryOnStatus = "idle" | "loading" | "running" | "error";
 type VirtualLipTryOnProps = {
   language: Language;
   onClose: () => void;
+  productFinish: string;
   productImage: string;
   productName: string;
   shades: LipTryOnShade[];
@@ -32,6 +33,7 @@ const MODEL_URL =
 export default function VirtualLipTryOn({
   language,
   onClose,
+  productFinish,
   productImage,
   productName,
   shades,
@@ -42,18 +44,23 @@ export default function VirtualLipTryOn({
   const landmarkerRef = useRef<FaceLandmarker | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
+  const isClosingRef = useRef(false);
   const mountedRef = useRef(true);
   const faceDetectedRef = useRef(false);
   const shadeRef = useRef(initialShade);
-  const intensityRef = useRef(0.58);
+  const intensityRef = useRef(0.01);
   const effectEnabledRef = useRef(true);
 
   const [status, setStatus] = useState<TryOnStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedShade, setSelectedShade] = useState(initialShade);
-  const [intensity, setIntensity] = useState(0.58);
+  const [intensity, setIntensity] = useState(0.01);
   const [effectEnabled, setEffectEnabled] = useState(true);
   const [faceDetected, setFaceDetected] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const isGlossProduct = productFinish === "GLOSS IT BETTER" ||
+    /GLOSS|GLOSSY|VINYL|BALM|VELVET-SHINE/i.test(productName);
 
   const copy = language === "id"
     ? {
@@ -65,6 +72,7 @@ export default function VirtualLipTryOn({
         cameraHint: "Izinkan akses kamera saat browser memintanya.",
         centerFace: "Posisikan wajahmu di tengah kamera",
         shade: "Warna",
+        scrollHint: "Geser ke kiri untuk melihat warna lain",
         intensity: "Intensitas warna",
         effectOn: "HASIL AKTIF",
         effectOff: "LIHAT TANPA WARNA",
@@ -81,6 +89,7 @@ export default function VirtualLipTryOn({
         cameraHint: "Allow camera access when your browser asks.",
         centerFace: "Center your face in the camera",
         shade: "Shade",
+        scrollHint: "Scroll left to explore shade",
         intensity: "Color intensity",
         effectOn: "EFFECT ON",
         effectOff: "VIEW WITHOUT COLOR",
@@ -106,20 +115,30 @@ export default function VirtualLipTryOn({
     landmarkerRef.current = null;
   }, []);
 
+  const requestClose = useCallback(() => {
+    if (isClosingRef.current) return;
+    isClosingRef.current = true;
+    setIsClosing(true);
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    closeTimerRef.current = window.setTimeout(onClose, prefersReducedMotion ? 0 : 420);
+  }, [onClose]);
+
   useEffect(() => {
     mountedRef.current = true;
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") requestClose();
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       mountedRef.current = false;
       window.removeEventListener("keydown", handleKeyDown);
+      if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current);
       stopEverything();
     };
-  }, [onClose, stopEverything]);
+  }, [requestClose, stopEverything]);
 
   function updateFaceDetected(nextValue: boolean) {
     if (faceDetectedRef.current === nextValue) return;
@@ -157,8 +176,61 @@ export default function VirtualLipTryOn({
     context.globalCompositeOperation = "multiply";
     context.globalAlpha = intensityRef.current;
     context.fillStyle = shadeRef.current.hex;
-    context.filter = "blur(0.55px)";
+    const edgeBlur = Math.max(1, Math.min(1.8, (width / 640) * 1.25));
+    context.filter = `blur(${edgeBlur}px)`;
     context.fill("evenodd");
+    context.restore();
+
+    if (isGlossProduct) drawGlossHighlight(context, points, width, height, edgeBlur);
+  }
+
+  function drawGlossHighlight(
+    context: CanvasRenderingContext2D,
+    points: NormalizedLandmark[],
+    width: number,
+    height: number,
+    edgeBlur: number,
+  ) {
+    const lipPoints = OUTER_LIP.map((index) => points[index]);
+    const minX = Math.min(...lipPoints.map((point) => point.x * width));
+    const maxX = Math.max(...lipPoints.map((point) => point.x * width));
+    const minY = Math.min(...lipPoints.map((point) => point.y * height));
+    const maxY = Math.max(...lipPoints.map((point) => point.y * height));
+    const lipWidth = maxX - minX;
+    const lipHeight = maxY - minY;
+
+    context.save();
+    context.beginPath();
+    tracePath(context, points, OUTER_LIP, width, height);
+    tracePath(context, points, INNER_LIP, width, height);
+    context.clip("evenodd");
+    context.globalCompositeOperation = "screen";
+    context.filter = `blur(${edgeBlur * 1.15}px)`;
+
+    const sheen = context.createLinearGradient(0, minY, 0, maxY);
+    sheen.addColorStop(0, "rgba(255,255,255,0)");
+    sheen.addColorStop(0.2, "rgba(255,245,248,0.34)");
+    sheen.addColorStop(0.4, "rgba(255,255,255,0.04)");
+    sheen.addColorStop(0.63, "rgba(255,245,248,0.25)");
+    sheen.addColorStop(0.88, "rgba(255,255,255,0)");
+    context.globalAlpha = 0.58;
+    context.fillStyle = sheen;
+    context.fillRect(minX, minY, lipWidth, lipHeight);
+
+    const highlight = context.createRadialGradient(
+      minX + lipWidth * 0.42,
+      minY + lipHeight * 0.32,
+      0,
+      minX + lipWidth * 0.42,
+      minY + lipHeight * 0.32,
+      lipWidth * 0.38,
+    );
+    highlight.addColorStop(0, "rgba(255,255,255,0.42)");
+    highlight.addColorStop(0.46, "rgba(255,246,248,0.14)");
+    highlight.addColorStop(1, "rgba(255,255,255,0)");
+    context.globalAlpha = 0.5;
+    context.fillStyle = highlight;
+    context.fillRect(minX, minY, lipWidth, lipHeight);
     context.restore();
   }
 
@@ -322,7 +394,7 @@ export default function VirtualLipTryOn({
     <section
       aria-label={`${productName} virtual try-on`}
       aria-modal="true"
-      className="virtual-tryon"
+      className={`virtual-tryon ${isClosing ? "closing" : ""}`}
       role="dialog"
     >
       <header className="tryon-header">
@@ -330,7 +402,7 @@ export default function VirtualLipTryOn({
           <span>TIMEPHORIA VIRTUAL TRY-ON</span>
           <h2>{productName}</h2>
         </div>
-        <button aria-label={copy.close} className="tryon-close" onClick={onClose} type="button">
+        <button aria-label={copy.close} className="tryon-close" onClick={requestClose} type="button">
           X
         </button>
       </header>
@@ -381,6 +453,7 @@ export default function VirtualLipTryOn({
         <div className="tryon-selected-shade">
           <span>{copy.shade}</span>
           <strong>{selectedShade.code} {selectedShade.name}</strong>
+          {shades.length > 9 ? <em>{copy.scrollHint}</em> : null}
           {selectedShade.description ? <small>{selectedShade.description}</small> : null}
         </div>
 
@@ -406,10 +479,10 @@ export default function VirtualLipTryOn({
             <span>{copy.intensity}</span>
             <input
               aria-label={copy.intensity}
-              max="0.82"
-              min="0.28"
+              max="0.22"
+              min="0.01"
               onChange={(event) => changeIntensity(Number(event.target.value))}
-              step="0.02"
+              step="0.01"
               type="range"
               value={intensity}
             />

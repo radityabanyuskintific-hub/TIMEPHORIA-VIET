@@ -1104,6 +1104,7 @@ export default function Home() {
           <VirtualLipTryOn
             language={language}
             onClose={closeTryOn}
+            productFinish={activeTryOnProduct.finish}
             productImage={productThumbnail(activeTryOnProduct)}
             productName={activeTryOnProduct.name}
             shades={lipTryOnShades[activeTryOnProduct.name]}
