@@ -1971,6 +1971,7 @@ button {
 }
 
 .tryon-canvas {
+  filter: blur(0.8px);
   pointer-events: none;
   z-index: 1;
 }

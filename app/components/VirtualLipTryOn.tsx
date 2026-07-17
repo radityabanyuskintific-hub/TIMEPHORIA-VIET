@@ -216,7 +216,11 @@ export default function VirtualLipTryOn({
     );
     const maskContext = maskCanvas.getContext("2d");
     const featheredMaskContext = featheredMaskCanvas.getContext("2d");
-    const edgeBlur = Math.max(2.2, Math.min(4, (width / 640) * 2.4));
+    const outerLipPoints = OUTER_LIP.map((index) => points[index]);
+    const lipMinX = Math.min(...outerLipPoints.map((point) => point.x * width));
+    const lipMaxX = Math.max(...outerLipPoints.map((point) => point.x * width));
+    const detectedLipWidth = lipMaxX - lipMinX;
+    const edgeBlur = Math.max(4.5, Math.min(10, detectedLipWidth * 0.055));
 
     if (!maskContext || !featheredMaskContext) {
       return { canvas: maskCanvas, edgeBlur };
@@ -231,6 +235,7 @@ export default function VirtualLipTryOn({
 
     featheredMaskContext.clearRect(0, 0, width, height);
     featheredMaskContext.save();
+    featheredMaskContext.globalAlpha = 0.96;
     featheredMaskContext.filter = `blur(${edgeBlur}px)`;
     featheredMaskContext.drawImage(maskCanvas, 0, 0);
     featheredMaskContext.restore();
