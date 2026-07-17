@@ -41,6 +41,9 @@ export default function VirtualLipTryOn({
   const initialShade = shades[0];
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const lipMaskCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const featheredMaskCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const lipEffectCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const landmarkerRef = useRef<FaceLandmarker | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -153,14 +156,76 @@ export default function VirtualLipTryOn({
     width: number,
     height: number,
   ) {
+    const firstPoint = points[indices[0]];
+    const lastPoint = points[indices[indices.length - 1]];
+    context.moveTo(
+      ((lastPoint.x + firstPoint.x) / 2) * width,
+      ((lastPoint.y + firstPoint.y) / 2) * height,
+    );
+
     indices.forEach((index, pointIndex) => {
       const point = points[index];
-      const x = point.x * width;
-      const y = point.y * height;
-      if (pointIndex === 0) context.moveTo(x, y);
-      else context.lineTo(x, y);
+      const nextPoint = points[indices[(pointIndex + 1) % indices.length]];
+      context.quadraticCurveTo(
+        point.x * width,
+        point.y * height,
+        ((point.x + nextPoint.x) / 2) * width,
+        ((point.y + nextPoint.y) / 2) * height,
+      );
     });
     context.closePath();
+  }
+
+  function prepareWorkingCanvas(
+    canvasReference: { current: HTMLCanvasElement | null },
+    width: number,
+    height: number,
+  ) {
+    if (!canvasReference.current) {
+      canvasReference.current = document.createElement("canvas");
+    }
+
+    const canvas = canvasReference.current;
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+    return canvas;
+  }
+
+  function createFeatheredLipMask(
+    points: NormalizedLandmark[],
+    width: number,
+    height: number,
+  ) {
+    const maskCanvas = prepareWorkingCanvas(lipMaskCanvasRef, width, height);
+    const featheredMaskCanvas = prepareWorkingCanvas(
+      featheredMaskCanvasRef,
+      width,
+      height,
+    );
+    const maskContext = maskCanvas.getContext("2d");
+    const featheredMaskContext = featheredMaskCanvas.getContext("2d");
+    const edgeBlur = Math.max(2.2, Math.min(4, (width / 640) * 2.4));
+
+    if (!maskContext || !featheredMaskContext) {
+      return { canvas: maskCanvas, edgeBlur };
+    }
+
+    maskContext.clearRect(0, 0, width, height);
+    maskContext.beginPath();
+    tracePath(maskContext, points, OUTER_LIP, width, height);
+    tracePath(maskContext, points, INNER_LIP, width, height);
+    maskContext.fillStyle = "#ffffff";
+    maskContext.fill("evenodd");
+
+    featheredMaskContext.clearRect(0, 0, width, height);
+    featheredMaskContext.save();
+    featheredMaskContext.filter = `blur(${edgeBlur}px)`;
+    featheredMaskContext.drawImage(maskCanvas, 0, 0);
+    featheredMaskContext.restore();
+
+    return { canvas: featheredMaskCanvas, edgeBlur };
   }
 
   function drawLipColor(
@@ -169,19 +234,39 @@ export default function VirtualLipTryOn({
     width: number,
     height: number,
   ) {
+    const { canvas: featheredMask, edgeBlur } = createFeatheredLipMask(
+      points,
+      width,
+      height,
+    );
+    const effectCanvas = prepareWorkingCanvas(lipEffectCanvasRef, width, height);
+    const effectContext = effectCanvas.getContext("2d");
+    if (!effectContext) return;
+
+    effectContext.clearRect(0, 0, width, height);
+    effectContext.fillStyle = shadeRef.current.hex;
+    effectContext.fillRect(0, 0, width, height);
+    effectContext.globalCompositeOperation = "destination-in";
+    effectContext.drawImage(featheredMask, 0, 0);
+    effectContext.globalCompositeOperation = "source-over";
+
     context.save();
-    context.beginPath();
-    tracePath(context, points, OUTER_LIP, width, height);
-    tracePath(context, points, INNER_LIP, width, height);
     context.globalCompositeOperation = "multiply";
     context.globalAlpha = intensityRef.current;
-    context.fillStyle = shadeRef.current.hex;
-    const edgeBlur = Math.max(1, Math.min(1.8, (width / 640) * 1.25));
-    context.filter = `blur(${edgeBlur}px)`;
-    context.fill("evenodd");
+    context.drawImage(effectCanvas, 0, 0);
     context.restore();
 
-    if (isGlossProduct) drawGlossHighlight(context, points, width, height, edgeBlur);
+    if (isGlossProduct) {
+      drawGlossHighlight(
+        context,
+        points,
+        width,
+        height,
+        featheredMask,
+        effectCanvas,
+        edgeBlur,
+      );
+    }
   }
 
   function drawGlossHighlight(
@@ -189,6 +274,8 @@ export default function VirtualLipTryOn({
     points: NormalizedLandmark[],
     width: number,
     height: number,
+    featheredMask: HTMLCanvasElement,
+    effectCanvas: HTMLCanvasElement,
     edgeBlur: number,
   ) {
     const lipPoints = OUTER_LIP.map((index) => points[index]);
@@ -199,25 +286,21 @@ export default function VirtualLipTryOn({
     const lipWidth = maxX - minX;
     const lipHeight = maxY - minY;
 
-    context.save();
-    context.beginPath();
-    tracePath(context, points, OUTER_LIP, width, height);
-    tracePath(context, points, INNER_LIP, width, height);
-    context.clip("evenodd");
-    context.globalCompositeOperation = "screen";
-    context.filter = `blur(${edgeBlur * 1.15}px)`;
+    const effectContext = effectCanvas.getContext("2d");
+    if (!effectContext) return;
 
-    const sheen = context.createLinearGradient(0, minY, 0, maxY);
+    effectContext.clearRect(0, 0, width, height);
+
+    const sheen = effectContext.createLinearGradient(0, minY, 0, maxY);
     sheen.addColorStop(0, "rgba(255,255,255,0)");
-    sheen.addColorStop(0.2, "rgba(255,245,248,0.34)");
-    sheen.addColorStop(0.4, "rgba(255,255,255,0.04)");
-    sheen.addColorStop(0.63, "rgba(255,245,248,0.25)");
+    sheen.addColorStop(0.2, "rgba(255,225,233,0.2)");
+    sheen.addColorStop(0.4, "rgba(255,246,248,0.03)");
+    sheen.addColorStop(0.63, "rgba(255,225,233,0.16)");
     sheen.addColorStop(0.88, "rgba(255,255,255,0)");
-    context.globalAlpha = 0.58;
-    context.fillStyle = sheen;
-    context.fillRect(minX, minY, lipWidth, lipHeight);
+    effectContext.fillStyle = sheen;
+    effectContext.fillRect(minX, minY, lipWidth, lipHeight);
 
-    const highlight = context.createRadialGradient(
+    const highlight = effectContext.createRadialGradient(
       minX + lipWidth * 0.42,
       minY + lipHeight * 0.32,
       0,
@@ -225,12 +308,20 @@ export default function VirtualLipTryOn({
       minY + lipHeight * 0.32,
       lipWidth * 0.38,
     );
-    highlight.addColorStop(0, "rgba(255,255,255,0.42)");
-    highlight.addColorStop(0.46, "rgba(255,246,248,0.14)");
+    highlight.addColorStop(0, "rgba(255,225,233,0.22)");
+    highlight.addColorStop(0.46, "rgba(255,240,244,0.08)");
     highlight.addColorStop(1, "rgba(255,255,255,0)");
-    context.globalAlpha = 0.5;
-    context.fillStyle = highlight;
-    context.fillRect(minX, minY, lipWidth, lipHeight);
+    effectContext.fillStyle = highlight;
+    effectContext.fillRect(minX, minY, lipWidth, lipHeight);
+
+    effectContext.globalCompositeOperation = "destination-in";
+    effectContext.drawImage(featheredMask, 0, 0);
+    effectContext.globalCompositeOperation = "source-over";
+
+    context.save();
+    context.globalCompositeOperation = "multiply";
+    context.globalAlpha = Math.max(0.2, 0.34 - edgeBlur * 0.02);
+    context.drawImage(effectCanvas, 0, 0);
     context.restore();
   }
 
