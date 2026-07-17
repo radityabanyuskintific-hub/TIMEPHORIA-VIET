@@ -1911,7 +1911,7 @@ button {
 }
 
 .tryon-stage {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 6;
   background: #080808;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 20px;
@@ -2297,7 +2297,4 @@ button {
     padding: 10px;
   }
 
-  .tryon-stage {
-    max-height: 300px;
-  }
 }

@@ -428,8 +428,8 @@ export default function VirtualLipTryOn({
         video: {
           facingMode: "user",
           width: { ideal: 720 },
-          height: { ideal: 900 },
-          aspectRatio: { ideal: 4 / 5 },
+          height: { ideal: 1080 },
+          aspectRatio: { ideal: 4 / 6 },
         },
       });
 
@@ -505,7 +505,7 @@ export default function VirtualLipTryOn({
     }
 
     const outputWidth = 1080;
-    const outputHeight = 1350;
+    const outputHeight = 1620;
     const targetAspectRatio = outputWidth / outputHeight;
     const sourceWidth = video.videoWidth;
     const sourceHeight = video.videoHeight;
