@@ -1487,6 +1487,7 @@ button {
 }
 
 .mega-promo-copy a,
+.mega-promo-actions button,
 .promo-hero-cta,
 .faq-link {
   background: #fff;
@@ -1501,6 +1502,16 @@ button {
   margin-top: 14px;
   padding: 10px 14px;
   text-decoration: none;
+}
+
+.mega-promo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mega-promo-actions button {
+  font-family: inherit;
 }
 
 .promo-page-hero h2 {

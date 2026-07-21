@@ -1120,13 +1120,24 @@ export default function Home() {
             <div className="mega-promo-copy">
               <strong>{megaPromo.title}</strong>
               <em>{megaPromo.detail}</em>
-              <a
-                href={megaPromo.registrationUrl}
-                rel="noreferrer"
-                target="_blank"
-              >
-                KLIK UNTUK IKUTAN
-              </a>
+              <div className="mega-promo-actions">
+                <a
+                  href={megaPromo.registrationUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  KLIK UNTUK IKUTAN
+                </a>
+                <button
+                  onClick={() => {
+                    setShowMegaPromo(false);
+                    setView("faq");
+                  }}
+                  type="button"
+                >
+                  VIEW FAQ
+                </button>
+              </div>
             </div>
             <img src={promoVisual(megaPromo)} alt="" aria-hidden="true" />
           </div>
