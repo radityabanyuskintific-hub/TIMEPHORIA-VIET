@@ -1891,6 +1891,23 @@ button {
   z-index: 30;
 }
 
+.virtual-tryon:fullscreen {
+  height: 100dvh;
+  max-width: none;
+  padding: clamp(10px, 2vw, 22px);
+  width: 100vw;
+}
+
+.virtual-tryon.fullscreen {
+  height: 100dvh;
+  inset: 0;
+  max-width: none;
+  padding: clamp(10px, 2vw, 22px);
+  position: fixed;
+  width: 100vw;
+  z-index: 100;
+}
+
 .virtual-tryon.closing {
   animation: tryon-slide-down 420ms cubic-bezier(0.76, 0, 0.24, 1) forwards;
   pointer-events: none;
@@ -1900,30 +1917,14 @@ button {
 .tryon-header {
   align-items: flex-start;
   display: flex;
-  flex: 0 0 auto;
   gap: 12px;
+  left: 24px;
   justify-content: space-between;
-}
-
-.tryon-header > div {
-  min-width: 0;
-}
-
-.tryon-header span {
-  color: #ff9aba;
-  display: block;
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
-.tryon-header h2 {
-  font-size: 17px;
-  font-weight: 600;
-  line-height: 1.05;
-  margin: 5px 0 0;
-  overflow-wrap: anywhere;
-  text-transform: uppercase;
+  pointer-events: none;
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  z-index: 8;
 }
 
 .tryon-close {
@@ -1939,10 +1940,48 @@ button {
   font-weight: 900;
   height: 34px;
   justify-content: center;
+  pointer-events: auto;
+}
+
+.tryon-floating-nav {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  pointer-events: auto;
+}
+
+.tryon-ratio-selector {
+  display: flex;
+  gap: 4px;
+}
+
+.tryon-ratio-selector button,
+.tryon-icon-control {
+  align-items: center;
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 9px;
+  font-weight: 800;
+  height: 34px;
+  justify-content: center;
+  min-width: 34px;
+  padding: 0 9px;
+}
+
+.tryon-ratio-selector button[aria-pressed="true"],
+.tryon-icon-control[aria-pressed="true"] {
+  background: #fff;
+  color: #111;
 }
 
 .tryon-stage {
-  aspect-ratio: 4 / 6;
+  aspect-ratio: 9 / 16;
   background: #080808;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 20px;
@@ -1953,6 +1992,10 @@ button {
   width: 100%;
 }
 
+.tryon-stage.ratio-4-5 {
+  aspect-ratio: 4 / 5;
+}
+
 .tryon-product-backdrop,
 .tryon-video,
 .tryon-canvas {
@@ -1961,6 +2004,12 @@ button {
   object-fit: cover;
   position: absolute;
   width: 100%;
+}
+
+.tryon-video,
+.tryon-canvas {
+  transition: opacity 240ms ease, transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
 .tryon-product-backdrop {
@@ -1988,6 +2037,11 @@ button {
 .tryon-canvas {
   opacity: 0;
   transform: scaleX(-1);
+}
+
+.tryon-stage.zoomed .tryon-video,
+.tryon-stage.zoomed .tryon-canvas {
+  transform: scaleX(-1) scale(1.22);
 }
 
 .tryon-stage.loading .tryon-video,
@@ -2259,6 +2313,34 @@ button {
   grid-template-columns: minmax(0, 1fr) auto;
 }
 
+.tryon-intensity-steps {
+  display: grid;
+  gap: 5px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.tryon-adjustments .tryon-intensity-steps button {
+  border-radius: 10px;
+  min-width: 0;
+  padding: 7px 5px;
+}
+
+.tryon-intensity-steps strong,
+.tryon-intensity-steps span {
+  display: block;
+  line-height: 1.1;
+}
+
+.tryon-intensity-steps strong {
+  font-size: 7px;
+}
+
+.tryon-intensity-steps span {
+  font-size: 8px;
+  margin-top: 3px;
+  opacity: 0.72;
+}
+
 .tryon-adjustments label {
   display: grid;
   gap: 5px;
@@ -2317,6 +2399,12 @@ button {
 }
 
 @media (max-width: 390px) {
+  .tryon-header {
+    left: 18px;
+    right: 18px;
+    top: 18px;
+  }
+
   .tryon-selected-shade em {
     max-width: 132px;
   }

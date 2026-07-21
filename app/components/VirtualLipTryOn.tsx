@@ -7,6 +7,13 @@ import type { LipTryOnShade } from "../lip-try-on-shades";
 type Language = "en" | "id";
 type TryOnStatus = "idle" | "loading" | "running" | "error";
 type CaptureStatus = "idle" | "saved" | "error";
+type CameraRatio = "9:16" | "4:5";
+
+const INTENSITY_LEVELS = [
+  { label: "1 SWIPE", value: 0.15 },
+  { label: "2 SWIPES", value: 0.22 },
+  { label: "3 SWIPES", value: 0.3 },
+] as const;
 
 type VirtualLipTryOnProps = {
   language: Language;
@@ -42,6 +49,7 @@ export default function VirtualLipTryOn({
   const initialShade = shades[0];
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const tryOnRef = useRef<HTMLElement>(null);
   const lipMaskCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const featheredMaskCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const lipEffectCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -54,17 +62,20 @@ export default function VirtualLipTryOn({
   const mountedRef = useRef(true);
   const faceDetectedRef = useRef(false);
   const shadeRef = useRef(initialShade);
-  const intensityRef = useRef(0.01);
+  const intensityRef = useRef(0.15);
   const effectEnabledRef = useRef(true);
 
   const [status, setStatus] = useState<TryOnStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedShade, setSelectedShade] = useState(initialShade);
-  const [intensity, setIntensity] = useState(0.01);
+  const [intensity, setIntensity] = useState(0.15);
   const [effectEnabled, setEffectEnabled] = useState(true);
   const [faceDetected, setFaceDetected] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [captureStatus, setCaptureStatus] = useState<CaptureStatus>("idle");
+  const [cameraRatio, setCameraRatio] = useState<CameraRatio>("9:16");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
   const isGlossProduct = productFinish === "GLOSS IT BETTER" ||
     /GLOSS|GLOSSY|VINYL|BALM|VELVET-SHINE/i.test(productName);
 
@@ -88,6 +99,10 @@ export default function VirtualLipTryOn({
         captureError: "COBA LAGI",
         close: "Tutup virtual try-on",
         approximation: "Visualisasi warna. Hasil aktual dapat berbeda karena pencahayaan dan layar.",
+        fullscreen: "Layar penuh",
+        exitFullscreen: "Keluar layar penuh",
+        zoomIn: "Perbesar kamera",
+        zoomOut: "Kembalikan zoom",
       }
     : {
         title: "TRY YOUR LIP SHADE",
@@ -108,6 +123,10 @@ export default function VirtualLipTryOn({
         captureError: "TRY AGAIN",
         close: "Close virtual try-on",
         approximation: "Shade visualization only. Actual results vary with lighting and screen settings.",
+        fullscreen: "Enter fullscreen",
+        exitFullscreen: "Exit fullscreen",
+        zoomIn: "Zoom camera in",
+        zoomOut: "Reset camera zoom",
       };
 
   const stopEverything = useCallback(() => {
@@ -143,10 +162,16 @@ export default function VirtualLipTryOn({
       if (event.key === "Escape") requestClose();
     }
 
+    function handleFullscreenChange() {
+      setIsFullscreen(document.fullscreenElement === tryOnRef.current);
+    }
+
     window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => {
       mountedRef.current = false;
       window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
       if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current);
       if (captureTimerRef.current !== null) window.clearTimeout(captureTimerRef.current);
       stopEverything();
@@ -486,6 +511,23 @@ export default function VirtualLipTryOn({
     setIntensity(nextIntensity);
   }
 
+  async function toggleFullscreen() {
+    const tryOnElement = tryOnRef.current;
+    if (!tryOnElement) return;
+
+    try {
+      if (document.fullscreenElement === tryOnElement) {
+        await document.exitFullscreen();
+      } else if (!document.fullscreenEnabled) {
+        setIsFullscreen((fullscreen) => !fullscreen);
+      } else {
+        await tryOnElement.requestFullscreen();
+      }
+    } catch {
+      setIsFullscreen((fullscreen) => !fullscreen);
+    }
+  }
+
   function toggleEffect() {
     const nextValue = !effectEnabledRef.current;
     effectEnabledRef.current = nextValue;
@@ -505,7 +547,7 @@ export default function VirtualLipTryOn({
     }
 
     const outputWidth = 1080;
-    const outputHeight = 1620;
+    const outputHeight = cameraRatio === "9:16" ? 1920 : 1350;
     const targetAspectRatio = outputWidth / outputHeight;
     const sourceWidth = video.videoWidth;
     const sourceHeight = video.videoHeight;
@@ -521,6 +563,16 @@ export default function VirtualLipTryOn({
     } else {
       cropHeight = sourceWidth / targetAspectRatio;
       cropY = (sourceHeight - cropHeight) / 2;
+    }
+
+    if (isZoomed) {
+      const zoomScale = 1.22;
+      const zoomedWidth = cropWidth / zoomScale;
+      const zoomedHeight = cropHeight / zoomScale;
+      cropX += (cropWidth - zoomedWidth) / 2;
+      cropY += (cropHeight - zoomedHeight) / 2;
+      cropWidth = zoomedWidth;
+      cropHeight = zoomedHeight;
     }
 
     const photoCanvas = document.createElement("canvas");
@@ -583,43 +635,70 @@ export default function VirtualLipTryOn({
     }, "image/jpeg", 0.94);
   }
 
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      void startTryOn();
+    });
+    return () => window.cancelAnimationFrame(frame);
+    // Opening the product try-on is the user action that starts the camera flow.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <section
       aria-label={`${productName} virtual try-on`}
       aria-modal="true"
-      className={`virtual-tryon ${isClosing ? "closing" : ""}`}
+      className={`virtual-tryon ${isClosing ? "closing" : ""} ${isFullscreen ? "fullscreen" : ""}`}
+      ref={tryOnRef}
       role="dialog"
     >
       <header className="tryon-header">
-        <div>
-          <span>TIMEPHORIA VIRTUAL TRY-ON</span>
-          <h2>{productName}</h2>
-        </div>
-        <button aria-label={copy.close} className="tryon-close" onClick={requestClose} type="button">
-          X
-        </button>
+        <nav className="tryon-floating-nav" aria-label="Virtual try-on controls">
+          <div className="tryon-ratio-selector" aria-label="Camera ratio">
+            {(["9:16", "4:5"] as CameraRatio[]).map((ratio) => (
+              <button
+                aria-pressed={cameraRatio === ratio}
+                key={ratio}
+                onClick={() => setCameraRatio(ratio)}
+                type="button"
+              >
+                {ratio}
+              </button>
+            ))}
+          </div>
+          <button
+            aria-label={isZoomed ? copy.zoomOut : copy.zoomIn}
+            aria-pressed={isZoomed}
+            className="tryon-icon-control"
+            onClick={() => setIsZoomed((zoomed) => !zoomed)}
+            type="button"
+          >
+            {isZoomed ? "1×" : "+"}
+          </button>
+          <button
+            aria-label={isFullscreen ? copy.exitFullscreen : copy.fullscreen}
+            aria-pressed={isFullscreen}
+            className="tryon-icon-control"
+            onClick={toggleFullscreen}
+            type="button"
+          >
+            {isFullscreen ? "↙" : "↗"}
+          </button>
+          <button aria-label={copy.close} className="tryon-close" onClick={requestClose} type="button">
+            X
+          </button>
+        </nav>
       </header>
 
-      <div className={`tryon-stage ${status}`}>
+      <div className={`tryon-stage ${status} ratio-${cameraRatio.replace(":", "-")} ${isZoomed ? "zoomed" : ""}`}>
         {/* The existing local product thumbnail is a decorative camera-stage backdrop. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="tryon-product-backdrop" src={productImage} alt="" aria-hidden="true" />
         <video ref={videoRef} className="tryon-video" muted playsInline />
         <canvas ref={canvasRef} className="tryon-canvas" aria-hidden="true" />
 
-        {status === "idle" ? (
-          <div className="tryon-intro-panel">
-            <span>LIVE LIP COLOR</span>
-            <h3>{copy.title}</h3>
-            <p>{copy.intro}</p>
-            <p className="tryon-privacy">{copy.privacy}</p>
-            <button autoFocus onClick={startTryOn} type="button">
-              {copy.enable}
-            </button>
-          </div>
-        ) : null}
-
-        {status === "loading" ? (
+        {status === "idle" || status === "loading" ? (
           <div className="tryon-status-panel" aria-live="polite">
             <i aria-hidden="true" />
             <strong>{copy.loading}</strong>
@@ -686,18 +765,19 @@ export default function VirtualLipTryOn({
         </div>
 
         <div className="tryon-adjustments">
-          <label>
-            <span>{copy.intensity}</span>
-            <input
-              aria-label={copy.intensity}
-              max="0.30"
-              min="0.01"
-              onChange={(event) => changeIntensity(Number(event.target.value))}
-              step="0.01"
-              type="range"
-              value={intensity}
-            />
-          </label>
+          <div className="tryon-intensity-steps" aria-label={copy.intensity}>
+            {INTENSITY_LEVELS.map((level) => (
+              <button
+                aria-label={`${level.label}, ${Math.round(level.value * 100)}%`}
+                aria-pressed={intensity === level.value}
+                key={level.value}
+                onClick={() => changeIntensity(level.value)}
+                type="button"
+              >
+                <strong>{level.label}</strong>
+              </button>
+            ))}
+          </div>
           <button aria-pressed={effectEnabled} onClick={toggleEffect} type="button">
             {effectEnabled ? copy.effectOn : copy.effectOff}
           </button>
