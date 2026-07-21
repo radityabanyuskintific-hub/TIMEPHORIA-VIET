@@ -34,6 +34,7 @@ type Store = {
 
 type Promo = {
   title: string;
+  selectorLabel?: string;
   kicker: string;
   detail: string;
   category: CategoryKey;
@@ -46,14 +47,15 @@ type Promo = {
 
 const promos: Promo[] = [
   {
-    title: "BUY 1 TIMEPHORIA PRODUCT, GET READY TO SEE BTS LIVE!",
-    kicker: "Grand prize promo",
+    title: "CUMA BELI 1 TIMEPHORIA BISA JALAN-JALAN KE SEOUL & BANGKOK!",
+    selectorLabel: "TIMEPHORIA Giveaway!",
+    kicker: "Seoul & Bangkok giveaway",
     detail:
-      "Scan the QR code, complete the registration form, and upload your receipt for a chance to win spectacular prizes worth hundreds of millions of rupiah.",
+      "IKUTI UNDIANNYA, DAN MENANGKAN HADIAH TOTAL RATUSAN JUTA RUPIAH.",
     category: "lips",
     finish: "GLOSS IT BETTER",
     discount: "GET THE REWARD",
-    artwork: "/promos/bts-concert-experience.webp",
+    artwork: "/promos/seoul-bangkok-giveaway.webp",
     registrationUrl: "https://forms.gle/ChMJtWT7mReLJERs6",
     registrationLabel: "KLIK UNTUK IKUTAN",
   },
@@ -84,9 +86,8 @@ const promos: Promo[] = [
 ];
 
 const promoTranslation = {
-  title: "BELI 1 PRODUK TIMEPHORIA, SIAP-SIAP NONTON KONSER BTS!",
-  detail:
-    "Cukup scan QR Code, lengkapi formulir pendaftaran, unggah foto struk pembelianmu untuk resmi mengikuti undian dan kesempatan memenangkan hadiah spektakuler lainnya seharga RATUSAN JUTA!",
+  title: "CUMA BELI 1 TIMEPHORIA BISA JALAN-JALAN KE SEOUL & BANGKOK!",
+  detail: "IKUTI UNDIANNYA, DAN MENANGKAN HADIAH TOTAL RATUSAN JUTA RUPIAH.",
 };
 
 const finishTranslations: Record<string, string> = {
@@ -128,44 +129,96 @@ const productTranslations: Record<string, ProductTranslation> = {
 };
 
 const faqItems = [
-  ["Bagaimana cara mengikuti program ini?", "Beli minimal 1 produk Timephoria di toko yang berpartisipasi, scan QR Code pada poster di toko, isi formulir, unggah foto struk, lalu submit."],
-  ["Apakah ada minimum pembelian?", "Setiap pembelian minimal 1 produk Timephoria berhak mengikuti program."],
-  ["Apakah satu struk bisa didaftarkan lebih dari satu kali?", "Tidak. Setiap struk pembelian hanya dapat digunakan untuk 1 kali pendaftaran."],
-  ["Jika membeli lebih dari satu produk, apakah peluang menang bertambah?", "Setiap struk yang berbeda dapat didaftarkan sebagai satu kesempatan mengikuti undian."],
-  ["Toko mana saja yang mengikuti program ini?", "Program tersedia di 314 toko pilihan Timephoria."],
-  ["Apakah pembelian online bisa ikut?", "Tidak. Program hanya berlaku untuk pembelian di toko yang berpartisipasi."],
-  ["Bagaimana jika foto struk tidak jelas?", "Pendaftaran dapat dianggap tidak valid apabila foto struk tidak terbaca atau tidak lengkap."],
-  ["Bagaimana saya tahu kalau pendaftaran berhasil?", "Setelah formulir berhasil dikirim, akan muncul halaman konfirmasi bahwa data telah diterima."],
-  ["Kapan pengumuman pemenang?", "Pengumuman dilakukan pada bulan November melalui Instagram resmi Timephoria dan website resmi program."],
-  ["Bagaimana pemenang dihubungi?", "Pemenang diumumkan melalui Instagram Story resmi Timephoria dan dihubungi melalui DM untuk proses verifikasi."],
-  ["Berapa lama batas konfirmasi?", "Maksimal 3 x 24 jam."],
-  ["Apakah hadiah dapat diuangkan?", "Tidak. Hadiah tidak dapat diuangkan maupun dipindahtangankan."],
-  ["Apakah saya dipungut biaya jika menang?", "Tidak. Seluruh proses program dan penyerahan hadiah tidak dipungut biaya."],
-  ["Bagaimana jika saya salah mengisi data?", "Pastikan seluruh data benar. Data yang telah dikirim tidak dapat diubah."],
-  ["Apakah tiket konser sudah termasuk transportasi dan akomodasi?", "Tidak. Hadiah hanya berupa tiket konser BTS. Biaya lain menjadi tanggung jawab pemenang."],
-  ["Bagaimana proses pengambilan tiket konser BTS?", "Waktu dan lokasi akan diberitahukan kepada pemenang. Pengambilan dilakukan di area sekitar GBK, Jakarta, dengan kartu identitas yang sesuai data pendaftaran."],
-  ["Apakah hadiah dapat diwakilkan pengambilannya?", "Tidak. Hadiah hanya dapat diterima oleh pemenang yang telah diverifikasi identitasnya."],
+  ["Bagaimana cara mengikuti Giveaway Time Phoria?", "Beli minimal 1 produk Time Phoria di toko yang berpartisipasi, scan QR Code pada materi promosi Giveaway Time Phoria, isi seluruh data pada Google Form, upload foto struk pembelian yang jelas dan masih dapat dibaca, lalu submit formulir untuk mendapatkan kesempatan mengikuti undian."],
+  ["Kapan periode program berlangsung?", "Program berlangsung mulai Juli 2026 hingga Oktober 2026. Pengumuman pemenang akan dilakukan pada November 2026 melalui Instagram resmi Time Phoria."],
+  ["Siapa saja yang dapat mengikuti program ini?", "Program terbuka bagi seluruh Warga Negara Indonesia (WNI). Khusus hadiah perjalanan ke luar negeri, pemenang harus berusia minimal 17 tahun."],
+  ["Di mana program ini berlaku?", "Program hanya berlaku untuk pembelian offline di toko yang menjual produk Time Phoria dan memasang materi promosi Giveaway Time Phoria. Program tidak berlaku untuk pembelian di Modern Trade (MT), seperti Guardian, Watsons, Dandan, dan toko MT lainnya."],
+  ["Berapa minimal pembelian?", "Minimal pembelian adalah 1 produk Time Phoria."],
+  ["Apakah semakin banyak membeli produk akan menambah kesempatan menang?", "Ya. Setiap pembelian 1 produk Time Phoria mendapatkan 1 kesempatan undian. Contoh: beli 2 produk = 2 kesempatan; beli 5 produk = 5 kesempatan."],
+  ["Apakah satu struk dapat digunakan lebih dari satu kali?", "Tidak. Setiap struk hanya dapat digunakan untuk satu kali registrasi."],
+  ["Data apa saja yang harus diisi?", "Peserta wajib mengisi seluruh data yang diminta pada Google Form dan mengunggah foto struk pembelian yang jelas. Pastikan seluruh data yang diisi sudah benar karena data yang telah dikirim tidak dapat diubah."],
+  ["Bagaimana jika foto struk tidak jelas?", "Struk yang buram, rusak, tidak lengkap, hasil edit, atau tidak dapat dibaca dapat dinyatakan tidak valid. Peserta juga disarankan menyimpan struk asli hingga program berakhir karena penyelenggara dapat meminta struk asli untuk proses verifikasi."],
+  ["Bagaimana pemenang dipilih?", "Seluruh pemenang akan dipilih secara acak melalui proses pengundian."],
+  ["Bagaimana pengumuman pemenang dilakukan?", "Pemenang akan diumumkan melalui Instagram resmi Time Phoria dan dihubungi oleh tim resmi Time Phoria untuk proses verifikasi. Pemenang wajib memberikan konfirmasi maksimal 4 (empat) hari kalender sejak dihubungi. Apabila tidak memberikan konfirmasi dalam batas waktu tersebut, hadiah dianggap hangus dan penyelenggara berhak melakukan pengundian ulang."],
+  ["Apa saja hadiah utama yang tersedia?", "Hadiah utama terdiri dari 2 pemenang Trip Seoul, 3 pemenang Trip Bangkok, emas, smartwatch, dan voucher belanja Alfamart. Jenis, spesifikasi, dan nominal hadiah tertentu akan diumumkan oleh penyelenggara."],
+  ["Apa saja yang termasuk dalam hadiah perjalanan?", "Setiap pemenang trip memperoleh 1 paket perjalanan untuk 1 orang (single traveler), mencakup tiket pesawat pulang-pergi Jakarta–tujuan, hotel, makan sesuai itinerary, visa (apabila diperlukan), dan fasilitas lain yang termasuk dalam paket tour dari travel partner."],
+  ["Apa saja yang tidak termasuk dalam hadiah perjalanan?", "Hadiah perjalanan tidak mencakup transportasi dari kota domisili menuju Jakarta dan sebaliknya, uang saku, pengeluaran pribadi, belanja pribadi, dan biaya di luar paket tour."],
+  ["Bagaimana jika saya tinggal di luar Jakarta?", "Pemenang yang berdomisili di luar Jakarta wajib menanggung sendiri biaya perjalanan menuju Jakarta dan kepulangan ke kota domisili."],
+  ["Apakah saya harus memiliki paspor?", "Ya. Pemenang wajib memiliki paspor yang masih berlaku sesuai persyaratan perjalanan internasional. Pembuatan maupun perpanjangan paspor menjadi tanggung jawab pemenang."],
+  ["Kapan keberangkatan trip?", "Perjalanan direncanakan berlangsung pada Januari–Februari 2027. Jadwal keberangkatan akan disesuaikan dengan ketersediaan dari travel partner serta kesepakatan dengan pemenang."],
+  ["Apakah saya boleh membawa pendamping?", "Hadiah perjalanan hanya berlaku untuk 1 (satu) orang pemenang dan tidak termasuk pendamping. Apabila pemenang ingin membawa pendamping, seluruh biaya tambahan sesuai ketentuan travel partner menjadi tanggung jawab pemenang."],
+  ["Apakah hadiah perjalanan dapat dipindahtangankan?", "Ya. Hadiah perjalanan dapat dialihkan kepada pihak lain dengan pemberitahuan kepada penyelenggara sebelum proses keberangkatan."],
+  ["Bagaimana jika saya tidak dapat mengikuti perjalanan?", "Pemenang dapat memilih penggantian hadiah berupa uang tunai sebesar nilai paket perjalanan. Pajak atas hadiah uang tunai menjadi tanggung jawab pemenang sesuai ketentuan perpajakan yang berlaku."],
+  ["Apakah hadiah dapat diuangkan atau ditukar?", "Seluruh hadiah tidak dapat ditukar maupun diuangkan, kecuali hadiah perjalanan sesuai ketentuan pada FAQ nomor 20."],
+  ["Siapa yang menanggung pajak hadiah?", "Seluruh pajak hadiah menjadi tanggung jawab masing-masing pemenang sesuai ketentuan perpajakan yang berlaku."],
+  ["Apa yang diperlukan saat proses verifikasi?", "Pemenang wajib menunjukkan KTP atau kartu identitas resmi yang masih berlaku, data yang sesuai dengan informasi saat registrasi, dan struk pembelian asli apabila diminta oleh penyelenggara."],
 ];
 
 const faqItemsEnglish = [
-  ["How do I join?", "Buy at least one Timephoria product at a participating store, scan the QR code, complete the form, upload your receipt, and submit."],
-  ["Is there a minimum purchase?", "Every purchase of at least one Timephoria product is eligible."],
-  ["Can one receipt be registered more than once?", "No. Each receipt can only be used for one registration."],
-  ["Does buying more products increase my chance?", "Each different receipt can be registered as one entry in the draw."],
-  ["Which stores are participating?", "The program is available at 314 selected Timephoria stores."],
-  ["Are online purchases eligible?", "No. Only purchases from participating physical stores are eligible."],
-  ["What if my receipt photo is unclear?", "The registration may be invalid if the receipt is unreadable or incomplete."],
-  ["How do I know my registration succeeded?", "A confirmation page will appear after the form is submitted."],
-  ["When will winners be announced?", "Winners will be announced in November on Timephoria's official Instagram and program website."],
-  ["How will winners be contacted?", "Winners will be announced on Timephoria's official Instagram Story and contacted by DM for verification."],
-  ["How long is the confirmation period?", "A maximum of 3 x 24 hours."],
-  ["Can the prize be exchanged for cash?", "No. Prizes cannot be exchanged for cash or transferred."],
-  ["Will I be charged if I win?", "No. The program and prize handover process are free of charge."],
-  ["What if I entered incorrect data?", "Check all details before submitting. Submitted data cannot be changed."],
-  ["Does the concert ticket include transport and accommodation?", "No. The prize only includes the BTS concert ticket. Other expenses are the winner's responsibility."],
-  ["How do I collect the concert ticket?", "Collection details will be provided to the winner. Collection will be near GBK, Jakarta, with matching valid identification."],
-  ["Can someone collect the prize for me?", "No. The verified winner must receive the prize."],
+  ["How do I join the Time Phoria Giveaway?", "Buy at least one Time Phoria product at a participating store, scan the QR code on the promotional material, complete the Google Form, upload a clear and readable receipt photo, and submit the form to receive an entry in the draw."],
+  ["When does the program run?", "The program runs from July through October 2026. Winners will be announced in November 2026 through Time Phoria's official Instagram account."],
+  ["Who can participate?", "The program is open to all Indonesian citizens. Winners of international travel prizes must be at least 17 years old."],
+  ["Where is the program valid?", "The program is valid only for offline purchases at stores that sell Time Phoria products and display the Time Phoria Giveaway promotional material. It does not apply to Modern Trade retailers such as Guardian, Watsons, Dandan, or other MT stores."],
+  ["What is the minimum purchase?", "The minimum purchase is one Time Phoria product."],
+  ["Does buying more products increase my chances?", "Yes. Each Time Phoria product purchased earns one draw entry. For example, two products earn two entries and five products earn five entries."],
+  ["Can one receipt be used more than once?", "No. Each receipt can only be used for one registration."],
+  ["What information must I provide?", "Participants must complete all requested information in the Google Form and upload a clear receipt photo. Check all information carefully because submitted data cannot be changed."],
+  ["What if my receipt photo is unclear?", "Blurred, damaged, incomplete, edited, or unreadable receipts may be declared invalid. Keep the original receipt until the program ends because it may be requested for verification."],
+  ["How are winners selected?", "All winners will be selected at random through a prize draw."],
+  ["How will winners be announced?", "Winners will be announced through Time Phoria's official Instagram account and contacted by the official Time Phoria team for verification. Winners must confirm within four calendar days of being contacted. Otherwise, the prize will be forfeited and the organizer may redraw it."],
+  ["What main prizes are available?", "The prizes include two Seoul trips, three Bangkok trips, gold, smartwatches, and Alfamart shopping vouchers. Certain prize types, specifications, and values will be announced by the organizer."],
+  ["What is included in the travel prize?", "Each trip winner receives one travel package for one person, including round-trip airfare from Jakarta to the destination, hotel, meals according to the itinerary, a visa if required, and other facilities included in the travel partner's tour package."],
+  ["What is not included in the travel prize?", "The travel prize does not include transportation between the winner's city and Jakarta, spending money, personal expenses, personal shopping, or costs outside the tour package."],
+  ["What if I live outside Jakarta?", "Winners living outside Jakarta are responsible for their own travel costs to Jakarta and back to their city of residence."],
+  ["Do I need a passport?", "Yes. Winners must hold a passport that remains valid under international travel requirements. Obtaining or renewing the passport is the winner's responsibility."],
+  ["When will the trips depart?", "Travel is planned for January–February 2027. Departure dates will depend on the travel partner's availability and agreement with the winners."],
+  ["May I bring a companion?", "The travel prize is for one winner and does not include a companion. Any additional costs for a companion under the travel partner's rules are the winner's responsibility."],
+  ["Can the travel prize be transferred?", "Yes. The travel prize may be transferred to another person by notifying the organizer before departure arrangements are processed."],
+  ["What if I cannot take the trip?", "The winner may choose a cash replacement equal to the travel package value. Taxes on the cash prize are the winner's responsibility under applicable tax regulations."],
+  ["Can prizes be exchanged or redeemed for cash?", "Prizes cannot be exchanged or redeemed for cash, except for travel prizes under FAQ number 20."],
+  ["Who pays prize taxes?", "All prize taxes are the responsibility of each winner under applicable tax regulations."],
+  ["What is required during verification?", "Winners must present a valid national ID or other official identification, information matching their registration, and the original purchase receipt if requested by the organizer."],
 ];
+
+const termsItems = [
+  "Program berlangsung pada periode Juli 2026–Oktober 2026.",
+  "Program hanya berlaku untuk pembelian produk Time Phoria secara offline di toko yang berpartisipasi dan memasang materi promosi Giveaway Time Phoria.",
+  "Setiap pembelian 1 produk Time Phoria memperoleh 1 kesempatan undian.",
+  "Setiap struk pembelian hanya dapat digunakan untuk 1 kali registrasi.",
+  "Peserta wajib mengisi data dengan benar dan lengkap pada Google Form.",
+  "Penyelenggara berhak melakukan verifikasi terhadap seluruh data peserta, bukti pembelian, maupun identitas pemenang.",
+  "Peserta akan didiskualifikasi apabila menggunakan struk palsu; mengubah atau mengedit struk; memberikan data yang tidak benar; menggunakan akun Instagram palsu atau tidak valid; melakukan spam atau tindakan yang mengganggu program; tidak dapat dihubungi atau tidak memberikan konfirmasi dalam 4 hari kalender; atau tidak dapat menunjukkan dokumen pendukung saat verifikasi.",
+  "Keputusan penyelenggara dalam seluruh proses program, termasuk verifikasi, pengundian, dan penetapan pemenang, bersifat final dan tidak dapat diganggu gugat.",
+  "Seluruh pajak hadiah menjadi tanggung jawab pemenang sesuai ketentuan perpajakan yang berlaku.",
+  "Pemenang hadiah perjalanan wajib memiliki paspor yang masih berlaku dan memenuhi persyaratan perjalanan internasional.",
+  "Hadiah perjalanan tidak mencakup biaya transportasi menuju Jakarta, uang saku, pengeluaran pribadi, maupun biaya lain di luar paket tour.",
+  "Apabila pemenang memilih untuk tidak mengikuti perjalanan, penyelenggara dapat memberikan penggantian berupa uang tunai sebesar nilai paket perjalanan. Pajak atas hadiah uang tunai menjadi tanggung jawab pemenang.",
+  "Hadiah perjalanan dapat dialihkan kepada pihak lain dengan pemberitahuan kepada penyelenggara sebelum keberangkatan.",
+  "Penyelenggara berhak mengubah jadwal, mekanisme program, atau jenis hadiah dengan nilai yang setara apabila terjadi keadaan di luar kendali penyelenggara (force majeure), termasuk perubahan regulasi, pembatalan perjalanan, kebijakan pemerintah, atau keadaan kahar lainnya.",
+  "Dengan mengikuti program ini, peserta dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan yang berlaku.",
+];
+
+const termsItemsEnglish = [
+  "The program runs from July through October 2026.",
+  "The program is valid only for offline purchases of Time Phoria products at participating stores displaying the Time Phoria Giveaway promotional material.",
+  "Each Time Phoria product purchased earns one draw entry.",
+  "Each purchase receipt may only be used for one registration.",
+  "Participants must provide correct and complete information in the Google Form.",
+  "The organizer may verify participant data, proof of purchase, and winner identities.",
+  "Participants will be disqualified for using a fake or edited receipt; providing false information; using a fake or invalid Instagram account; spamming or disrupting the program; being unreachable or failing to confirm within four calendar days; or failing to present required verification documents.",
+  "The organizer's decisions throughout the program, including verification, drawing, and winner selection, are final and cannot be contested.",
+  "All prize taxes are the winner's responsibility under applicable tax regulations.",
+  "Travel-prize winners must hold a valid passport and meet international travel requirements.",
+  "The travel prize excludes transportation to Jakarta, spending money, personal expenses, and costs outside the tour package.",
+  "If a winner chooses not to travel, the organizer may provide cash equal to the travel package value. Taxes on the cash prize are the winner's responsibility.",
+  "The travel prize may be transferred to another person by notifying the organizer before departure.",
+  "The organizer may change the schedule, program mechanism, or prize type for another of equal value due to circumstances beyond its control (force majeure), including regulatory changes, travel cancellation, government policy, or other force majeure events.",
+  "By participating, participants are deemed to have read, understood, and accepted all applicable terms and conditions.",
+];
+
+const giveawayDisclaimer = "Hati-hati terhadap penipuan yang mengatasnamakan Time Phoria. Seluruh informasi resmi mengenai program Giveaway Time Phoria hanya disampaikan melalui akun Instagram resmi Time Phoria dan kanal komunikasi resmi Time Phoria. Time Phoria tidak pernah memungut biaya apa pun kepada peserta maupun pemenang untuk mengikuti program atau menerima hadiah.";
+
+const giveawayDisclaimerEnglish = "Beware of fraud claiming to represent Time Phoria. Official information about the Time Phoria Giveaway is communicated only through Time Phoria's official Instagram account and official communication channels. Time Phoria never charges participants or winners to join the program or receive a prize.";
 
 function parseStoreCsv(csv: string): Store[] {
   const rows: string[][] = [];
@@ -1065,8 +1118,8 @@ export default function Home() {
         <div className="mega-promo-modal" role="dialog" aria-label={megaPromo.title}>
           <div className="mega-promo-card">
             <div className="mega-promo-copy">
-              <strong>BELI 1 PRODUK TIMEPHORIA, SIAP-SIAP NONTON KONSER BTS!</strong>
-              <em>{promoTranslation.detail}</em>
+              <strong>{megaPromo.title}</strong>
+              <em>{megaPromo.detail}</em>
               <a
                 href={megaPromo.registrationUrl}
                 rel="noreferrer"
@@ -1128,7 +1181,7 @@ export default function Home() {
                 />
                 <b className="promo-tap-hint">Tap To See Details</b>
                 <span>{promos[promoIndex].kicker}</span>
-                <strong>{promoIndex === 0 ? "BUY 1 TIMEPHORIA PRODUCT, GET READY TO SEE BTS LIVE!" : promos[promoIndex].title}</strong>
+                <strong>{promos[promoIndex].title}</strong>
                 <em>{promos[promoIndex].detail}</em>
               </button>
               <div className="promo-bar" aria-label="Promo slides">
@@ -1201,13 +1254,13 @@ export default function Home() {
                   }}
                   type="button"
                 >
-                  {promo.title}
+                  {promo.selectorLabel ?? promo.title}
                 </button>
               ))}
             </div>
 
             {currentPromo.registrationUrl && currentPromo.artwork ? (
-              <div className="promo-placeholder bts-promo-artwork">
+              <div className="promo-placeholder featured-promo-artwork">
                 <div className="promo-artwork-scroll">
                   <img
                     src={currentPromo.artwork}
@@ -1215,7 +1268,7 @@ export default function Home() {
                   />
                 </div>
                 <button className="faq-link" onClick={() => setView("faq")} type="button">
-                  {isIndonesian ? "LIHAT FAQ" : "VIEW FAQ"}
+                  VIEW FAQ
                 </button>
               </div>
             ) : (
@@ -1239,7 +1292,7 @@ export default function Home() {
           <div className="faq-screen">
             <header className="faq-header">
               <button onClick={() => setView("promo")} type="button">Back</button>
-              <span>TIMEPHORIA BTS GIVEAWAY</span>
+              <span>TIMEPHORIA SEOUL &amp; BANGKOK GIVEAWAY</span>
               <h2>FAQ</h2>
             </header>
             <div className="faq-list">
@@ -1247,21 +1300,21 @@ export default function Home() {
                 <details key={question} open={index === 0}>
                   <summary>{question}</summary>
                   <p>{answer}</p>
-                  {index === 4 ? (
-                    <button
-                      className="store-directory-link"
-                      onClick={() => {
-                        setStoreStatus("loading");
-                        setView("stores");
-                      }}
-                      type="button"
-                    >
-                      {isIndonesian ? "LIHAT 314 TOKO" : "VIEW 314 STORES"}
-                    </button>
-                  ) : null}
                 </details>
               ))}
             </div>
+            <section className="terms-section">
+              <h3>{isIndonesian ? "Syarat & Ketentuan" : "Terms & Conditions"}</h3>
+              <ol>
+                {(isIndonesian ? termsItems : termsItemsEnglish).map((term) => (
+                  <li key={term}>{term}</li>
+                ))}
+              </ol>
+              <aside className="giveaway-disclaimer">
+                <strong>{isIndonesian ? "Disclaimer" : "Disclaimer"}</strong>
+                <p>{isIndonesian ? giveawayDisclaimer : giveawayDisclaimerEnglish}</p>
+              </aside>
+            </section>
           </div>
         ) : null}
 
@@ -1269,7 +1322,7 @@ export default function Home() {
           <div className="stores-screen">
             <header className="stores-header">
               <button onClick={() => setView("faq")} type="button">Back</button>
-              <span>TIMEPHORIA BTS GIVEAWAY</span>
+              <span>TIMEPHORIA SEOUL &amp; BANGKOK GIVEAWAY</span>
               <h2>{isIndonesian ? "TOKO TERSEDIA" : "AVAILABLE STORES"}</h2>
               <p>
                 {isIndonesian

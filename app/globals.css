@@ -605,7 +605,7 @@ button {
   width: 100%;
 }
 
-.promo-placeholder.bts-promo-artwork {
+.promo-placeholder.featured-promo-artwork {
   border-color: rgba(222, 75, 208, 0.76);
   box-shadow: 0 0 28px rgba(222, 75, 208, 0.2);
   display: flex;
@@ -621,7 +621,7 @@ button {
   padding-top: 141.4%;
 }
 
-.bts-promo-artwork::before {
+.featured-promo-artwork::before {
   display: none;
 }
 
@@ -655,36 +655,6 @@ button {
   height: auto;
   position: static;
   width: 100%;
-}
-
-.bts-register-button {
-  align-items: center;
-  backdrop-filter: blur(10px);
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.36), transparent 58%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(12, 10, 16, 0.88));
-  border: 2px solid rgba(255, 255, 255, 0.58);
-  border-radius: 18px;
-  bottom: 18px;
-  box-shadow:
-    inset 0 0 18px rgba(255, 255, 255, 0.3),
-    0 0 18px rgba(255, 255, 255, 0.18);
-  color: #fff;
-  display: flex;
-  font-size: 15px;
-  font-weight: 500;
-  justify-content: center;
-  left: 20px;
-  line-height: 1;
-  padding: 12px 14px;
-  position: absolute;
-  text-align: center;
-  text-decoration: none;
-  text-shadow:
-    0 0 8px rgba(255, 255, 255, 0.72),
-    0 0 16px rgba(196, 82, 255, 0.42);
-  text-transform: uppercase;
-  width: 124px;
 }
 
 .category-stack {
@@ -1553,6 +1523,13 @@ button {
   z-index: 3;
 }
 
+.featured-promo-artwork .faq-link {
+  bottom: 14px;
+  flex: 0 0 auto;
+  left: 14px;
+  margin: 0;
+}
+
 .language-toggle {
   background: rgba(8, 8, 8, 0.84);
   border: 1px solid rgba(255, 255, 255, 0.55);
@@ -1666,6 +1643,49 @@ button {
   font-size: 12px;
   line-height: 1.5;
   margin: 10px 0 0;
+}
+
+.terms-section {
+  margin-top: 28px;
+}
+
+.terms-section h3 {
+  font-size: 24px;
+  margin: 0 0 12px;
+}
+
+.terms-section ol {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding-left: 22px;
+}
+
+.terms-section li {
+  color: #d7d2d4;
+  font-size: 12px;
+  line-height: 1.5;
+  padding-left: 3px;
+}
+
+.giveaway-disclaimer {
+  background: rgba(255, 214, 0, 0.1);
+  border: 1px solid rgba(255, 214, 0, 0.32);
+  border-radius: 8px;
+  margin-top: 18px;
+  padding: 14px;
+}
+
+.giveaway-disclaimer strong {
+  color: #ffdc3f;
+  font-size: 13px;
+}
+
+.giveaway-disclaimer p {
+  color: #f1e8bd;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 7px 0 0;
 }
 
 .store-directory-link {
