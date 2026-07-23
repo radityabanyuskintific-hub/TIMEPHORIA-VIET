@@ -1,8 +1,8 @@
-# vinext-starter
+# Timephoria Web
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+The Timephoria product universe and virtual lip try-on experience, built with
+React, Next.js-compatible routing, and
+[Vinext](https://github.com/cloudflare/vinext).
 
 ## Prerequisites
 
@@ -13,19 +13,24 @@ Drizzle support.
 ```bash
 npm install
 npm run dev
-npm run build
+npm run check
 ```
 
-This starter does not use `wrangler.jsonc`.
+## Source Structure
 
-## Included Shape
+- `app/page.tsx` is the route entry point.
+- `app/features/home/` owns homepage composition and content.
+- `app/features/catalog/` owns product types, translations, and cards.
+- `app/features/stores/` owns store-directory loading and filtering.
+- `app/features/try-on/` owns MediaPipe setup and lip rendering.
+- `app/components/VirtualLipTryOn.tsx` coordinates try-on UI and camera state.
+- `public/vendor/mediapipe/` contains the pinned on-device vision runtime and
+  model. These files are served locally so try-on startup does not depend on
+  Google Storage or a third-party CDN.
+- `.openai/hosting.json` contains the existing Sites deployment configuration.
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+Keep visual changes separate from structural refactors. Run `npm run check`
+after changes to verify lint, TypeScript, and the production build.
 
 ## Asset Replacement Guide
 
@@ -140,7 +145,10 @@ actions tied to the current ChatGPT user. Leave public content anonymous.
 ## Useful Commands
 
 - `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
+- `npm run lint`: check code quality
+- `npm run typecheck`: verify TypeScript types
+- `npm run build`: create the Vinext production output
+- `npm run check`: run lint, type checking, and the production build
 - `npm run db:generate`: generate Drizzle migrations after schema changes
 
 ## Learn More

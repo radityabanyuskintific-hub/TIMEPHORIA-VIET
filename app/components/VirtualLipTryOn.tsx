@@ -1,7 +1,12 @@
 "use client";
 
-import type { FaceLandmarker, NormalizedLandmark } from "@mediapipe/tasks-vision";
+import type { FaceLandmarker } from "@mediapipe/tasks-vision";
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  createLipRenderer,
+  type LipRenderer,
+} from "../features/try-on/lip-renderer";
+import { createFaceLandmarker } from "../features/try-on/mediapipe";
 import type { LipTryOnShade } from "../lip-try-on-shades";
 
 type Language = "en" | "id";
@@ -10,9 +15,9 @@ type CaptureStatus = "idle" | "saved" | "error";
 type CameraRatio = "9:16" | "4:5";
 
 const INTENSITY_LEVELS = [
-  { label: "1 SWIPE", value: 0.15 },
-  { label: "2 SWIPES", value: 0.22 },
-  { label: "3 SWIPES", value: 0.3 },
+  { label: "1 SWIPE", value: 0.2 },
+  { label: "2 SWIPES", value: 0.28 },
+  { label: "3 SWIPES", value: 0.38 },
 ] as const;
 
 type VirtualLipTryOnProps = {
@@ -23,20 +28,6 @@ type VirtualLipTryOnProps = {
   productName: string;
   shades: LipTryOnShade[];
 };
-
-const OUTER_LIP = [
-  61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 409, 270, 269, 267,
-  0, 37, 39, 40, 185,
-];
-
-const INNER_LIP = [
-  78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308, 415, 310, 311, 312,
-  13, 82, 81, 80, 191,
-];
-
-const MEDIAPIPE_VERSION = "0.10.35";
-const MODEL_URL =
-  "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
 
 export default function VirtualLipTryOn({
   language,
@@ -50,9 +41,7 @@ export default function VirtualLipTryOn({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tryOnRef = useRef<HTMLElement>(null);
-  const lipMaskCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const featheredMaskCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const lipEffectCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const lipRendererRef = useRef<LipRenderer | null>(null);
   const landmarkerRef = useRef<FaceLandmarker | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -62,13 +51,13 @@ export default function VirtualLipTryOn({
   const mountedRef = useRef(true);
   const faceDetectedRef = useRef(false);
   const shadeRef = useRef(initialShade);
-  const intensityRef = useRef(0.15);
+  const intensityRef = useRef(0.2);
   const effectEnabledRef = useRef(true);
 
   const [status, setStatus] = useState<TryOnStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedShade, setSelectedShade] = useState(initialShade);
-  const [intensity, setIntensity] = useState(0.15);
+  const [intensity, setIntensity] = useState(0.2);
   const [effectEnabled, setEffectEnabled] = useState(true);
   const [faceDetected, setFaceDetected] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -184,187 +173,6 @@ export default function VirtualLipTryOn({
     setFaceDetected(nextValue);
   }
 
-  function tracePath(
-    context: CanvasRenderingContext2D,
-    points: NormalizedLandmark[],
-    indices: number[],
-    width: number,
-    height: number,
-  ) {
-    const firstPoint = points[indices[0]];
-    const lastPoint = points[indices[indices.length - 1]];
-    context.moveTo(
-      ((lastPoint.x + firstPoint.x) / 2) * width,
-      ((lastPoint.y + firstPoint.y) / 2) * height,
-    );
-
-    indices.forEach((index, pointIndex) => {
-      const point = points[index];
-      const nextPoint = points[indices[(pointIndex + 1) % indices.length]];
-      context.quadraticCurveTo(
-        point.x * width,
-        point.y * height,
-        ((point.x + nextPoint.x) / 2) * width,
-        ((point.y + nextPoint.y) / 2) * height,
-      );
-    });
-    context.closePath();
-  }
-
-  function prepareWorkingCanvas(
-    canvasReference: { current: HTMLCanvasElement | null },
-    width: number,
-    height: number,
-  ) {
-    if (!canvasReference.current) {
-      canvasReference.current = document.createElement("canvas");
-    }
-
-    const canvas = canvasReference.current;
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-    }
-    return canvas;
-  }
-
-  function createFeatheredLipMask(
-    points: NormalizedLandmark[],
-    width: number,
-    height: number,
-  ) {
-    const maskCanvas = prepareWorkingCanvas(lipMaskCanvasRef, width, height);
-    const featheredMaskCanvas = prepareWorkingCanvas(
-      featheredMaskCanvasRef,
-      width,
-      height,
-    );
-    const maskContext = maskCanvas.getContext("2d");
-    const featheredMaskContext = featheredMaskCanvas.getContext("2d");
-    const outerLipPoints = OUTER_LIP.map((index) => points[index]);
-    const lipMinX = Math.min(...outerLipPoints.map((point) => point.x * width));
-    const lipMaxX = Math.max(...outerLipPoints.map((point) => point.x * width));
-    const detectedLipWidth = lipMaxX - lipMinX;
-    const edgeBlur = Math.max(4.5, Math.min(10, detectedLipWidth * 0.055));
-
-    if (!maskContext || !featheredMaskContext) {
-      return { canvas: maskCanvas, edgeBlur };
-    }
-
-    maskContext.clearRect(0, 0, width, height);
-    maskContext.beginPath();
-    tracePath(maskContext, points, OUTER_LIP, width, height);
-    tracePath(maskContext, points, INNER_LIP, width, height);
-    maskContext.fillStyle = "#ffffff";
-    maskContext.fill("evenodd");
-
-    featheredMaskContext.clearRect(0, 0, width, height);
-    featheredMaskContext.save();
-    featheredMaskContext.globalAlpha = 0.96;
-    featheredMaskContext.filter = `blur(${edgeBlur}px)`;
-    featheredMaskContext.drawImage(maskCanvas, 0, 0);
-    featheredMaskContext.restore();
-
-    return { canvas: featheredMaskCanvas, edgeBlur };
-  }
-
-  function drawLipColor(
-    context: CanvasRenderingContext2D,
-    points: NormalizedLandmark[],
-    width: number,
-    height: number,
-  ) {
-    const { canvas: featheredMask, edgeBlur } = createFeatheredLipMask(
-      points,
-      width,
-      height,
-    );
-    const effectCanvas = prepareWorkingCanvas(lipEffectCanvasRef, width, height);
-    const effectContext = effectCanvas.getContext("2d");
-    if (!effectContext) return;
-
-    effectContext.clearRect(0, 0, width, height);
-    effectContext.fillStyle = shadeRef.current.hex;
-    effectContext.fillRect(0, 0, width, height);
-    effectContext.globalCompositeOperation = "destination-in";
-    effectContext.drawImage(featheredMask, 0, 0);
-    effectContext.globalCompositeOperation = "source-over";
-
-    context.save();
-    context.globalCompositeOperation = "multiply";
-    context.globalAlpha = intensityRef.current;
-    context.drawImage(effectCanvas, 0, 0);
-    context.restore();
-
-    if (isGlossProduct) {
-      drawGlossHighlight(
-        context,
-        points,
-        width,
-        height,
-        featheredMask,
-        effectCanvas,
-        edgeBlur,
-      );
-    }
-  }
-
-  function drawGlossHighlight(
-    context: CanvasRenderingContext2D,
-    points: NormalizedLandmark[],
-    width: number,
-    height: number,
-    featheredMask: HTMLCanvasElement,
-    effectCanvas: HTMLCanvasElement,
-    edgeBlur: number,
-  ) {
-    const lipPoints = OUTER_LIP.map((index) => points[index]);
-    const minX = Math.min(...lipPoints.map((point) => point.x * width));
-    const maxX = Math.max(...lipPoints.map((point) => point.x * width));
-    const minY = Math.min(...lipPoints.map((point) => point.y * height));
-    const maxY = Math.max(...lipPoints.map((point) => point.y * height));
-    const lipWidth = maxX - minX;
-    const lipHeight = maxY - minY;
-
-    const effectContext = effectCanvas.getContext("2d");
-    if (!effectContext) return;
-
-    effectContext.clearRect(0, 0, width, height);
-
-    const sheen = effectContext.createLinearGradient(0, minY, 0, maxY);
-    sheen.addColorStop(0, "rgba(255,255,255,0)");
-    sheen.addColorStop(0.2, "rgba(255,225,233,0.2)");
-    sheen.addColorStop(0.4, "rgba(255,246,248,0.03)");
-    sheen.addColorStop(0.63, "rgba(255,225,233,0.16)");
-    sheen.addColorStop(0.88, "rgba(255,255,255,0)");
-    effectContext.fillStyle = sheen;
-    effectContext.fillRect(minX, minY, lipWidth, lipHeight);
-
-    const highlight = effectContext.createRadialGradient(
-      minX + lipWidth * 0.42,
-      minY + lipHeight * 0.32,
-      0,
-      minX + lipWidth * 0.42,
-      minY + lipHeight * 0.32,
-      lipWidth * 0.38,
-    );
-    highlight.addColorStop(0, "rgba(255,225,233,0.22)");
-    highlight.addColorStop(0.46, "rgba(255,240,244,0.08)");
-    highlight.addColorStop(1, "rgba(255,255,255,0)");
-    effectContext.fillStyle = highlight;
-    effectContext.fillRect(minX, minY, lipWidth, lipHeight);
-
-    effectContext.globalCompositeOperation = "destination-in";
-    effectContext.drawImage(featheredMask, 0, 0);
-    effectContext.globalCompositeOperation = "source-over";
-
-    context.save();
-    context.globalCompositeOperation = "multiply";
-    context.globalAlpha = Math.max(0.2, 0.34 - edgeBlur * 0.02);
-    context.drawImage(effectCanvas, 0, 0);
-    context.restore();
-  }
-
   function beginRenderLoop() {
     let lastDetectionAt = 0;
     let lastVideoTime = -1;
@@ -399,7 +207,20 @@ export default function VirtualLipTryOn({
           updateFaceDetected(Boolean(points));
 
           if (points && effectEnabledRef.current) {
-            drawLipColor(context, points, canvas.width, canvas.height);
+            if (!lipRendererRef.current) {
+              lipRendererRef.current = createLipRenderer();
+            }
+            lipRendererRef.current.draw(
+              context,
+              points,
+              canvas.width,
+              canvas.height,
+              {
+                shadeHex: shadeRef.current.hex,
+                intensity: intensityRef.current,
+                isGloss: isGlossProduct,
+              },
+            );
           }
         }
 
@@ -411,30 +232,6 @@ export default function VirtualLipTryOn({
     }
 
     rafRef.current = window.requestAnimationFrame(renderFrame);
-  }
-
-  async function createLandmarker() {
-    const { FaceLandmarker, FilesetResolver } = await import("@mediapipe/tasks-vision");
-    const fileset = await FilesetResolver.forVisionTasks(
-      `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}/wasm`,
-    );
-    const options = {
-      baseOptions: { modelAssetPath: MODEL_URL, delegate: "GPU" as const },
-      runningMode: "VIDEO" as const,
-      numFaces: 1,
-      minFaceDetectionConfidence: 0.55,
-      minFacePresenceConfidence: 0.55,
-      minTrackingConfidence: 0.55,
-    };
-
-    try {
-      return await FaceLandmarker.createFromOptions(fileset, options);
-    } catch {
-      return FaceLandmarker.createFromOptions(fileset, {
-        ...options,
-        baseOptions: { modelAssetPath: MODEL_URL, delegate: "CPU" },
-      });
-    }
   }
 
   async function startTryOn() {
@@ -469,7 +266,7 @@ export default function VirtualLipTryOn({
         await videoRef.current.play();
       }
 
-      const landmarker = await createLandmarker();
+      const landmarker = await createFaceLandmarker();
       if (!mountedRef.current) {
         landmarker.close();
         stopEverything();

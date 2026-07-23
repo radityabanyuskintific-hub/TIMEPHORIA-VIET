@@ -16,6 +16,7 @@
 # next.js
 /.next/
 /out/
+/.vinext/
 
 # misc
 .DS_Store
@@ -27,6 +28,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 dev-server*.log
+.dev-server*.log
+codex-dev-server*.log
 
 # env files (can opt-in for committing if needed)
 .env*
@@ -36,5 +39,6 @@ dev-server*.log
 
 # typescript
 next-env.d.ts
+*.tsbuildinfo
 /dist/
 /.wrangler/

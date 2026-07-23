@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
+import "./features/try-on/try-on.css";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
