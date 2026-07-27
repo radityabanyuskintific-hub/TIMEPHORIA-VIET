@@ -20,6 +20,9 @@ import type {
 import { useStoreDirectory } from "../stores/useStoreDirectory";
 import { lipTryOnShades } from "../../lip-try-on-shades";
 
+const ENABLE_INTRO_LOADER = false;
+const PROMO_SEEN_SESSION_KEY = "timephoria:mega-promo-seen";
+
 const promos: Promo[] = [
   {
     title: "CUMA BELI 1 TIMEPHORIA BISA JALAN-JALAN KE SEOUL & BANGKOK!",
@@ -794,9 +797,9 @@ export default function Home() {
   const [promoIndex, setPromoIndex] = useState(0);
   const [activePromo, setActivePromo] = useState<Promo | null>(null);
   const [activeTryOnProduct, setActiveTryOnProduct] = useState<Product | null>(null);
-  const [showMegaPromo, setShowMegaPromo] = useState(true);
+  const [showMegaPromo, setShowMegaPromo] = useState(false);
   const [loaderState, setLoaderState] = useState<"loading" | "leaving" | "done">(
-    "loading",
+    ENABLE_INTRO_LOADER ? "loading" : "done",
   );
   const closeTryOn = useCallback(() => setActiveTryOnProduct(null), []);
   const {
@@ -813,12 +816,37 @@ export default function Home() {
   useEffect(() => {
     const timer = window.setInterval(() => {
       setPromoIndex((current) => (current + 1) % promos.length);
-    }, 2000);
+    }, 4000);
 
     return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
+    let hasSeenPromo = false;
+
+    try {
+      hasSeenPromo =
+        window.sessionStorage.getItem(PROMO_SEEN_SESSION_KEY) === "true";
+
+      if (!hasSeenPromo) {
+        window.sessionStorage.setItem(PROMO_SEEN_SESSION_KEY, "true");
+      }
+    } catch {
+      // Session storage may be unavailable in restricted browsing modes.
+    }
+
+    const timer = window.setTimeout(() => {
+      setShowMegaPromo(!hasSeenPromo);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!ENABLE_INTRO_LOADER) {
+      return;
+    }
+
     const fillTimer = window.setTimeout(() => {
       setLoaderState("leaving");
     }, 2400);
@@ -1309,7 +1337,6 @@ export default function Home() {
             onClick={() => {
               setActiveTryOnProduct(null);
               setView("home");
-              setShowMegaPromo(true);
             }}
             aria-label="Back to home"
             type="button"
