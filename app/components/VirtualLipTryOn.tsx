@@ -248,10 +248,8 @@ export default function VirtualLipTryOn({
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
         video: {
-          facingMode: "user",
-          width: { ideal: 720 },
-          height: { ideal: 1080 },
-          aspectRatio: { ideal: 4 / 6 },
+          facingMode: { ideal: "user" },
+          width: { ideal: 1280 },
         },
       });
 

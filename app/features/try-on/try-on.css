@@ -158,7 +158,6 @@
 .tryon-canvas {
   height: 100%;
   inset: 0;
-  object-fit: cover;
   position: absolute;
   width: 100%;
 }
@@ -171,6 +170,7 @@
 
 .tryon-product-backdrop {
   filter: saturate(0.82) contrast(1.04);
+  object-fit: cover;
   opacity: 0.58;
 }
 
@@ -192,6 +192,7 @@
 
 .tryon-video,
 .tryon-canvas {
+  object-fit: contain;
   opacity: 0;
   transform: scaleX(-1);
 }
