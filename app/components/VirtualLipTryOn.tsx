@@ -62,7 +62,7 @@ export default function VirtualLipTryOn({
   const [faceDetected, setFaceDetected] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [captureStatus, setCaptureStatus] = useState<CaptureStatus>("idle");
-  const [cameraRatio, setCameraRatio] = useState<CameraRatio>("9:16");
+  const [cameraRatio, setCameraRatio] = useState<CameraRatio>("4:5");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const isGlossProduct = productFinish === "GLOSS IT BETTER" ||
