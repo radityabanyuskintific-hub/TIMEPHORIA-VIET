@@ -1,7 +1,27 @@
 import type { NextConfig } from "next";
+import {
+  MEDIAPIPE_BROWSER_CACHE_CONTROL,
+  MEDIAPIPE_VERSIONED_BASE_PATH,
+} from "./app/features/try-on/mediapipe-config";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async headers() {
+    return [
+      {
+        source: `${MEDIAPIPE_VERSIONED_BASE_PATH}/:asset*`,
+        headers: [
+          {
+            key: "Cache-Control",
+            value: MEDIAPIPE_BROWSER_CACHE_CONTROL,
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

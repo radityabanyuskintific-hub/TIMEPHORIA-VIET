@@ -3,7 +3,6 @@ import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } fr
 import handler from "vinext/server/app-router-entry";
 import {
   MEDIAPIPE_BROWSER_CACHE_CONTROL,
-  MEDIAPIPE_SOURCE_BASE_PATH,
   MEDIAPIPE_VERSIONED_BASE_PATH,
 } from "../app/features/try-on/mediapipe-config";
 
@@ -38,14 +37,7 @@ const worker = {
       (request.method === "GET" || request.method === "HEAD") &&
       url.pathname.startsWith(`${MEDIAPIPE_VERSIONED_BASE_PATH}/`)
     ) {
-      const assetUrl = new URL(request.url);
-      assetUrl.pathname = url.pathname.replace(
-        MEDIAPIPE_VERSIONED_BASE_PATH,
-        MEDIAPIPE_SOURCE_BASE_PATH,
-      );
-      const assetResponse = await env.ASSETS.fetch(
-        new Request(assetUrl, request),
-      );
+      const assetResponse = await env.ASSETS.fetch(request);
       const headers = new Headers(assetResponse.headers);
 
       if (assetResponse.ok) {
