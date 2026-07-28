@@ -1,6 +1,11 @@
 /** Cloudflare Worker entry point for the vinext-starter template. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import {
+  MEDIAPIPE_BROWSER_CACHE_CONTROL,
+  MEDIAPIPE_SOURCE_BASE_PATH,
+  MEDIAPIPE_VERSIONED_BASE_PATH,
+} from "../app/features/try-on/mediapipe-config";
 
 interface Env {
   ASSETS: Fetcher;
@@ -28,6 +33,32 @@ interface ExecutionContext {
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    if (
+      (request.method === "GET" || request.method === "HEAD") &&
+      url.pathname.startsWith(`${MEDIAPIPE_VERSIONED_BASE_PATH}/`)
+    ) {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = url.pathname.replace(
+        MEDIAPIPE_VERSIONED_BASE_PATH,
+        MEDIAPIPE_SOURCE_BASE_PATH,
+      );
+      const assetResponse = await env.ASSETS.fetch(
+        new Request(assetUrl, request),
+      );
+      const headers = new Headers(assetResponse.headers);
+
+      if (assetResponse.ok) {
+        headers.set("Cache-Control", MEDIAPIPE_BROWSER_CACHE_CONTROL);
+        headers.set("X-Content-Type-Options", "nosniff");
+      }
+
+      return new Response(assetResponse.body, {
+        headers,
+        status: assetResponse.status,
+        statusText: assetResponse.statusText,
+      });
+    }
 
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];

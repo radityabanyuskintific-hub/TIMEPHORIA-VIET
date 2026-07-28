@@ -6,7 +6,10 @@ import {
   createLipRenderer,
   type LipRenderer,
 } from "../features/try-on/lip-renderer";
-import { createFaceLandmarker } from "../features/try-on/mediapipe";
+import {
+  acquireFaceLandmarker,
+  type FaceLandmarkerLease,
+} from "../features/try-on/mediapipe";
 import type { LipTryOnShade } from "../lip-try-on-shades";
 
 type Language = "en" | "id";
@@ -43,6 +46,9 @@ export default function VirtualLipTryOn({
   const tryOnRef = useRef<HTMLElement>(null);
   const lipRendererRef = useRef<LipRenderer | null>(null);
   const landmarkerRef = useRef<FaceLandmarker | null>(null);
+  const landmarkerLeaseRef = useRef<FaceLandmarkerLease | null>(null);
+  const pendingLandmarkerLeaseRef =
+    useRef<Promise<FaceLandmarkerLease> | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
   const closeTimerRef = useRef<number | null>(null);
@@ -131,7 +137,16 @@ export default function VirtualLipTryOn({
       videoRef.current.srcObject = null;
     }
 
-    landmarkerRef.current?.close();
+    const pendingLandmarkerLease = pendingLandmarkerLeaseRef.current;
+    pendingLandmarkerLeaseRef.current = null;
+    if (pendingLandmarkerLease) {
+      void pendingLandmarkerLease
+        .then((lease) => lease.release())
+        .catch(() => undefined);
+    }
+
+    landmarkerLeaseRef.current?.release();
+    landmarkerLeaseRef.current = null;
     landmarkerRef.current = null;
   }, []);
 
@@ -245,6 +260,8 @@ export default function VirtualLipTryOn({
         throw new Error("unsupported");
       }
 
+      const landmarkerLeasePromise = acquireFaceLandmarker();
+      pendingLandmarkerLeaseRef.current = landmarkerLeasePromise;
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
         video: {
@@ -255,6 +272,7 @@ export default function VirtualLipTryOn({
 
       if (!mountedRef.current) {
         stream.getTracks().forEach((track) => track.stop());
+        stopEverything();
         return;
       }
 
@@ -264,14 +282,18 @@ export default function VirtualLipTryOn({
         await videoRef.current.play();
       }
 
-      const landmarker = await createFaceLandmarker();
+      const landmarkerLease = await landmarkerLeasePromise;
+      if (pendingLandmarkerLeaseRef.current === landmarkerLeasePromise) {
+        pendingLandmarkerLeaseRef.current = null;
+      }
       if (!mountedRef.current) {
-        landmarker.close();
+        landmarkerLease.release();
         stopEverything();
         return;
       }
 
-      landmarkerRef.current = landmarker;
+      landmarkerLeaseRef.current = landmarkerLease;
+      landmarkerRef.current = landmarkerLease.landmarker;
       setStatus("running");
       beginRenderLoop();
     } catch (error) {
