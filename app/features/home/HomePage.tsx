@@ -792,7 +792,7 @@ function promoVisual(promo: Promo) {
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("lips");
   const [view, setView] = useState<SiteView>("home");
-  const [language, setLanguage] = useState<Language>("en");
+  const [language, setLanguage] = useState<Language>("id");
   const [finish, setFinish] = useState("All");
   const [promoIndex, setPromoIndex] = useState(0);
   const [activePromo, setActivePromo] = useState<Promo | null>(null);

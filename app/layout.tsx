@@ -14,7 +14,7 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Timephoria Product Universe",
   description:
-    "A portrait-first Timephoria product education web experience.",
+    "Pengalaman web edukasi produk Timephoria dengan tampilan portrait-first.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="id">
       <body className={`${montserrat.variable} antialiased`}>
         {children}
         <Analytics />
