@@ -37,3 +37,41 @@ export const productTranslations: Record<string, ProductTranslation> = {
   "GENESIS EYEBROW PENCIL": { description: "Pensil alis berujung oval presisi untuk membingkai, mengisi, dan mendefinisikan alis natural maupun bold.", claims: ["Hasil Natural", "Ujung Oval", "Anti Luntur"] },
   "NAVI EYESHADOW PALETTE": { description: "Palet eyeshadow 8 warna matte, satin, dan shimmer yang mudah dibaurkan untuk tampilan tahan lama.", claims: ["Warna Intens", "Mudah di-Blend", "Tahan Lama"] },
 };
+
+export const finishTranslationsSpanish: Record<string, string> = {
+  "SKIN FINISH PERFECTED": "PIEL PERFECCIONADA",
+  "FLAWLESS FLUSHED CHEEKS": "MEJILLAS RADIANTES",
+  "BROWS, BUT BETTER": "CEJAS AÚN MEJORES",
+  "EYE GAME STRONG": "MIRADA DE IMPACTO",
+  "TINTED TO GO": "TINTE PARA LLEVAR",
+  "GLOSS IT BETTER": "BRILLO SIN LÍMITES",
+  "IT'S MATTE TO LAST": "MATE DE LARGA DURACIÓN",
+};
+
+export const productTranslationsSpanish: Record<string, ProductTranslation> = {
+  "ALTERA LIP TINT": { description: "Color para labios innovador que pasa de un acabado brillante a uno suave y difuminado con una sola aplicación.", claims: ["Difumina las líneas", "Tinte duradero", "Color intenso"] },
+  "ELIXIR VELVET-SHINE SWITCHING LIP CREAM": { description: "Crema labial ligera e hidratante con dos acabados en un solo producto.", claims: ["2 acabados", "Color intenso", "Súper cómodo"] },
+  "ETERNAL LIP MATTE": { description: "Labial mate de pigmentación intensa, resistente a la transferencia y al agua hasta por 24 horas.", claims: ["Mate intenso", "Color de alto impacto", "Sensación ligera"] },
+  "NEBULA LIP CREAM": { description: "Crema labial de textura aterciopelada mate que no reseca y ayuda a difuminar las líneas de los labios.", claims: ["Mate aterciopelado", "No se transfiere", "Sensación ligera"] },
+  "STELLAR DUST LIP STAIN": { description: "Cobertura total en una sola pasada, con textura ligera que fija el pigmento para un color duradero y de mínima transferencia.", claims: ["Tinte superintenso", "Brillo máximo", "Larga duración"] },
+  "SPECTRA LIP VINYL": { description: "Labial vinilo resistente a la transferencia, con color ultraintenso y cobertura total en una sola pasada.", claims: ["Color intenso", "Hasta 24 horas", "Súper cómodo"] },
+  "ORION CLOUD MATTE LIPSTICK": { description: "Labial mate de alta pigmentación que difumina, brinda cobertura total y resiste la transferencia hasta por 12 horas.", claims: ["Mate difuminado", "Textura suave", "No se transfiere"] },
+  "ORBITA 3 IN 1 BLURRING POT": { description: "Fórmula aterciopelada y flexible para ojos, mejillas y labios, con aplicador de silicón de alta precisión.", claims: ["Acabado aterciopelado", "Cobertura modulable", "Aplicador práctico"] },
+  "MILKYWAY MELTING LIP BALM": { description: "Bálsamo fundente con brillo 5D, textura cremosa, sensación refrescante, color vibrante y acabado efecto espejo.", claims: ["Brillo 5D", "Suavidad cremosa", "Nutritivo"] },
+  "LUNARA 3D LIP GLOSS": { description: "Brillo labial con textura de gel suave y acabado de alto brillo tipo cristal.", claims: ["Efecto 3D", "No pegajoso", "Sensación refrescante"] },
+  "APHRODITE EVERLASTING GLOSSY TINT": { description: "Tinte labial brillante de color vivo y larga duración que mantiene los labios cómodos e hidratados.", claims: ["Textura jugosa", "Tinte de fijación acuosa", "Súper cómodo"] },
+  "AION SUPERSTAIN LIP TATTOO INK": { description: "Tinte de gel líquido con pigmento tres veces más concentrado para un color intenso hasta por 24 horas.", claims: ["Color intenso", "Sin retirar película", "Larga duración"] },
+  "UTOPIA GLOW CUSHION": { description: "Cushion ligero y ultrahidratante con luminosidad inmediata, cobertura media a completa y duración de hasta 10 horas.", claims: ["Acabado luminoso", "Suavidad instantánea", "Hidratante"] },
+  "LUMINA MATTE CUSHION": { description: "Cushion de cobertura total y sensación ligera para una piel natural e impecable durante todo el día.", claims: ["Acabado natural", "Sensación ligera", "No se oxida"] },
+  "OPTIMA POWDER FOUNDATION": { description: "Base de maquillaje en polvo ultraligera que ofrece cobertura total con una sola aplicación.", claims: ["Mate difuminado", "Control de grasa", "No comedogénica"] },
+  "PANDORA CHEEK LIQUID BLUSH": { description: "Rubor líquido de alta pigmentación que brinda color intenso con una sola gota.", claims: ["Color intenso", "Fácil de difuminar", "Larga duración"] },
+  "FIXION SKIN TINT STICK": { description: "Tinte facial en barra, cremoso y ligero, con cobertura media a completa y acabado de segunda piel hasta por 8 horas.", claims: ["Acabado satinado", "Textura cremosa", "Ligero en la piel"] },
+  "ECLIPSE 2 IN 1 FACE CONTOUR": { description: "Barra de contorno facial 2 en 1 con fórmula ultracremosa y color intenso que se desliza uniformemente.", claims: ["Ultracremoso", "De crema a polvo", "Brocha removible"] },
+  "VALORA CONCEALER": { description: "Corrector de alta cobertura que disimula ojeras e imperfecciones con un acabado ligero y resistente a los pliegues hasta por 12 horas.", claims: ["Mate suave", "Pigmento intenso", "Hidratante"] },
+  "SUPERNOVA SETTING SPRAY": { description: "Fijador con micropartículas de polvo que deja el maquillaje mate al instante y sin brillo.", claims: ["Acabado mate", "Resistente al desgaste", "Control de grasa"] },
+  "REVELA BROW MASCARA": { description: "Máscara para cejas con pigmento intenso y fijación de alto desempeño.", claims: ["Color intenso", "Hasta 12 horas", "Sin grumos"] },
+  "ILLUMINA EYESHADOW STICK": { description: "Sombra en barra de textura tipo jelly, ligera y fácil de aplicar, con color intenso y alto brillo en una pasada.", claims: ["Textura jelly", "Brillo instantáneo", "Sin residuos"] },
+  "DUNE EYELINER": { description: "Delineador con punta fina y precisa para crear trazos definidos y uniformes.", claims: ["Pigmento intenso", "Punta precisa", "Resistente al agua"] },
+  "GENESIS EYEBROW PENCIL": { description: "Lápiz para cejas con punta ovalada de precisión para enmarcar, rellenar y definir desde un look natural hasta uno intenso.", claims: ["Acabado natural", "Punta ovalada", "Larga duración"] },
+  "NAVI EYESHADOW PALETTE": { description: "Paleta de ocho sombras mate, satinadas y brillantes, fáciles de difuminar y de larga duración.", claims: ["Color intenso", "Fácil de difuminar", "Larga duración"] },
+};

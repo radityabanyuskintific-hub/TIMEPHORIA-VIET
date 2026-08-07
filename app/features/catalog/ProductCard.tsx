@@ -18,6 +18,52 @@ type ProductCardProps = {
   thumbnail: string;
 };
 
+const cardCopy: Record<Language, {
+  claims: string;
+  finishAndShades: string;
+  liveCamera: string;
+  productImage: string;
+  swatch: string;
+  swatchSlides: string;
+  swatches: string;
+  toneChart: string;
+  tryOn: string;
+}> = {
+  id: {
+    claims: "klaim",
+    finishAndShades: "LIHAT HASIL DAN WARNA",
+    liveCamera: "KAMERA LANGSUNG",
+    productImage: "gambar produk",
+    swatch: "Lihat swatches",
+    swatchSlides: "Slide swatch",
+    swatches: "swatch",
+    toneChart: "Pilihan warna",
+    tryOn: "COBA DI BIBIRMU",
+  },
+  en: {
+    claims: "claims",
+    finishAndShades: "TAP TO SEE THE FINISH AND SHADES",
+    liveCamera: "LIVE CAMERA",
+    productImage: "product image",
+    swatch: "Tap to see swatches",
+    swatchSlides: "Swatch slides",
+    swatches: "swatch",
+    toneChart: "Tone chart",
+    tryOn: "TRY IT ON",
+  },
+  es: {
+    claims: "beneficios",
+    finishAndShades: "TOCA PARA VER EL ACABADO Y LOS TONOS",
+    liveCamera: "CÁMARA EN VIVO",
+    productImage: "imagen del producto",
+    swatch: "Toca para ver las muestras",
+    swatchSlides: "Muestras de color",
+    swatches: "muestra",
+    toneChart: "Guía de tonos",
+    tryOn: "PRUÉBALO EN TUS LABIOS",
+  },
+};
+
 export default function ProductCard({
   claims,
   description,
@@ -31,6 +77,7 @@ export default function ProductCard({
 }: ProductCardProps) {
   const [isSwatchOpen, setIsSwatchOpen] = useState(false);
   const [activeSwatchSlide, setActiveSwatchSlide] = useState(0);
+  const copy = cardCopy[language];
 
   function updateActiveSwatchSlide(target: HTMLDivElement) {
     const nextSlide = Math.round(target.scrollLeft / target.clientWidth);
@@ -43,7 +90,7 @@ export default function ProductCard({
     <article className="product-card">
       {promoLabel ? <div className="promo-badge">{promoLabel}</div> : null}
       <div className="product-visual">
-        <img src={thumbnail} alt={`${product.name} product knowledge page`} />
+        <img src={thumbnail} alt={`${product.name}, ${copy.productImage}`} />
       </div>
       <div className="product-copy">
         <div className="product-meta">
@@ -51,7 +98,7 @@ export default function ProductCard({
         </div>
         <h3>{product.shortName}</h3>
         <p>{description}</p>
-        <div className="claim-row" aria-label={`${product.name} claims`}>
+        <div className="claim-row" aria-label={`${product.name}, ${copy.claims}`}>
           {claims.slice(0, 3).map((claim) => (
             <span key={claim}>{claim}</span>
           ))}
@@ -63,8 +110,8 @@ export default function ProductCard({
           onClick={() => onTryOn(product)}
           type="button"
         >
-          <span>{language === "id" ? "COBA DI BIBIRMU" : "TRY IT ON"}</span>
-          <strong>LIVE CAMERA</strong>
+          <span>{copy.tryOn}</span>
+          <strong>{copy.liveCamera}</strong>
         </button>
       ) : null}
       <div className={`shade-panel ${isSwatchOpen ? "open" : ""}`}>
@@ -76,17 +123,15 @@ export default function ProductCard({
         >
           {product.category === "lips" || product.category === "eyes" ? (
             <span>
-              {language === "id"
-                ? "LIHAT HASIL DAN WARNA"
-                : "TAP TO SEE THE FINISH AND SHADES"}
+              {copy.finishAndShades}
             </span>
           ) : (
             <>
               <span>
-                {language === "id" ? "Lihat swatches" : "Tap to see swatches"}
+                {copy.swatch}
               </span>
               <strong>
-                {language === "id" ? "Pilihan warna" : "Tone chart"}
+                {copy.toneChart}
               </strong>
             </>
           )}
@@ -103,12 +148,12 @@ export default function ProductCard({
                   <img
                     key={slide}
                     src={slide}
-                    alt={`${product.name} swatch ${index + 1}`}
+                    alt={`${product.name}, ${copy.swatches} ${index + 1}`}
                   />
                 ))}
               </div>
               {swatchSlides.length > 1 ? (
-                <div className="swatch-dots" aria-label="Swatch slides">
+                <div className="swatch-dots" aria-label={copy.swatchSlides}>
                   {swatchSlides.map((slide, index) => (
                     <span
                       key={slide}

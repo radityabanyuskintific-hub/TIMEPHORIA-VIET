@@ -11,17 +11,58 @@ import {
   type FaceLandmarkerLease,
 } from "../features/try-on/mediapipe";
 import type { LipTryOnShade } from "../lip-try-on-shades";
+import type { Language } from "../features/catalog/types";
 
-type Language = "en" | "id";
 type TryOnStatus = "idle" | "loading" | "running" | "error";
 type CaptureStatus = "idle" | "saved" | "error";
 type CameraRatio = "9:16" | "4:5";
 
 const INTENSITY_LEVELS = [
-  { label: "1 SWIPE", value: 0.2 },
-  { label: "2 SWIPES", value: 0.28 },
-  { label: "3 SWIPES", value: 0.38 },
+  { value: 0.2 },
+  { value: 0.28 },
+  { value: 0.38 },
 ] as const;
+
+const SHADE_DESCRIPTIONS_SPANISH: Record<string, string> = {
+  "Bold crimson": "Carmesí intenso",
+  "Bright coral pink": "Rosa coral brillante",
+  "Burgundy wine": "Vino borgoña",
+  "Cool-tone pink": "Rosa de subtono frío",
+  "Deep berry plum": "Ciruela frutos rojos profunda",
+  "Deep berry red": "Rojo frutos rojos profundo",
+  "Deep brown": "Café profundo",
+  "Deep coral": "Coral profundo",
+  "Deep red": "Rojo profundo",
+  "Deep red brown": "Café rojizo profundo",
+  "Deep tomato red": "Rojo tomate profundo",
+  "Edgy purple": "Morado atrevido",
+  Mauve: "Malva",
+  "Muted pink": "Rosa apagado",
+  "Muted rosewood": "Palo de rosa apagado",
+  "Neutral burnt rose": "Rosa quemado neutro",
+  "Nude brown": "Café nude",
+  "Nude pink": "Rosa nude",
+  "Orangish red": "Rojo anaranjado",
+  Peach: "Durazno",
+  "Peach pink": "Rosa durazno",
+  "Pink berry": "Rosa frutos rojos",
+  "Pink mauve": "Rosa malva",
+  "Pink plump": "Rosa intenso",
+  Pinkish: "Rosado",
+  "Pinkish coral": "Coral rosado",
+  "Raspberry rose": "Rosa frambuesa",
+  "Rose brown": "Café rosado",
+  "Rose pink": "Rosa clásico",
+  "Rosy cocoa": "Cacao rosado",
+  "Rosy mauve": "Malva rosado",
+  "Ruby red with a purple hint": "Rojo rubí con un toque morado",
+  "Soft pink": "Rosa suave",
+  "Sweet cherry pink": "Rosa cereza dulce",
+  "True warm red": "Rojo cálido puro",
+  "Vibrant orange": "Naranja vibrante",
+  "Vibrant watermelon pink": "Rosa sandía vibrante",
+  "Vivid warm pink": "Rosa cálido vivo",
+};
 
 type VirtualLipTryOnProps = {
   language: Language;
@@ -97,8 +138,41 @@ export default function VirtualLipTryOn({
         fullscreen: "Layar penuh",
         exitFullscreen: "Keluar layar penuh",
         zoomIn: "Perbesar kamera",
-        zoomOut: "Kembalikan zoom",
+          zoomOut: "Kembalikan zoom",
+          swipes: ["1 SAPUAN", "2 SAPUAN", "3 SAPUAN"],
+          cameraRatio: "Rasio kamera",
+          controls: "Kontrol virtual try-on",
+          tryOnLabel: "virtual try-on",
       }
+    : language === "es"
+      ? {
+          title: "PRUEBA TU TONO DE LABIAL",
+          intro: "Mira los tonos Timephoria en tus labios con la cámara frontal.",
+          privacy: "El procesamiento ocurre en tu dispositivo. Las fotos y los videos no se suben ni se guardan.",
+          enable: "ACTIVAR CÁMARA",
+          loading: "PREPARANDO LA PRUEBA...",
+          cameraHint: "Permite el acceso a la cámara cuando tu navegador lo solicite.",
+          centerFace: "Centra tu rostro en la cámara",
+          shade: "Tono",
+          scrollHint: "Desliza a la izquierda para explorar otros tonos",
+          intensity: "Intensidad del color",
+          effectOn: "EFECTO ACTIVO",
+          effectOff: "VER SIN COLOR",
+          retry: "INTENTAR DE NUEVO",
+          capture: "TOMAR FOTO",
+          captured: "FOTO GUARDADA",
+          captureError: "INTENTAR DE NUEVO",
+          close: "Cerrar prueba virtual",
+          approximation: "Esta es una visualización del tono. El resultado puede variar según la iluminación y la pantalla.",
+          fullscreen: "Ver en pantalla completa",
+          exitFullscreen: "Salir de pantalla completa",
+          zoomIn: "Acercar cámara",
+          zoomOut: "Restablecer zoom",
+          swipes: ["1 PASADA", "2 PASADAS", "3 PASADAS"],
+          cameraRatio: "Proporción de cámara",
+          controls: "Controles de prueba virtual",
+          tryOnLabel: "prueba virtual",
+        }
     : {
         title: "TRY YOUR LIP SHADE",
         intro: "See Timephoria shades on your lips using your front camera.",
@@ -122,7 +196,15 @@ export default function VirtualLipTryOn({
         exitFullscreen: "Exit fullscreen",
         zoomIn: "Zoom camera in",
         zoomOut: "Reset camera zoom",
+        swipes: ["1 SWIPE", "2 SWIPES", "3 SWIPES"],
+        cameraRatio: "Camera ratio",
+        controls: "Virtual try-on controls",
+        tryOnLabel: "virtual try-on",
       };
+
+  const selectedShadeDescription = selectedShade.description && language === "es"
+    ? SHADE_DESCRIPTIONS_SPANISH[selectedShade.description] ?? selectedShade.description
+    : selectedShade.description;
 
   const stopEverything = useCallback(() => {
     if (rafRef.current !== null) {
@@ -299,17 +381,28 @@ export default function VirtualLipTryOn({
     } catch (error) {
       stopEverything();
       const errorName = error instanceof DOMException ? error.name : "";
+      const errorMessages = language === "id"
+        ? {
+            denied: "Akses kamera ditolak. Izinkan kamera di pengaturan browser lalu coba lagi.",
+            missing: "Kamera depan tidak ditemukan di perangkat ini.",
+            unavailable: "Virtual try-on belum dapat dimulai. Periksa koneksi dan izin kameramu.",
+          }
+        : language === "es"
+          ? {
+              denied: "Se rechazó el acceso a la cámara. Permítelo en la configuración del navegador e inténtalo de nuevo.",
+              missing: "No se encontró una cámara frontal en este dispositivo.",
+              unavailable: "No se pudo iniciar la prueba virtual. Revisa tu conexión y los permisos de la cámara.",
+            }
+          : {
+              denied: "Camera access was denied. Allow it in your browser settings, then try again.",
+              missing: "A front camera could not be found on this device.",
+              unavailable: "Virtual try-on could not start. Check your connection and camera permission.",
+            };
       const message = errorName === "NotAllowedError"
-        ? language === "id"
-          ? "Akses kamera ditolak. Izinkan kamera di pengaturan browser lalu coba lagi."
-          : "Camera access was denied. Allow it in your browser settings, then try again."
+        ? errorMessages.denied
         : errorName === "NotFoundError"
-          ? language === "id"
-            ? "Kamera depan tidak ditemukan di perangkat ini."
-            : "A front camera could not be found on this device."
-          : language === "id"
-            ? "Virtual try-on belum dapat dimulai. Periksa koneksi dan izin kameramu."
-            : "Virtual try-on could not start. Check your connection and camera permission.";
+          ? errorMessages.missing
+          : errorMessages.unavailable;
 
       if (mountedRef.current) {
         setErrorMessage(message);
@@ -464,15 +557,15 @@ export default function VirtualLipTryOn({
 
   return (
     <section
-      aria-label={`${productName} virtual try-on`}
+      aria-label={`${productName}, ${copy.tryOnLabel}`}
       aria-modal="true"
       className={`virtual-tryon ${isClosing ? "closing" : ""} ${isFullscreen ? "fullscreen" : ""}`}
       ref={tryOnRef}
       role="dialog"
     >
       <header className="tryon-header">
-        <nav className="tryon-floating-nav" aria-label="Virtual try-on controls">
-          <div className="tryon-ratio-selector" aria-label="Camera ratio">
+        <nav className="tryon-floating-nav" aria-label={copy.controls}>
+          <div className="tryon-ratio-selector" aria-label={copy.cameraRatio}>
             {(["9:16", "4:5"] as CameraRatio[]).map((ratio) => (
               <button
                 aria-pressed={cameraRatio === ratio}
@@ -561,7 +654,7 @@ export default function VirtualLipTryOn({
           <span>{copy.shade}</span>
           <strong>{selectedShade.code} {selectedShade.name}</strong>
           {shades.length > 9 ? <em>{copy.scrollHint}</em> : null}
-          {selectedShade.description ? <small>{selectedShade.description}</small> : null}
+          {selectedShadeDescription ? <small>{selectedShadeDescription}</small> : null}
         </div>
 
         <div className="tryon-shade-list" aria-label={copy.shade}>
@@ -583,15 +676,15 @@ export default function VirtualLipTryOn({
 
         <div className="tryon-adjustments">
           <div className="tryon-intensity-steps" aria-label={copy.intensity}>
-            {INTENSITY_LEVELS.map((level) => (
+            {INTENSITY_LEVELS.map((level, index) => (
               <button
-                aria-label={`${level.label}, ${Math.round(level.value * 100)}%`}
+                aria-label={`${copy.swipes[index]}, ${Math.round(level.value * 100)}%`}
                 aria-pressed={intensity === level.value}
                 key={level.value}
                 onClick={() => changeIntensity(level.value)}
                 type="button"
               >
-                <strong>{level.label}</strong>
+                <strong>{copy.swipes[index]}</strong>
               </button>
             ))}
           </div>

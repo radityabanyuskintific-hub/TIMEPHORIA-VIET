@@ -1,6 +1,6 @@
 export type CategoryKey = "lips" | "eyes" | "face";
 
-export type Language = "en" | "id";
+export type Language = "en" | "es" | "id";
 
 export type SiteView =
   | "home"

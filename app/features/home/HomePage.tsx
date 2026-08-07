@@ -8,7 +8,9 @@ import VirtualLipTryOn from "../../components/VirtualLipTryOn";
 import ProductCard from "../catalog/ProductCard";
 import {
   finishTranslations,
+  finishTranslationsSpanish,
   productTranslations,
+  productTranslationsSpanish,
 } from "../catalog/product-copy";
 import type {
   CategoryKey,
@@ -19,6 +21,14 @@ import type {
 } from "../catalog/types";
 import { useStoreDirectory } from "../stores/useStoreDirectory";
 import { lipTryOnShades } from "../../lip-try-on-shades";
+import {
+  categoryCopy,
+  faqItemsSpanish,
+  giveawayDisclaimerSpanish,
+  localizePromo,
+  termsItemsSpanish,
+  uiCopy,
+} from "./home-copy";
 
 const ENABLE_INTRO_LOADER = false;
 const PROMO_SEEN_SESSION_KEY = "timephoria:mega-promo-seen";
@@ -793,6 +803,7 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("lips");
   const [view, setView] = useState<SiteView>("home");
   const [language, setLanguage] = useState<Language>("id");
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [finish, setFinish] = useState("All");
   const [promoIndex, setPromoIndex] = useState(0);
   const [activePromo, setActivePromo] = useState<Promo | null>(null);
@@ -875,11 +886,27 @@ export default function Home() {
   const currentPromo = activePromo ?? promos[promoIndex];
   const megaPromo = promos[0];
   const isIndonesian = language === "id";
-  const translatedPromo = currentPromo === promos[0] && isIndonesian
-    ? { ...currentPromo, ...promoTranslation }
-    : currentPromo;
-  function toggleLanguage() {
-    setLanguage((current) => (current === "en" ? "id" : "en"));
+  const isSpanish = language === "es";
+  const copy = uiCopy[language];
+  const localizedCategory = categoryCopy[language][activeCategory];
+  const translatedPromo = localizePromo(
+    currentPromo === promos[0] && isIndonesian
+      ? { ...currentPromo, ...promoTranslation }
+      : currentPromo,
+    language,
+  );
+  const translatedMegaPromo = localizePromo(megaPromo, language);
+  const translatedHomePromo = localizePromo(promos[promoIndex], language);
+
+  function chooseLanguage(nextLanguage: Language) {
+    setLanguage(nextLanguage);
+    setLanguageMenuOpen(false);
+  }
+
+  function translatedFinish(value: string) {
+    if (isIndonesian) return finishTranslations[value] ?? value;
+    if (isSpanish) return finishTranslationsSpanish[value] ?? value;
+    return value;
   }
 
   function chooseCategory(key: CategoryKey, target: "category" | "products") {
@@ -906,7 +933,7 @@ export default function Home() {
   return (
     <main className="site-shell">
       {loaderState !== "done" ? (
-        <div className={`loading-screen ${loaderState}`} aria-label="Loading">
+        <div className={`loading-screen ${loaderState}`} aria-label={copy.loading}>
           <div className="loading-content">
             <img
               className="loading-logo"
@@ -916,24 +943,24 @@ export default function Home() {
             <div className="loading-bar" aria-hidden="true">
               <span />
             </div>
-            <p>LOADING ....</p>
+            <p>{copy.loading}</p>
           </div>
         </div>
       ) : null}
 
       {loaderState === "done" && showMegaPromo ? (
-        <div className="mega-promo-modal" role="dialog" aria-label={megaPromo.title}>
+        <div className="mega-promo-modal" role="dialog" aria-label={translatedMegaPromo.title}>
           <div className="mega-promo-card">
             <div className="mega-promo-copy">
-              <strong>{megaPromo.title}</strong>
-              <em>{megaPromo.detail}</em>
+              <strong>{translatedMegaPromo.title}</strong>
+              <em>{translatedMegaPromo.detail}</em>
               <div className="mega-promo-actions">
                 <a
                   href={megaPromo.registrationUrl}
                   rel="noreferrer"
                   target="_blank"
                 >
-                  KLIK UNTUK IKUTAN
+                  {copy.joinNow}
                 </a>
                 <button
                   onClick={() => {
@@ -942,7 +969,7 @@ export default function Home() {
                   }}
                   type="button"
                 >
-                  VIEW FAQ
+                  {copy.viewFaq}
                 </button>
               </div>
             </div>
@@ -950,7 +977,7 @@ export default function Home() {
           </div>
           <button
             className="mega-promo-close"
-            aria-label="Close promo popup"
+            aria-label={copy.closePromo}
             onClick={() => setShowMegaPromo(false)}
             type="button"
           >
@@ -959,16 +986,13 @@ export default function Home() {
         </div>
       ) : null}
 
-      <section className="brand-panel" aria-label="Timephoria brand story">
+      <section className="brand-panel" aria-label={copy.brandLabel}>
         <h1>TIMEPHORIA</h1>
-        <span>Beauty beyond limits</span>
-        <p>
-          Developed with advanced technology and a future-facing beauty universe,
-          translated from the supplied framework and product education decks.
-        </p>
+        <span>{copy.brandTagline}</span>
+        <p>{copy.brandDescription}</p>
       </section>
 
-      <section className={`phone-frame ${view}`} aria-label="Timephoria web app">
+      <section className={`phone-frame ${view}`} aria-label={copy.appLabel}>
         <div className="space-background" />
 
         {activeTryOnProduct ? (
@@ -997,16 +1021,16 @@ export default function Home() {
                   alt=""
                   aria-hidden="true"
                 />
-                <b className="promo-tap-hint">Tap To See Details</b>
-                <span>{promos[promoIndex].kicker}</span>
-                <strong>{promos[promoIndex].title}</strong>
-                <em>{promos[promoIndex].detail}</em>
+                <b className="promo-tap-hint">{copy.viewPromoDetails}</b>
+                <span>{translatedHomePromo.kicker}</span>
+                <strong>{translatedHomePromo.title}</strong>
+                <em>{translatedHomePromo.detail}</em>
               </button>
-              <div className="promo-bar" aria-label="Promo slides">
+              <div className="promo-bar" aria-label={copy.promoSlides}>
                 {promos.map((promo, index) => (
                   <button
                     key={promo.title}
-                    aria-label={`Show ${promo.title}`}
+                    aria-label={`${copy.viewPromoDetails}: ${localizePromo(promo, language).title}`}
                     className={index === promoIndex ? "active" : ""}
                     onClick={() => setPromoIndex(index)}
                     type="button"
@@ -1031,7 +1055,7 @@ export default function Home() {
                       alt=""
                       aria-hidden="true"
                     />
-                    <strong>{categories[key].label}</strong>
+                    <strong>{categoryCopy[language][key].label}</strong>
                   </button>
                 ),
               )}
@@ -1052,16 +1076,16 @@ export default function Home() {
               <p>{translatedPromo.detail}</p>
               {currentPromo.registrationUrl ? (
                 <a className="promo-hero-cta" href={currentPromo.registrationUrl} rel="noreferrer" target="_blank">
-                  {isIndonesian ? "KLIK UNTUK IKUTAN" : "JOIN NOW"}
+                  {copy.joinNow}
                 </a>
               ) : null}
               <div className="promo-scroll-hint">
-                <span>{isIndonesian ? "Scroll dan lihat promo lainnya" : "Scroll & Tap to See Other Promo!"}</span>
+                <span>{copy.otherPromos}</span>
                 <i aria-hidden="true" />
               </div>
             </header>
 
-            <div className="promo-selector" aria-label="Promo selector">
+            <div className="promo-selector" aria-label={copy.promoSelector}>
               {promos.map((promo, index) => (
                 <button
                   key={promo.title}
@@ -1072,7 +1096,7 @@ export default function Home() {
                   }}
                   type="button"
                 >
-                  {promo.selectorLabel ?? promo.title}
+                  {localizePromo(promo, language).selectorLabel ?? localizePromo(promo, language).title}
                 </button>
               ))}
             </div>
@@ -1082,11 +1106,11 @@ export default function Home() {
                 <div className="promo-artwork-scroll">
                   <img
                     src={currentPromo.artwork}
-                    alt={`${currentPromo.title} promo artwork`}
+                    alt={`${translatedPromo.title} ${copy.artworkAlt}`}
                   />
                 </div>
                 <button className="faq-link" onClick={() => setView("faq")} type="button">
-                  VIEW FAQ
+                  {copy.viewFaq}
                 </button>
               </div>
             ) : (
@@ -1098,7 +1122,7 @@ export default function Home() {
                 <div className="promo-artwork-scroll">
                   <img
                     src="/promos/promo-placeholder.png"
-                    alt={`${currentPromo.title} promo artwork`}
+                    alt={`${translatedPromo.title} ${copy.artworkAlt}`}
                   />
                 </div>
               </button>
@@ -1109,12 +1133,12 @@ export default function Home() {
         {view === "faq" ? (
           <div className="faq-screen">
             <header className="faq-header">
-              <button onClick={() => setView("promo")} type="button">Back</button>
-              <span>TIMEPHORIA SEOUL &amp; BANGKOK GIVEAWAY</span>
-              <h2>FAQ</h2>
+              <button onClick={() => setView("promo")} type="button">{copy.back}</button>
+              <span>{copy.giveawayTitle}</span>
+              <h2>{copy.faq}</h2>
             </header>
             <div className="faq-list">
-              {(isIndonesian ? faqItems : faqItemsEnglish).map(([question, answer], index) => (
+              {(isIndonesian ? faqItems : isSpanish ? faqItemsSpanish : faqItemsEnglish).map(([question, answer], index) => (
                 <details key={question} open={index === 0}>
                   <summary>{question}</summary>
                   <p>{answer}</p>
@@ -1122,15 +1146,15 @@ export default function Home() {
               ))}
             </div>
             <section className="terms-section">
-              <h3>{isIndonesian ? "Syarat & Ketentuan" : "Terms & Conditions"}</h3>
+              <h3>{copy.terms}</h3>
               <ol>
-                {(isIndonesian ? termsItems : termsItemsEnglish).map((term) => (
+                {(isIndonesian ? termsItems : isSpanish ? termsItemsSpanish : termsItemsEnglish).map((term) => (
                   <li key={term}>{term}</li>
                 ))}
               </ol>
               <aside className="giveaway-disclaimer">
-                <strong>{isIndonesian ? "Disclaimer" : "Disclaimer"}</strong>
-                <p>{isIndonesian ? giveawayDisclaimer : giveawayDisclaimerEnglish}</p>
+                <strong>{copy.disclaimer}</strong>
+                <p>{isIndonesian ? giveawayDisclaimer : isSpanish ? giveawayDisclaimerSpanish : giveawayDisclaimerEnglish}</p>
               </aside>
             </section>
           </div>
@@ -1139,32 +1163,28 @@ export default function Home() {
         {view === "stores" ? (
           <div className="stores-screen">
             <header className="stores-header">
-              <button onClick={() => setView("faq")} type="button">Back</button>
-              <span>TIMEPHORIA SEOUL &amp; BANGKOK GIVEAWAY</span>
-              <h2>{isIndonesian ? "TOKO TERSEDIA" : "AVAILABLE STORES"}</h2>
-              <p>
-                {isIndonesian
-                  ? "Cari toko tempat promo Timephoria ini berlaku."
-                  : "Find a store where this Timephoria promotion is active."}
-              </p>
+              <button onClick={() => setView("faq")} type="button">{copy.back}</button>
+              <span>{copy.giveawayTitle}</span>
+              <h2>{copy.availableStores}</h2>
+              <p>{copy.storeIntro}</p>
             </header>
 
             <div className="store-tools">
               <input
-                aria-label={isIndonesian ? "Cari nama toko" : "Search store name"}
+                aria-label={copy.searchStore}
                 onChange={(event) => setStoreQuery(event.target.value)}
-                placeholder={isIndonesian ? "Cari nama toko..." : "Search store name..."}
+                placeholder={copy.searchStorePlaceholder}
                 type="search"
                 value={storeQuery}
               />
               <select
-                aria-label={isIndonesian ? "Pilih wilayah" : "Choose region"}
+                aria-label={copy.chooseRegion}
                 onChange={(event) => setStoreRegion(event.target.value)}
                 value={storeRegion}
               >
                 {storeRegions.map((region) => (
                   <option key={region} value={region}>
-                    {region === "All" && isIndonesian ? "Semua wilayah" : region}
+                    {region === "All" ? copy.allRegions : region}
                   </option>
                 ))}
               </select>
@@ -1172,15 +1192,15 @@ export default function Home() {
 
             <div className="store-result-count" aria-live="polite">
               {storeStatus === "loading"
-                ? (isIndonesian ? "Memuat daftar toko..." : "Loading stores...")
-                : `${visibleStores.length} ${isIndonesian ? "toko" : "stores"}`}
+                ? copy.loadingStores
+                : `${visibleStores.length} ${copy.storeUnit}`}
             </div>
 
             {storeStatus === "error" ? (
               <div className="store-empty">
-                {isIndonesian ? "Daftar toko belum dapat dimuat." : "The store directory could not be loaded."}
+                {copy.storeError}
                 <button onClick={() => setStoreStatus("loading")} type="button">
-                  {isIndonesian ? "COBA LAGI" : "TRY AGAIN"}
+                  {copy.retry}
                 </button>
               </div>
             ) : (
@@ -1193,7 +1213,7 @@ export default function Home() {
                 ))}
                 {storeStatus !== "loading" && visibleStores.length === 0 ? (
                   <div className="store-empty">
-                    {isIndonesian ? "Toko tidak ditemukan." : "No stores found."}
+                    {copy.noStores}
                   </div>
                 ) : null}
               </div>
@@ -1214,14 +1234,14 @@ export default function Home() {
                   src={category.video}
                 />
               </div>
-              <span>{category.eyebrow}</span>
-              <h2>{category.label}</h2>
-              <p>{isIndonesian ? "Temukan warna, tekstur, dan hasil akhir Timephoria untuk setiap tampilan." : category.intro}</p>
+              <span>{localizedCategory.eyebrow}</span>
+              <h2>{localizedCategory.label}</h2>
+              <p>{localizedCategory.intro}</p>
             </header>
 
             <div className="section-title">
               <i />
-              <span>{isIndonesian ? "PILIH HASIL AKHIR" : category.headline}</span>
+              <span>{language === "en" ? localizedCategory.headline : copy.chooseFinish}</span>
               <i />
             </div>
 
@@ -1237,8 +1257,8 @@ export default function Home() {
                   }}
                   type="button"
                 >
-                  <span>{isIndonesian ? finishTranslations[item] : item}</span>
-                  <small>{isIndonesian ? "Lihat produk" : "Tap to view products"}</small>
+                  <span>{translatedFinish(item)}</span>
+                  <small>{copy.viewProducts}</small>
                 </button>
               ))}
             </div>
@@ -1251,18 +1271,18 @@ export default function Home() {
               className="product-header"
               style={{ "--accent": category.color } as React.CSSProperties}
             >
-              <span>{category.label}</span>
-              <h2>{finish === "All" ? (isIndonesian ? "PILIH PRODUK" : category.headline) : (isIndonesian ? finishTranslations[finish] : finish)}</h2>
-              <p>{isIndonesian ? "Temukan produk Timephoria untuk melengkapi setiap tampilan." : category.intro}</p>
+              <span>{localizedCategory.label}</span>
+              <h2>{finish === "All" ? (language === "en" ? localizedCategory.headline : copy.chooseProduct) : translatedFinish(finish)}</h2>
+              <p>{language === "en" ? localizedCategory.intro : copy.productsIntro}</p>
               {activePromo ? (
                 <div className="active-promo">
                   <strong>{activePromo.discount}</strong>
-                  <span>{activePromo.detail}</span>
+                  <span>{localizePromo(activePromo, language).detail}</span>
                 </div>
               ) : null}
             </header>
 
-            <div className="filter-bar" aria-label="Product filters">
+            <div className="filter-bar" aria-label={copy.productFilters}>
               <button
                 className={finish === "All" ? "selected" : ""}
                 onClick={() => {
@@ -1271,7 +1291,7 @@ export default function Home() {
                 }}
                 type="button"
               >
-                {isIndonesian ? "Semua" : "All"}
+                {copy.all}
               </button>
               {category.finishes.map((item) => (
                 <button
@@ -1283,7 +1303,7 @@ export default function Home() {
                   }}
                   type="button"
                 >
-                  {isIndonesian ? finishTranslations[item] : item}
+                  {translatedFinish(item)}
                 </button>
               ))}
             </div>
@@ -1295,19 +1315,21 @@ export default function Home() {
                     isIndonesian
                       ? productTranslations[product.name]?.claims ??
                         product.claims
+                      : isSpanish
+                        ? productTranslationsSpanish[product.name]?.claims ??
+                          product.claims
                       : product.claims
                   }
                   description={
                     isIndonesian
                       ? productTranslations[product.name]?.description ??
                         product.description
+                      : isSpanish
+                        ? productTranslationsSpanish[product.name]?.description ??
+                          product.description
                       : product.description
                   }
-                  finishLabel={
-                    isIndonesian
-                      ? finishTranslations[product.finish]
-                      : product.finish
-                  }
+                  finishLabel={translatedFinish(product.finish)}
                   key={product.name}
                   language={language}
                   onTryOn={
@@ -1321,7 +1343,7 @@ export default function Home() {
                     activePromo &&
                     product.category === activePromo.category &&
                     productGroup(product) === activePromo.finish
-                      ? activePromo.discount
+                      ? localizePromo(activePromo, language).discount
                       : undefined
                   }
                   swatchSlides={productSwatches(product)}
@@ -1338,22 +1360,45 @@ export default function Home() {
               setActiveTryOnProduct(null);
               setView("home");
             }}
-            aria-label="Back to home"
+            aria-label={copy.backHome}
             type="button"
           >
-            Back to Home
+            {copy.backHome}
           </button>
-          {view !== "home" ? (
+          <div
+            className={`language-menu ${languageMenuOpen ? "open" : ""}`}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) {
+                setLanguageMenuOpen(false);
+              }
+            }}
+          >
             <button
-              aria-label="Switch language"
-              className="language-toggle footer-language-toggle"
-              onClick={toggleLanguage}
+              aria-expanded={languageMenuOpen}
+              aria-haspopup="menu"
+              aria-label={copy.translateLabel}
+              className="language-menu-trigger"
+              onClick={() => setLanguageMenuOpen((open) => !open)}
               type="button"
             >
-              <span className={language === "en" ? "active" : ""}>EN</span>
-              <span className={language === "id" ? "active" : ""}>ID</span>
+              <span>{copy.translate}</span>
+              <i aria-hidden="true">⌃</i>
             </button>
-          ) : <span className="footer-control-spacer" aria-hidden="true" />}
+            <div className="language-menu-options" role="menu">
+              {(["id", "en", "es"] as Language[]).map((option) => (
+                <button
+                  aria-checked={language === option}
+                  className={language === option ? "active" : ""}
+                  key={option}
+                  onClick={() => chooseLanguage(option)}
+                  role="menuitemradio"
+                  type="button"
+                >
+                  {option.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
           <img
             className="footer-logo"
             src="/brand/timephoria-logo.png"
@@ -1362,7 +1407,7 @@ export default function Home() {
         </footer>
       </section>
 
-      <nav className="desktop-nav" aria-label="Category shortcuts">
+      <nav className="desktop-nav" aria-label={copy.navLabel}>
         {(["lips", "eyes", "face"] as CategoryKey[]).map((key) => (
           <button
             key={key}
@@ -1370,7 +1415,7 @@ export default function Home() {
             onClick={() => chooseCategory(key, "products")}
             type="button"
           >
-            {categories[key].label}
+            {categoryCopy[language][key].label}
           </button>
         ))}
       </nav>
