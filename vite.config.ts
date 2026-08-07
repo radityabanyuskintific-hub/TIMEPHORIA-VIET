@@ -1,9 +1,9 @@
 import vinext from "vinext";
 import { defineConfig } from "vite";
 import { cloudflare } from "@cloudflare/vite-plugin";
-import hostingConfig from "./.openai/hosting.json";
-import { sites } from "./build/sites-vite-plugin";
-import { MEDIAPIPE_ASSET_ROUTE_PATTERN } from "./app/features/try-on/mediapipe-config";
+import hostingConfig from "./.openai/hosting.json" with { type: "json" };
+import { sites } from "./build/sites-vite-plugin.ts";
+import { MEDIAPIPE_ASSET_ROUTE_PATTERN } from "./app/features/try-on/mediapipe-config.ts";
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
