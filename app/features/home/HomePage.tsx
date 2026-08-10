@@ -9,8 +9,10 @@ import ProductCard from "../catalog/ProductCard";
 import {
   finishTranslations,
   finishTranslationsSpanish,
+  finishTranslationsTraditionalChinese,
   productTranslations,
   productTranslationsSpanish,
+  productTranslationsTraditionalChinese,
 } from "../catalog/product-copy";
 import type {
   CategoryKey,
@@ -29,6 +31,11 @@ import {
   termsItemsSpanish,
   uiCopy,
 } from "./home-copy";
+import {
+  faqItemsTraditionalChinese,
+  giveawayDisclaimerTraditionalChinese,
+  termsItemsTraditionalChinese,
+} from "./home-copy-zh-tw";
 
 const ENABLE_INTRO_LOADER = false;
 const PROMO_SEEN_SESSION_KEY = "timephoria:mega-promo-seen";
@@ -825,6 +832,14 @@ export default function Home() {
   } = useStoreDirectory(view);
 
   useEffect(() => {
+    document.documentElement.lang = language === "es"
+      ? "es-MX"
+      : language === "zh-tw"
+        ? "zh-TW"
+        : language;
+  }, [language]);
+
+  useEffect(() => {
     const timer = window.setInterval(() => {
       setPromoIndex((current) => (current + 1) % promos.length);
     }, 4000);
@@ -887,6 +902,7 @@ export default function Home() {
   const megaPromo = promos[0];
   const isIndonesian = language === "id";
   const isSpanish = language === "es";
+  const isTraditionalChinese = language === "zh-tw";
   const copy = uiCopy[language];
   const localizedCategory = categoryCopy[language][activeCategory];
   const translatedPromo = localizePromo(
@@ -906,6 +922,7 @@ export default function Home() {
   function translatedFinish(value: string) {
     if (isIndonesian) return finishTranslations[value] ?? value;
     if (isSpanish) return finishTranslationsSpanish[value] ?? value;
+    if (isTraditionalChinese) return finishTranslationsTraditionalChinese[value] ?? value;
     return value;
   }
 
@@ -1138,23 +1155,44 @@ export default function Home() {
               <h2>{copy.faq}</h2>
             </header>
             <div className="faq-list">
-              {(isIndonesian ? faqItems : isSpanish ? faqItemsSpanish : faqItemsEnglish).map(([question, answer], index) => (
+              {(isIndonesian
+                ? faqItems
+                : isSpanish
+                  ? faqItemsSpanish
+                  : isTraditionalChinese
+                    ? faqItemsTraditionalChinese
+                    : faqItemsEnglish).map(([question, answer], index) => (
                 <details key={question} open={index === 0}>
                   <summary>{question}</summary>
                   <p>{answer}</p>
                 </details>
               ))}
             </div>
+            <button className="stores-link" onClick={() => setView("stores")} type="button">
+              {copy.viewStores}
+            </button>
             <section className="terms-section">
               <h3>{copy.terms}</h3>
               <ol>
-                {(isIndonesian ? termsItems : isSpanish ? termsItemsSpanish : termsItemsEnglish).map((term) => (
+                {(isIndonesian
+                  ? termsItems
+                  : isSpanish
+                    ? termsItemsSpanish
+                    : isTraditionalChinese
+                      ? termsItemsTraditionalChinese
+                      : termsItemsEnglish).map((term) => (
                   <li key={term}>{term}</li>
                 ))}
               </ol>
               <aside className="giveaway-disclaimer">
                 <strong>{copy.disclaimer}</strong>
-                <p>{isIndonesian ? giveawayDisclaimer : isSpanish ? giveawayDisclaimerSpanish : giveawayDisclaimerEnglish}</p>
+                <p>{isIndonesian
+                  ? giveawayDisclaimer
+                  : isSpanish
+                    ? giveawayDisclaimerSpanish
+                    : isTraditionalChinese
+                      ? giveawayDisclaimerTraditionalChinese
+                      : giveawayDisclaimerEnglish}</p>
               </aside>
             </section>
           </div>
@@ -1318,6 +1356,9 @@ export default function Home() {
                       : isSpanish
                         ? productTranslationsSpanish[product.name]?.claims ??
                           product.claims
+                        : isTraditionalChinese
+                          ? productTranslationsTraditionalChinese[product.name]?.claims ??
+                            product.claims
                       : product.claims
                   }
                   description={
@@ -1327,6 +1368,9 @@ export default function Home() {
                       : isSpanish
                         ? productTranslationsSpanish[product.name]?.description ??
                           product.description
+                        : isTraditionalChinese
+                          ? productTranslationsTraditionalChinese[product.name]?.description ??
+                            product.description
                       : product.description
                   }
                   finishLabel={translatedFinish(product.finish)}
@@ -1385,7 +1429,12 @@ export default function Home() {
               <i aria-hidden="true">⌃</i>
             </button>
             <div className="language-menu-options" role="menu">
-              {(["id", "en", "es"] as Language[]).map((option) => (
+              {([
+                ["id", "ID"],
+                ["en", "EN"],
+                ["es", "ES"],
+                ["zh-tw", "繁中"],
+              ] as const).map(([option, label]) => (
                 <button
                   aria-checked={language === option}
                   className={language === option ? "active" : ""}
@@ -1394,7 +1443,7 @@ export default function Home() {
                   role="menuitemradio"
                   type="button"
                 >
-                  {option.toUpperCase()}
+                  {label}
                 </button>
               ))}
             </div>

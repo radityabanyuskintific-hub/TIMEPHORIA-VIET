@@ -64,6 +64,47 @@ const SHADE_DESCRIPTIONS_SPANISH: Record<string, string> = {
   "Vivid warm pink": "Rosa cálido vivo",
 };
 
+const SHADE_DESCRIPTIONS_TRADITIONAL_CHINESE: Record<string, string> = {
+  "Bold crimson": "濃郁緋紅",
+  "Bright coral pink": "明亮珊瑚粉",
+  "Burgundy wine": "酒紅色",
+  "Cool-tone pink": "冷調粉紅",
+  "Deep berry plum": "深莓果李子色",
+  "Deep berry red": "深莓果紅",
+  "Deep brown": "深棕色",
+  "Deep coral": "深珊瑚色",
+  "Deep red": "深紅色",
+  "Deep red brown": "深紅棕",
+  "Deep tomato red": "深番茄紅",
+  "Edgy purple": "個性紫",
+  Mauve: "灰紫色",
+  "Muted pink": "低飽和粉紅",
+  "Muted rosewood": "低飽和玫瑰木",
+  "Neutral burnt rose": "中性乾燥玫瑰",
+  "Nude brown": "裸棕色",
+  "Nude pink": "裸粉色",
+  "Orangish red": "橘紅色",
+  Peach: "蜜桃色",
+  "Peach pink": "蜜桃粉",
+  "Pink berry": "莓果粉",
+  "Pink mauve": "粉紫色",
+  "Pink plump": "飽滿粉紅",
+  Pinkish: "偏粉色",
+  "Pinkish coral": "粉珊瑚色",
+  "Raspberry rose": "覆盆莓玫瑰色",
+  "Rose brown": "玫瑰棕",
+  "Rose pink": "玫瑰粉",
+  "Rosy cocoa": "可可玫瑰",
+  "Rosy mauve": "玫瑰灰紫",
+  "Ruby red with a purple hint": "帶紫調的紅寶石色",
+  "Soft pink": "柔粉色",
+  "Sweet cherry pink": "甜櫻桃粉",
+  "True warm red": "純正暖紅",
+  "Vibrant orange": "鮮明橘色",
+  "Vibrant watermelon pink": "鮮明西瓜粉",
+  "Vivid warm pink": "明亮暖粉",
+};
+
 type VirtualLipTryOnProps = {
   language: Language;
   onClose: () => void;
@@ -173,6 +214,35 @@ export default function VirtualLipTryOn({
           controls: "Controles de prueba virtual",
           tryOnLabel: "prueba virtual",
         }
+    : language === "zh-tw"
+      ? {
+          title: "試用你的唇彩色號",
+          intro: "使用前置鏡頭，即時預覽 Timephoria 唇彩。",
+          privacy: "所有鏡頭處理皆在你的裝置上完成；照片與影片不會上傳或儲存。",
+          enable: "開啟鏡頭",
+          loading: "正在準備虛擬試色...",
+          cameraHint: "瀏覽器詢問時，請允許使用鏡頭。",
+          centerFace: "請將臉部置於畫面中央",
+          shade: "色號",
+          scrollHint: "向左滑動探索其他色號",
+          intensity: "顯色濃度",
+          effectOn: "試色效果開啟",
+          effectOff: "查看原始唇色",
+          retry: "再試一次",
+          capture: "拍照",
+          captured: "照片已儲存",
+          captureError: "再試一次",
+          close: "關閉虛擬試色",
+          approximation: "色號僅供模擬參考，實際效果可能因光線與螢幕設定而異。",
+          fullscreen: "全螢幕顯示",
+          exitFullscreen: "離開全螢幕",
+          zoomIn: "放大鏡頭",
+          zoomOut: "重設鏡頭縮放",
+          swipes: ["1 次塗抹", "2 次塗抹", "3 次塗抹"],
+          cameraRatio: "鏡頭比例",
+          controls: "虛擬試色控制",
+          tryOnLabel: "虛擬試色",
+        }
     : {
         title: "TRY YOUR LIP SHADE",
         intro: "See Timephoria shades on your lips using your front camera.",
@@ -204,7 +274,9 @@ export default function VirtualLipTryOn({
 
   const selectedShadeDescription = selectedShade.description && language === "es"
     ? SHADE_DESCRIPTIONS_SPANISH[selectedShade.description] ?? selectedShade.description
-    : selectedShade.description;
+    : selectedShade.description && language === "zh-tw"
+      ? SHADE_DESCRIPTIONS_TRADITIONAL_CHINESE[selectedShade.description] ?? selectedShade.description
+      : selectedShade.description;
 
   const stopEverything = useCallback(() => {
     if (rafRef.current !== null) {
@@ -393,6 +465,12 @@ export default function VirtualLipTryOn({
               missing: "No se encontró una cámara frontal en este dispositivo.",
               unavailable: "No se pudo iniciar la prueba virtual. Revisa tu conexión y los permisos de la cámara.",
             }
+          : language === "zh-tw"
+            ? {
+                denied: "鏡頭存取遭拒。請在瀏覽器設定中允許使用鏡頭，然後再試一次。",
+                missing: "此裝置找不到前置鏡頭。",
+                unavailable: "無法啟動虛擬試色。請檢查網路連線與鏡頭權限。",
+              }
           : {
               denied: "Camera access was denied. Allow it in your browser settings, then try again.",
               missing: "A front camera could not be found on this device.",

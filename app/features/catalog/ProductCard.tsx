@@ -62,6 +62,17 @@ const cardCopy: Record<Language, {
     toneChart: "Guía de tonos",
     tryOn: "PRUÉBALO EN TUS LABIOS",
   },
+  "zh-tw": {
+    claims: "產品特色",
+    finishAndShades: "點選查看妝效與色號",
+    liveCamera: "即時鏡頭",
+    productImage: "產品圖片",
+    swatch: "點選查看色票",
+    swatchSlides: "色票輪播",
+    swatches: "色票",
+    toneChart: "色號表",
+    tryOn: "立即試色",
+  },
 };
 
 export default function ProductCard({

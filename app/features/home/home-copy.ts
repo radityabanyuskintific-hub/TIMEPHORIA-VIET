@@ -41,6 +41,7 @@ type UiCopy = {
   viewFaq: string;
   viewProducts: string;
   viewPromoDetails: string;
+  viewStores: string;
 };
 
 export const uiCopy: Record<Language, UiCopy> = {
@@ -85,6 +86,7 @@ export const uiCopy: Record<Language, UiCopy> = {
     viewFaq: "LIHAT FAQ",
     viewProducts: "Lihat produk",
     viewPromoDetails: "Ketuk untuk melihat detail",
+    viewStores: "LIHAT TOKO PESERTA",
   },
   en: {
     all: "All",
@@ -127,6 +129,7 @@ export const uiCopy: Record<Language, UiCopy> = {
     viewFaq: "VIEW FAQ",
     viewProducts: "Tap to view products",
     viewPromoDetails: "Tap to see details",
+    viewStores: "VIEW PARTICIPATING STORES",
   },
   es: {
     all: "Todos",
@@ -169,6 +172,50 @@ export const uiCopy: Record<Language, UiCopy> = {
     viewFaq: "VER PREGUNTAS",
     viewProducts: "Toca para ver productos",
     viewPromoDetails: "Toca para ver los detalles",
+    viewStores: "VER TIENDAS PARTICIPANTES",
+  },
+  "zh-tw": {
+    all: "全部",
+    allRegions: "所有地區",
+    appLabel: "Timephoria 網站應用程式",
+    artworkAlt: "活動宣傳圖",
+    availableStores: "適用門市",
+    back: "返回",
+    backHome: "回到首頁",
+    brandDescription: "結合先進科技與前瞻美妝概念，依據 Timephoria 產品資訊打造沉浸式美妝體驗。",
+    brandLabel: "Timephoria 品牌故事",
+    brandTagline: "美，無界限",
+    categoryIntro: "探索 Timephoria 的色彩、質地與妝效，打造每一種理想妝容。",
+    chooseFinish: "選擇妝效",
+    chooseProduct: "選擇產品",
+    chooseRegion: "選擇地區",
+    closePromo: "關閉活動視窗",
+    disclaimer: "重要提醒",
+    faq: "常見問題",
+    giveawayTitle: "TIMEPHORIA 首爾與曼谷抽獎活動",
+    joinNow: "立即參加",
+    loading: "載入中 ....",
+    loadingStores: "正在載入門市...",
+    navLabel: "產品分類捷徑",
+    noStores: "找不到符合條件的門市。",
+    otherPromos: "滑動並點選以查看其他活動",
+    productFilters: "產品篩選",
+    productsIntro: "探索 Timephoria 產品，完成每一種理想妝容。",
+    promoSelector: "活動選單",
+    promoSlides: "活動輪播",
+    retry: "再試一次",
+    searchStore: "搜尋門市名稱",
+    searchStorePlaceholder: "搜尋門市...",
+    storeError: "目前無法載入門市資訊。",
+    storeIntro: "尋找適用 Timephoria 此次活動的門市。",
+    storeUnit: "家門市",
+    terms: "活動條款與細則",
+    translate: "語言",
+    translateLabel: "選擇語言",
+    viewFaq: "查看常見問題",
+    viewProducts: "點選查看產品",
+    viewPromoDetails: "點選查看詳情",
+    viewStores: "查看適用門市",
   },
 };
 
@@ -192,6 +239,11 @@ export const categoryCopy: Record<Language, Record<CategoryKey, {
     lips: { label: "Labios", eyebrow: "Universo de labios", headline: "Encuentra tu acabado ideal", intro: "Color de alta pigmentación, brillo intenso, textura aterciopelada difuminada y larga duración para cada estilo de labios." },
     eyes: { label: "Ojos", eyebrow: "Universo de la mirada", headline: "Define, eleva e ilumina", intro: "Definición resistente al agua, cejas fáciles de moldear, brillo tipo jelly y color de larga duración." },
     face: { label: "Rostro", eyebrow: "Dimensión del rostro", headline: "Color, contorno y base", intro: "Productos para la piel, las mejillas, el contorno y el difuminado en cada paso de tu rutina." },
+  },
+  "zh-tw": {
+    lips: { label: "唇妝", eyebrow: "唇彩宇宙", headline: "找到你的理想唇妝", intro: "從高顯色、水亮光澤到柔焦絲絨與長效不沾染，滿足每一種唇妝風格。" },
+    eyes: { label: "眼妝", eyebrow: "迷人眼界", headline: "勾勒、提亮、聚焦目光", intro: "防水線條、俐落眉型、果凍光澤與長效眼彩，打造有神雙眸。" },
+    face: { label: "臉部", eyebrow: "立體輪廓", headline: "底妝、頰彩與修容", intro: "從底妝、頰彩到修容與柔焦，完整每一道臉部彩妝步驟。" },
   },
 };
 
@@ -224,9 +276,39 @@ const promoCopySpanish: Record<string, Partial<Promo>> = {
   },
 };
 
+const promoCopyTraditionalChinese: Record<string, Partial<Promo>> = {
+  "CUMA BELI 1 TIMEPHORIA BISA JALAN-JALAN KE SEOUL & BANGKOK!": {
+    title: "購買 1 件 TIMEPHORIA，就有機會暢遊首爾或曼谷！",
+    selectorLabel: "Timephoria 抽獎活動",
+    kicker: "首爾與曼谷旅遊抽獎",
+    detail: "立即參加抽獎，總獎項價值高達數億印尼盾。",
+    discount: "贏取大獎",
+    registrationLabel: "立即參加",
+  },
+  "Complexion Match": {
+    title: "找到你的完美色號",
+    kicker: "選色優惠活動",
+    detail: "購買氣墊粉餅或粉餅，即享定妝噴霧組合優惠。",
+    discount: "組合優惠",
+  },
+  "Eye Stay Set": {
+    title: "持久眼妝組",
+    kicker: "防水眼妝精選",
+    detail: "點選查看眉妝與眼線組合的活動價格。",
+    discount: "套組優惠價",
+  },
+  "Face Dimension": {
+    title: "立體輪廓",
+    kicker: "修容與頰彩",
+    detail: "Pandora Cheek 與 Eclipse Spark 臉部彩妝享專屬優惠。",
+    discount: "現省 15%",
+  },
+};
+
 export function localizePromo(promo: Promo, language: Language): Promo {
-  if (language !== "es") return promo;
-  return { ...promo, ...promoCopySpanish[promo.title] };
+  if (language === "es") return { ...promo, ...promoCopySpanish[promo.title] };
+  if (language === "zh-tw") return { ...promo, ...promoCopyTraditionalChinese[promo.title] };
+  return promo;
 }
 
 export const faqItemsSpanish = [

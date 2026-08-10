@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Montserrat } from "next/font/google";
+import { Montserrat, Noto_Sans_TC } from "next/font/google";
 import "./globals.css";
 import "./features/try-on/try-on.css";
 
@@ -10,6 +10,14 @@ const montserrat = Montserrat({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
 });
+
+const notoSansTC = Noto_Sans_TC({
+  variable: "--font-noto-sans-tc",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  preload: false,
+});
+
+const isVercelDeployment = process.env.VERCEL === "1";
 
 export const metadata: Metadata = {
   title: "Timephoria Product Universe",
@@ -28,10 +36,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`${montserrat.variable} antialiased`}>
+      <body className={`${montserrat.variable} ${notoSansTC.variable} antialiased`}>
         {children}
-        <Analytics />
-        <SpeedInsights />
+        {isVercelDeployment ? (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        ) : null}
       </body>
     </html>
   );

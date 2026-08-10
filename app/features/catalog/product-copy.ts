@@ -75,3 +75,41 @@ export const productTranslationsSpanish: Record<string, ProductTranslation> = {
   "GENESIS EYEBROW PENCIL": { description: "Lápiz para cejas con punta ovalada de precisión para enmarcar, rellenar y definir desde un look natural hasta uno intenso.", claims: ["Acabado natural", "Punta ovalada", "Larga duración"] },
   "NAVI EYESHADOW PALETTE": { description: "Paleta de ocho sombras mate, satinadas y brillantes, fáciles de difuminar y de larga duración.", claims: ["Color intenso", "Fácil de difuminar", "Larga duración"] },
 };
+
+export const finishTranslationsTraditionalChinese: Record<string, string> = {
+  "SKIN FINISH PERFECTED": "完美底妝",
+  "FLAWLESS FLUSHED CHEEKS": "自然紅潤雙頰",
+  "BROWS, BUT BETTER": "精緻立體眉型",
+  "EYE GAME STRONG": "聚焦迷人眼妝",
+  "TINTED TO GO": "隨行持色唇彩",
+  "GLOSS IT BETTER": "水光亮澤唇妝",
+  "IT'S MATTE TO LAST": "長效霧面唇妝",
+};
+
+export const productTranslationsTraditionalChinese: Record<string, ProductTranslation> = {
+  "ALTERA LIP TINT": { description: "創新唇彩只需輕輕一抹，即可從水亮光澤轉為柔霧暈染妝效。", claims: ["柔焦唇紋", "長效染唇", "高顯色"] },
+  "ELIXIR VELVET-SHINE SWITCHING LIP CREAM": { description: "輕盈保濕的絲絨唇霜，一支即可呈現兩種唇妝效果。", claims: ["雙重妝效", "高顯色", "舒適不乾澀"] },
+  "ETERNAL LIP MATTE": { description: "高顯色霧面唇彩，防水且不易沾染，持妝最長可達 24 小時。", claims: ["濃郁霧面", "高顯色", "輕盈質地"] },
+  "NEBULA LIP CREAM": { description: "柔滑絲絨霧面唇霜，不乾澀並能柔焦唇紋。", claims: ["絲絨霧面", "不易沾染", "輕盈舒適"] },
+  "STELLAR DUST LIP STAIN": { description: "一抹完整遮色，輕盈質地牢牢鎖住色澤，持久且不易沾染。", claims: ["濃郁染唇", "耀眼光澤", "持久顯色"] },
+  "SPECTRA LIP VINYL": { description: "不易沾染的鏡光唇釉，一抹即有超飽和色彩與完整遮色。", claims: ["高顯色", "24 小時持妝", "舒適不黏膩"] },
+  "ORION CLOUD MATTE LIPSTICK": { description: "高顯色柔焦霧面唇膏，完整遮色且最長 12 小時不易沾染。", claims: ["柔焦霧面", "柔滑質地", "不易沾染"] },
+  "ORBITA 3 IN 1 BLURRING POT": { description: "富彈性的絲絨泥質地，可用於眼、頰、唇，搭配精準矽膠刷頭。", claims: ["絲絨柔焦", "可疊加顯色", "便利刷頭"] },
+  "MILKYWAY MELTING LIP BALM": { description: "奶油般融化的 5D 光澤潤唇膏，帶來清涼感、鮮明色彩與鏡面亮澤。", claims: ["5D 光澤", "奶油般柔滑", "滋潤雙唇"] },
+  "LUNARA 3D LIP GLOSS": { description: "柔滑凝膠質地唇蜜，打造如玻璃般的高亮光澤。", claims: ["3D 豐唇感", "不黏膩", "清涼舒適"] },
+  "APHRODITE EVERLASTING GLOSSY TINT": { description: "鮮明水光染唇液，長效持色並維持雙唇舒適水潤。", claims: ["水感質地", "鎖水持色", "舒適保濕"] },
+  "AION SUPERSTAIN LIP TATTOO INK": { description: "水感凝膠染唇液，色料濃度提升三倍，鮮明持色最長可達 24 小時。", claims: ["濃郁顯色", "免撕除", "長效持色"] },
+  "UTOPIA GLOW CUSHION": { description: "輕盈高保濕光澤氣墊粉餅，立即提亮，提供中度至完整遮瑕，持妝最長 10 小時。", claims: ["水光妝效", "立即柔滑", "高保濕"] },
+  "LUMINA MATTE CUSHION": { description: "輕盈高遮瑕氣墊粉餅，全天呈現自然無瑕妝感。", claims: ["自然妝效", "輕盈服貼", "不易氧化"] },
+  "OPTIMA POWDER FOUNDATION": { description: "極輕盈粉餅，一抹即可提供完整遮瑕。", claims: ["柔焦霧面", "控油持妝", "不易致粉刺"] },
+  "PANDORA CHEEK LIQUID BLUSH": { description: "高顯色液態腮紅，只需一小點即可展現鮮明紅潤色彩。", claims: ["高顯色", "容易暈染", "持久妝效"] },
+  "FIXION SKIN TINT STICK": { description: "滑順輕盈的膚色修飾棒，提供中度至完整遮瑕，第二層肌膚般妝效最長 8 小時。", claims: ["緞光妝效", "滑順質地", "輕盈服貼"] },
+  "ECLIPSE 2 IN 1 FACE CONTOUR": { description: "二合一修容棒，超滑順配方與飽和色澤，一抹自然融入肌膚。", claims: ["超滑順", "霜轉粉質地", "可拆式刷具"] },
+  "VALORA CONCEALER": { description: "高遮瑕遮瑕液，有效修飾黑眼圈與瑕疵，輕盈且最長 12 小時不易卡紋。", claims: ["柔霧妝效", "高顯色遮瑕", "保濕服貼"] },
+  "SUPERNOVA SETTING SPRAY": { description: "含均勻細緻粉體的定妝噴霧，立即打造無油光霧面妝效。", claims: ["霧面妝效", "不易脫妝", "控油持妝"] },
+  "REVELA BROW MASCARA": { description: "高顯色染眉膏，提供強效定型力。", claims: ["高顯色", "12 小時持妝", "不結塊"] },
+  "ILLUMINA EYESHADOW STICK": { description: "輕盈果凍質地眼影棒，容易上妝，一抹即有飽和色澤與高亮光感。", claims: ["果凍質地", "立即閃耀", "不易飛粉"] },
+  "DUNE EYELINER": { description: "細緻精準筆尖，輕鬆勾勒俐落均勻眼線。", claims: ["濃黑顯色", "精準筆尖", "防水持妝"] },
+  "GENESIS EYEBROW PENCIL": { description: "精準橢圓筆芯，可勾勒、填補並塑造自然或鮮明眉型。", claims: ["自然妝效", "橢圓筆芯", "持久不暈染"] },
+  "NAVI EYESHADOW PALETTE": { description: "八色眼影盤，包含霧面、緞光與珠光質地，容易暈染並長效持妝。", claims: ["高顯色", "容易暈染", "持久妝效"] },
+};
