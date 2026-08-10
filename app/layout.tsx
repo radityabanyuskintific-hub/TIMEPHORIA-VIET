@@ -24,8 +24,11 @@ export const metadata: Metadata = {
   description:
     "Pengalaman web edukasi produk Timephoria dengan tampilan portrait-first.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png", sizes: "64x64" },
+    ],
+    shortcut: "/favicon.ico",
   },
 };
 
