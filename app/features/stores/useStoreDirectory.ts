@@ -10,7 +10,7 @@ export function useStoreDirectory(view: SiteView) {
   const [stores, setStores] = useState<Store[]>([]);
   const [query, setQuery] = useState("");
   const [region, setRegion] = useState("All");
-  const [status, setStatus] = useState<StoreStatus>("idle");
+  const [status, setStatus] = useState<StoreStatus>("loading");
 
   useEffect(() => {
     if (view !== "stores" || stores.length || status !== "loading") return;
