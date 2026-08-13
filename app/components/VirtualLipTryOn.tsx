@@ -500,16 +500,24 @@ export default function VirtualLipTryOn({
     shadeRef.current = firstShade;
     setIntensity(INTENSITY_LEVELS[0]);
     intensityRef.current = INTENSITY_LEVELS[0];
-    setStudioLook((look) => ({
-      ...look,
-      [nextProduct.preset.region]: {
-        intensity: INTENSITY_LEVELS[0],
-        isGloss: nextGloss,
-        preset: nextProduct.preset,
-        productName: nextProduct.name,
-        shadeHex: firstShade.hex,
-      },
-    }));
+    setStudioLook((look) => {
+      const isApplied = Object.values(look).some(({ productName }) => productName === nextProduct.name);
+      if (isApplied) {
+        return Object.fromEntries(
+          Object.entries(look).filter(([, layer]) => layer?.productName !== nextProduct.name),
+        ) as Partial<Record<TryOnRegion, StudioLayer>>;
+      }
+      return {
+        ...look,
+        [nextProduct.preset.region]: {
+          intensity: INTENSITY_LEVELS[0],
+          isGloss: nextGloss,
+          preset: nextProduct.preset,
+          productName: nextProduct.name,
+          shadeHex: firstShade.hex,
+        },
+      };
+    });
   }
 
   function toggleStudioCategory(nextCategory: StudioCategory) {
