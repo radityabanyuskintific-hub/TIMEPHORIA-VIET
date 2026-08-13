@@ -442,6 +442,7 @@ export default function VirtualLipTryOn({
       aria-label={`${productName}, virtual try-on`}
       aria-modal="true"
       className={`virtual-tryon ${isClosing ? "closing" : ""} ${isFullscreen ? "fullscreen" : ""}`}
+      data-engine={engine}
       ref={tryOnRef}
       role="dialog"
     >
