@@ -5,13 +5,15 @@ export type TryOnRegion =
   | "concealer"
   | "contour"
   | "eyeliner"
+  | "eyelashes"
   | "eyeshadow"
   | "foundation"
   | "lips"
-  | "blush"
-  | "soft-focus";
+  | "blush";
 
 export type TryOnPreset = {
+  coverage?: number;
+  finish?: "glow" | "matte" | "natural" | "satin";
   region: TryOnRegion;
   shades: LipTryOnShade[];
   shimmer?: boolean;
@@ -35,27 +37,31 @@ const faceBase = [
 ];
 
 const presets: Record<string, TryOnPreset> = {
-  "LUMINA MATTE CUSHION": { region: "foundation", shades: faceBase },
+  "LUMINA MATTE CUSHION": { coverage: 0.68, finish: "matte", region: "foundation", shades: faceBase },
   "OPTIMA POWDER FOUNDATION": {
+    coverage: 0.58,
+    finish: "matte",
     region: "foundation",
     shades: faceBase.slice(1, 7).map((item, index) => ({
       ...item,
       code: String(index + 1).padStart(2, "0"),
     })),
   },
-  "SUPERNOVA SETTING SPRAY": {
-    region: "soft-focus",
-    shades: [shade("01", "Universal", "#E8D2C6")],
-  },
   "UTOPIA GLOW CUSHION": {
+    coverage: 0.56,
+    finish: "glow",
     region: "foundation",
     shades: [faceBase[1], faceBase[2], faceBase[3], faceBase[4], faceBase[6]],
   },
   "FIXION SKIN TINT STICK": {
+    coverage: 0.36,
+    finish: "satin",
     region: "foundation",
     shades: faceBase.slice(1, 7),
   },
   "VALORA CONCEALER": {
+    coverage: 0.62,
+    finish: "matte",
     region: "concealer",
     shades: [faceBase[1], faceBase[2], faceBase[3], faceBase[4], faceBase[6]],
   },

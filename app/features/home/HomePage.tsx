@@ -4,7 +4,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import VirtualLipTryOn from "../../components/VirtualLipTryOn";
+import VirtualLipTryOn, { type StudioTryOnProduct } from "../../components/VirtualLipTryOn";
 import ProductCard from "../catalog/ProductCard";
 import {
   finishTranslations,
@@ -39,6 +39,18 @@ import {
 
 const ENABLE_INTRO_LOADER = false;
 const PROMO_SEEN_SESSION_KEY = "timephoria:mega-promo-seen";
+
+const studioNavigationCopy: Record<Language, {
+  cta: string;
+  detail: string;
+  eyebrow: string;
+  title: string;
+}> = {
+  id: { cta: "BUKA STUDIO", detail: "Gabungkan riasan mata dan bibir dalam satu kamera.", eyebrow: "BARU · VIRTUAL MAKEUP", title: "FULL LOOK STUDIO" },
+  en: { cta: "OPEN STUDIO", detail: "Layer eye and lip makeup in one live camera.", eyebrow: "NEW · VIRTUAL MAKEUP", title: "FULL LOOK STUDIO" },
+  es: { cta: "ABRIR ESTUDIO", detail: "Combina maquillaje de ojos y labios en una sola cámara.", eyebrow: "NUEVO · MAQUILLAJE VIRTUAL", title: "FULL LOOK STUDIO" },
+  "zh-tw": { cta: "開啟工作室", detail: "在同一個即時鏡頭中疊加眼妝與唇妝。", eyebrow: "全新 · 虛擬彩妝", title: "完整妝容工作室" },
+};
 
 const promos: Promo[] = [
   {
@@ -815,11 +827,13 @@ export default function Home() {
   const [promoIndex, setPromoIndex] = useState(0);
   const [activePromo, setActivePromo] = useState<Promo | null>(null);
   const [activeTryOnProduct, setActiveTryOnProduct] = useState<Product | null>(null);
+  const [studioOpen, setStudioOpen] = useState(false);
   const [showMegaPromo, setShowMegaPromo] = useState(false);
   const [loaderState, setLoaderState] = useState<"loading" | "leaving" | "done">(
     ENABLE_INTRO_LOADER ? "loading" : "done",
   );
   const closeTryOn = useCallback(() => setActiveTryOnProduct(null), []);
+  const closeStudio = useCallback(() => setStudioOpen(false), []);
   const {
     query: storeQuery,
     region: storeRegion,
@@ -898,12 +912,29 @@ export default function Home() {
         : categoryProducts.filter((product) => productGroup(product) === finish),
     [categoryProducts, finish],
   );
+  const studioProducts = useMemo<StudioTryOnProduct[]>(() => {
+    const studioCatalog = [
+      ...products.filter((product) => product.category === "eyes"),
+      ...products.filter((product) => product.category === "lips"),
+    ];
+    return studioCatalog.flatMap((product) => {
+      const productPreset = tryOnPresets[product.name];
+      return productPreset ? [{
+        category: product.category as "eyes" | "lips",
+        finish: product.finish,
+        image: productThumbnail(product),
+        name: product.name,
+        preset: productPreset,
+      }] : [];
+    });
+  }, []);
   const currentPromo = activePromo ?? promos[promoIndex];
   const megaPromo = promos[0];
   const isIndonesian = language === "id";
   const isSpanish = language === "es";
   const isTraditionalChinese = language === "zh-tw";
   const copy = uiCopy[language];
+  const studioCopy = studioNavigationCopy[language];
   const localizedCategory = categoryCopy[language][activeCategory];
   const translatedPromo = localizePromo(
     currentPromo === promos[0] && isIndonesian
@@ -1020,6 +1051,18 @@ export default function Home() {
             productFinish={activeTryOnProduct.finish}
             productImage={productThumbnail(activeTryOnProduct)}
             productName={activeTryOnProduct.name}
+          />
+        ) : null}
+
+        {studioOpen && studioProducts[0] ? (
+          <VirtualLipTryOn
+            language={language}
+            onClose={closeStudio}
+            preset={studioProducts[0].preset}
+            productFinish={studioProducts[0].finish}
+            productImage={studioProducts[0].image}
+            productName={studioProducts[0].name}
+            studioProducts={studioProducts}
           />
         ) : null}
 
@@ -1321,6 +1364,19 @@ export default function Home() {
             </header>
 
             <div className="filter-bar" aria-label={copy.productFilters}>
+              <button
+                className="studio-launch-card"
+                onClick={() => {
+                  setActiveTryOnProduct(null);
+                  setStudioOpen(true);
+                }}
+                type="button"
+              >
+                <span>{studioCopy.eyebrow}</span>
+                <strong>{studioCopy.title}</strong>
+                <small>{studioCopy.detail}</small>
+                <b>{studioCopy.cta} →</b>
+              </button>
               <button
                 className={finish === "All" ? "selected" : ""}
                 onClick={() => {

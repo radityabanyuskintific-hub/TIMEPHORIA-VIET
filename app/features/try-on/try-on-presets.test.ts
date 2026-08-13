@@ -6,6 +6,7 @@ test("provides try-on presets for lip, face, and eye products", () => {
   assert.equal(tryOnPresets["STELLAR DUST LIP STAIN"].region, "lips");
   assert.equal(tryOnPresets["LUMINA MATTE CUSHION"].region, "foundation");
   assert.equal(tryOnPresets["DUNE EYELINER"].region, "eyeliner");
+  assert.equal(tryOnPresets["SUPERNOVA SETTING SPRAY"], undefined);
   assert.ok(tryOnPresets["PANDORA CHEEK LIQUID BLUSH"].shades.length >= 7);
 });
 

@@ -7,6 +7,13 @@ const configuredToken = process.env.NEXT_PUBLIC_BANUBA_CLIENT_TOKEN?.trim() ?? "
 export const isBanubaConfigured =
   configuredToken.length > 40 && !/PUT YOUR|placeholder/i.test(configuredToken);
 
+export type TryOnEffectLayer = {
+  intensity: number;
+  isGloss?: boolean;
+  preset: TryOnPreset;
+  shadeHex: string;
+};
+
 function rgb(hex: string, alpha: number) {
   const value = hex.replace("#", "");
   const red = Number.parseInt(value.slice(0, 2), 16) / 255;
@@ -39,38 +46,65 @@ export async function createBanubaSession(
   player.play();
   Banuba.Dom.render(player, container);
 
-  async function applyPreset(preset: TryOnPreset, shadeHex: string, intensity: number) {
+  const reset = [
+    'Lips.color("0 0 0 0")',
+    "Lips.shineIntensity(0)",
+    "Lips.glitterIntensity(0)",
+    'Makeup.eyeshadow("0 0 0 0")',
+    'Makeup.eyeliner("0 0 0 0")',
+    'Makeup.lashes("0 0 0 0")',
+    'Makeup.blushes("0 0 0 0")',
+    'Makeup.contour("0 0 0 0")',
+    'Makeup.highlighter("0 0 0 0")',
+    'Eyelashes.color("0 0 0 0")',
+    'Brows.color("0 0 0 0")',
+    'Skin.color("0 0 0 0")',
+    "Skin.softening(0)",
+    "Softlight.strength(0)",
+    "EyeBagsRemoval.disable()",
+  ];
+
+  function commandsFor({ intensity, isGloss, preset, shadeHex }: TryOnEffectLayer) {
     const alpha = Math.min(1, Math.max(0, intensity * 2.4));
     const color = rgb(shadeHex, alpha);
-    const reset = [
-      'Lips.color("0 0 0 0")',
-      'Makeup.eyeshadow("0 0 0 0")',
-      'Makeup.eyeliner("0 0 0 0")',
-      'Makeup.blushes("0 0 0 0")',
-      'Makeup.contour("0 0 0 0")',
-      'Makeup.highlighter("0 0 0 0")',
-      'Brows.color("0 0 0 0")',
-      'Skin.color("0 0 0 0")',
-      "Skin.softening(0)",
-    ];
     const commands: Record<TryOnPreset["region"], string[]> = {
-      lips: [`Lips.color("${color}")`],
+      lips: [
+        `Lips.color("${color}")`,
+        `Lips.shineIntensity(${isGloss ? (alpha * 0.82).toFixed(2) : "0"})`,
+        `Lips.shineBleeding(${isGloss ? "0.52" : "0"})`,
+      ],
       eyeshadow: [`Makeup.eyeshadow("${color}")`],
       eyeliner: [`Makeup.eyeliner("${color}")`],
       brows: [`Brows.color("${color}")`],
+      eyelashes: [
+        `Makeup.lashes("${rgb(shadeHex, alpha * 0.72)}")`,
+        `Eyelashes.color("${rgb(shadeHex, alpha * 0.92)}")`,
+      ],
       blush: [`Makeup.blushes("${color}")`],
       contour: [`Makeup.contour("${color}")`],
-      concealer: [`Skin.color("${rgb(shadeHex, alpha * 0.35)}")`, `Skin.softening(${(alpha * 0.35).toFixed(2)})`],
-      foundation: [`Skin.color("${rgb(shadeHex, alpha * 0.42)}")`, `Skin.softening(${(alpha * 0.25).toFixed(2)})`],
-      "soft-focus": [`Skin.softening(${(alpha * 0.8).toFixed(2)})`],
+      concealer: ["EyeBagsRemoval.enable()", `Skin.softening(${(alpha * 0.12).toFixed(2)})`],
+      foundation: [
+        `Skin.color("${rgb(shadeHex, alpha * (preset.coverage ?? 0.5))}")`,
+        `Skin.softening(${(alpha * (preset.finish === "matte" ? 0.3 : 0.18)).toFixed(2)})`,
+        `Softlight.strength(${preset.finish === "glow" ? (alpha * 0.18).toFixed(2) : "0"})`,
+      ],
     };
     if (preset.shimmer) {
       commands.eyeshadow.push(`Makeup.highlighter("${rgb("#fff2d5", alpha * 0.28)}")`);
     }
-    await effect.evalJs([...reset, ...commands[preset.region]].join(";"));
+    return commands[preset.region];
+  }
+
+  async function applyPreset(preset: TryOnPreset, shadeHex: string, intensity: number, isGloss = false) {
+    await effect.evalJs([...reset, ...commandsFor({ intensity, isGloss, preset, shadeHex })].join(";"));
+  }
+
+  async function applyLook(layers: TryOnEffectLayer[]) {
+    await effect.evalJs([...reset, ...layers.flatMap(commandsFor)].join(";"));
   }
 
   return {
+    applyLook,
     applyPreset,
     async capture() {
       return new Banuba.ImageCapture(player).takePhoto({ quality: 0.94, type: "image/jpeg" });

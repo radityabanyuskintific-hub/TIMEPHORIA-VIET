@@ -13,6 +13,9 @@ type DrawOptions = {
 const FACE_OVAL = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109];
 const LEFT_EYE = [33, 246, 161, 160, 159, 158, 157, 173, 133];
 const RIGHT_EYE = [263, 466, 388, 387, 386, 385, 384, 398, 362];
+const LEFT_EYE_LOWER = [33, 130, 25, 110, 24, 23, 22, 26, 112, 243, 133];
+const RIGHT_EYE_LOWER = [263, 359, 255, 339, 254, 253, 252, 256, 341, 463, 362];
+const OUTER_LIPS = [61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 409, 270, 269, 0, 39, 40, 185];
 const LEFT_BROW = [70, 63, 105, 66, 107];
 const RIGHT_BROW = [336, 296, 334, 293, 300];
 
@@ -72,6 +75,34 @@ function drawSparkles(context: CanvasRenderingContext2D, points: NormalizedLandm
   context.restore();
 }
 
+function drawLashes(
+  context: CanvasRenderingContext2D,
+  points: NormalizedLandmark[],
+  eye: number[],
+  width: number,
+  height: number,
+  color: string,
+  intensity: number,
+) {
+  const upperLid = eye.slice(1, -1).map((index) => point(points, index, width, height));
+  const eyeWidth = Math.abs(point(points, eye[0], width, height).x - point(points, eye[eye.length - 1], width, height).x);
+  context.save();
+  context.globalAlpha = Math.min(1, 0.58 + intensity);
+  context.strokeStyle = color;
+  context.lineCap = "round";
+  context.lineWidth = Math.max(1.2, eyeWidth * 0.018);
+  upperLid.forEach((lash, index) => {
+    const centerBias = 1 - Math.abs(index - (upperLid.length - 1) / 2) / Math.max(1, upperLid.length / 2);
+    const length = eyeWidth * (0.055 + centerBias * 0.045) * (0.8 + intensity * 1.4);
+    const sideways = (index - (upperLid.length - 1) / 2) * eyeWidth * 0.012;
+    context.beginPath();
+    context.moveTo(lash.x, lash.y);
+    context.quadraticCurveTo(lash.x + sideways * 0.35, lash.y - length * 0.55, lash.x + sideways, lash.y - length);
+    context.stroke();
+  });
+  context.restore();
+}
+
 export function createMakeupRenderer() {
   const lipRenderer = createLipRenderer();
 
@@ -87,21 +118,39 @@ export function createMakeupRenderer() {
         return;
       }
 
-      if (options.preset.region === "foundation" || options.preset.region === "soft-focus") {
-        fillSoft(context, options.preset.region === "soft-focus" ? "#f7e9e3" : options.shadeHex, options.preset.region === "soft-focus" ? alpha * 0.25 : alpha * 0.5, 12, () => {
+      if (options.preset.region === "foundation") {
+        const coverage = options.preset.coverage ?? 0.5;
+        fillSoft(context, options.shadeHex, alpha * coverage, options.preset.finish === "matte" ? 9 : 12, () => {
           path(context, points, FACE_OVAL, width, height);
           context.closePath();
         });
+        context.save();
+        context.globalCompositeOperation = "destination-out";
+        context.filter = "blur(4px)";
+        for (const indices of [LEFT_EYE, RIGHT_EYE, OUTER_LIPS]) {
+          context.beginPath();
+          path(context, points, indices, width, height);
+          context.closePath();
+          context.fill();
+        }
+        context.restore();
       } else if (options.preset.region === "concealer") {
-        for (const [a, b] of [[33, 133], [263, 362]]) {
-          const left = point(points, a, width, height);
-          const right = point(points, b, width, height);
+        for (const indices of [LEFT_EYE_LOWER, RIGHT_EYE_LOWER]) {
+          const eyePoints = indices.map((index) => point(points, index, width, height));
+          const minX = Math.min(...eyePoints.map(({ x }) => x));
+          const maxX = Math.max(...eyePoints.map(({ x }) => x));
+          const topY = Math.min(...eyePoints.map(({ y }) => y));
+          const bottomY = Math.max(...eyePoints.map(({ y }) => y)) + (maxX - minX) * 0.22;
           context.save();
-          context.filter = "blur(8px)";
-          context.globalAlpha = alpha * 0.55;
+          context.filter = "blur(6px)";
+          context.globalAlpha = alpha * (options.preset.coverage ?? 0.58);
+          context.globalCompositeOperation = "soft-light";
           context.fillStyle = options.shadeHex;
           context.beginPath();
-          context.ellipse((left.x + right.x) / 2, (left.y + right.y) / 2 + Math.abs(right.x - left.x) * 0.2, Math.abs(right.x - left.x) * 0.55, Math.abs(right.x - left.x) * 0.2, 0, 0, Math.PI * 2);
+          context.moveTo(minX, topY);
+          context.quadraticCurveTo((minX + maxX) / 2, bottomY, maxX, topY);
+          context.quadraticCurveTo((minX + maxX) / 2, topY + (bottomY - topY) * 0.35, minX, topY);
+          context.closePath();
           context.fill();
           context.restore();
         }
@@ -121,12 +170,24 @@ export function createMakeupRenderer() {
       } else if (options.preset.region === "contour") {
         context.save();
         context.strokeStyle = options.shadeHex;
-        context.globalAlpha = alpha * 0.62;
-        context.globalCompositeOperation = "multiply";
-        context.filter = "blur(9px)";
+        context.globalAlpha = alpha * 0.48;
+        context.globalCompositeOperation = "soft-light";
+        context.filter = "blur(7px)";
         context.lineCap = "round";
-        context.lineWidth = Math.abs(points[454].x - points[234].x) * width * 0.035;
-        for (const indices of [[234, 138, 172], [454, 367, 397], [136, 150, 152, 379, 365]]) {
+        context.lineWidth = Math.abs(points[454].x - points[234].x) * width * 0.028;
+        for (const indices of [
+          [234, 123, 50, 205],
+          [454, 352, 280, 425],
+          [127, 162, 21, 54],
+          [356, 389, 251, 284],
+          [136, 150, 152, 379, 365],
+        ]) {
+          context.beginPath();
+          path(context, points, indices, width, height);
+          context.stroke();
+        }
+        context.lineWidth *= 0.48;
+        for (const indices of [[168, 6, 197, 5], [168, 6, 195, 5]]) {
           context.beginPath();
           path(context, points, indices, width, height);
           context.stroke();
@@ -159,6 +220,9 @@ export function createMakeupRenderer() {
           context.stroke();
         }
         context.restore();
+      } else if (options.preset.region === "eyelashes") {
+        drawLashes(context, points, LEFT_EYE, width, height, options.shadeHex, options.intensity);
+        drawLashes(context, points, RIGHT_EYE, width, height, options.shadeHex, options.intensity);
       } else if (options.preset.region === "eyeshadow") {
         fillSoft(context, options.shadeHex, alpha, 5, () => {
           eyeShadowPath(context, points, LEFT_EYE, LEFT_BROW, width, height);

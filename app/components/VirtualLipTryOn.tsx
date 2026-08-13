@@ -4,11 +4,11 @@
 /* eslint-disable @next/next/no-img-element */
 
 import type { FaceLandmarker } from "@mediapipe/tasks-vision";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { createBanubaSession, isBanubaConfigured, type BanubaSession } from "../features/try-on/banuba";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createBanubaSession, isBanubaConfigured, type BanubaSession, type TryOnEffectLayer } from "../features/try-on/banuba";
 import { createMakeupRenderer, type MakeupRenderer } from "../features/try-on/makeup-renderer";
 import { acquireFaceLandmarker, type FaceLandmarkerLease } from "../features/try-on/mediapipe";
-import type { TryOnPreset } from "../features/try-on/try-on-presets";
+import type { TryOnPreset, TryOnRegion } from "../features/try-on/try-on-presets";
 import type { LipTryOnShade } from "../lip-try-on-shades";
 import type { Language } from "../features/catalog/types";
 
@@ -16,6 +16,17 @@ type TryOnStatus = "loading" | "running" | "error";
 type CaptureStatus = "idle" | "saved" | "error";
 type CameraRatio = "9:16" | "4:5";
 type CameraFacing = "environment" | "user";
+type StudioCategory = "eyes" | "lips";
+
+export type StudioTryOnProduct = {
+  category: StudioCategory;
+  finish: string;
+  image: string;
+  name: string;
+  preset: TryOnPreset;
+};
+
+type StudioLayer = TryOnEffectLayer & { productName: string };
 
 const INTENSITY_LEVELS = [0.2, 0.28, 0.38] as const;
 
@@ -26,6 +37,7 @@ type VirtualTryOnProps = {
   productFinish: string;
   productImage: string;
   productName: string;
+  studioProducts?: StudioTryOnProduct[];
 };
 
 const COPY: Record<Language, {
@@ -37,12 +49,19 @@ const COPY: Record<Language, {
   close: string;
   effectOff: string;
   effectOn: string;
+  eyes: string;
   error: string;
   flipCamera: string;
   frontCamera: string;
   fullscreen: string;
   intensity: string;
+  lashes: string;
   loading: string;
+  look: string;
+  lips: string;
+  brows: string;
+  resetLook: string;
+  studioTitle: string;
   retry: string;
   shade: string;
   swipes: string[];
@@ -57,12 +76,19 @@ const COPY: Record<Language, {
     close: "Tutup virtual try-on",
     effectOff: "LIHAT TANPA EFEK",
     effectOn: "HASIL AKTIF",
+    eyes: "MATA",
     error: "Virtual try-on belum dapat dimulai. Periksa koneksi dan izin kameramu.",
     flipCamera: "Ganti kamera depan atau belakang",
     frontCamera: "Kamera depan aktif",
     fullscreen: "Ubah layar penuh",
     intensity: "INTENSITAS",
+    lashes: "BULU MATA",
     loading: "MENYIAPKAN TRY-ON...",
+    look: "LOOK AKTIF",
+    lips: "BIBIR",
+    brows: "ALIS",
+    resetLook: "HAPUS SEMUA",
+    studioTitle: "FULL LOOK STUDIO",
     retry: "COBA LAGI",
     shade: "WARNA",
     swipes: ["1 SAPUAN", "2 SAPUAN", "3 SAPUAN"],
@@ -77,12 +103,19 @@ const COPY: Record<Language, {
     close: "Close virtual try-on",
     effectOff: "VIEW WITHOUT EFFECT",
     effectOn: "EFFECT ON",
+    eyes: "EYES",
     error: "Virtual try-on could not start. Check your connection and camera permission.",
     flipCamera: "Switch front or back camera",
     frontCamera: "Front camera active",
     fullscreen: "Toggle fullscreen",
     intensity: "INTENSITY",
+    lashes: "LASHES",
     loading: "PREPARING TRY-ON...",
+    look: "ACTIVE LOOK",
+    lips: "LIPS",
+    brows: "BROWS",
+    resetLook: "RESET ALL",
+    studioTitle: "FULL LOOK STUDIO",
     retry: "TRY AGAIN",
     shade: "SHADE",
     swipes: ["1 SWIPE", "2 SWIPES", "3 SWIPES"],
@@ -97,12 +130,19 @@ const COPY: Record<Language, {
     close: "Cerrar prueba virtual",
     effectOff: "VER SIN EFECTO",
     effectOn: "EFECTO ACTIVO",
+    eyes: "OJOS",
     error: "No se pudo iniciar la prueba virtual. Revisa la conexión y los permisos de cámara.",
     flipCamera: "Cambiar cámara frontal o trasera",
     frontCamera: "Cámara frontal activa",
     fullscreen: "Cambiar pantalla completa",
     intensity: "INTENSIDAD",
+    lashes: "PESTAÑAS",
     loading: "PREPARANDO LA PRUEBA...",
+    look: "LOOK ACTIVO",
+    lips: "LABIOS",
+    brows: "CEJAS",
+    resetLook: "BORRAR TODO",
+    studioTitle: "ESTUDIO DE LOOK COMPLETO",
     retry: "INTENTAR DE NUEVO",
     shade: "TONO",
     swipes: ["1 PASADA", "2 PASADAS", "3 PASADAS"],
@@ -117,12 +157,19 @@ const COPY: Record<Language, {
     close: "關閉虛擬試妝",
     effectOff: "查看原始畫面",
     effectOn: "試妝效果開啟",
+    eyes: "眼妝",
     error: "無法啟動虛擬試妝，請檢查連線與鏡頭權限。",
     flipCamera: "切換前後鏡頭",
     frontCamera: "前置鏡頭已啟用",
     fullscreen: "切換全螢幕",
     intensity: "顯色濃度",
+    lashes: "睫毛",
     loading: "正在準備虛擬試妝...",
+    look: "目前妝容",
+    lips: "唇妝",
+    brows: "眉毛",
+    resetLook: "全部清除",
+    studioTitle: "完整妝容工作室",
     retry: "再試一次",
     shade: "色號",
     swipes: ["1 次塗抹", "2 次塗抹", "3 次塗抹"],
@@ -137,8 +184,23 @@ export default function VirtualLipTryOn({
   productFinish,
   productImage,
   productName,
+  studioProducts,
 }: VirtualTryOnProps) {
-  const shades = preset.shades;
+  const isStudio = Boolean(studioProducts?.length);
+  const firstStudioProduct = studioProducts?.[0];
+  const [studioCategory, setStudioCategory] = useState<StudioCategory>(firstStudioProduct?.category ?? "eyes");
+  const [activeStudioProductName, setActiveStudioProductName] = useState(firstStudioProduct?.name ?? productName);
+  const [revelaMode, setRevelaMode] = useState<"brows" | "eyelashes">("brows");
+  const activeStudioProduct = studioProducts?.find(({ name }) => name === activeStudioProductName) ?? firstStudioProduct;
+  const activeProductName = activeStudioProduct?.name ?? productName;
+  const activeProductFinish = activeStudioProduct?.finish ?? productFinish;
+  const basePreset = activeStudioProduct?.preset ?? preset;
+  const isRevela = activeProductName === "REVELA BROW MASCARA";
+  const activePreset = useMemo(
+    () => isRevela ? { ...basePreset, region: revelaMode } : basePreset,
+    [basePreset, isRevela, revelaMode],
+  );
+  const shades = activePreset.shades;
   const initialShade = shades[0];
   const copy = COPY[language];
   const tryOnRef = useRef<HTMLElement>(null);
@@ -159,6 +221,18 @@ export default function VirtualLipTryOn({
   const shadeRef = useRef(initialShade);
   const intensityRef = useRef<number>(INTENSITY_LEVELS[0]);
   const effectEnabledRef = useRef(true);
+  const activePresetRef = useRef(activePreset);
+  const activeGlossRef = useRef(false);
+
+  const initialStudioLayer = firstStudioProduct
+    ? {
+        intensity: INTENSITY_LEVELS[0],
+        isGloss: /GLOSS|GLOSSY|VINYL|BALM|VELVET-SHINE/i.test(firstStudioProduct.name),
+        preset: firstStudioProduct.preset,
+        productName: firstStudioProduct.name,
+        shadeHex: firstStudioProduct.preset.shades[0].hex,
+      }
+    : null;
 
   const [status, setStatus] = useState<TryOnStatus>("loading");
   const [errorMessage, setErrorMessage] = useState("");
@@ -173,7 +247,20 @@ export default function VirtualLipTryOn({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [engine, setEngine] = useState<"banuba" | "mediapipe">("mediapipe");
-  const isGlossProduct = productFinish === "GLOSS IT BETTER" || /GLOSS|GLOSSY|VINYL|BALM|VELVET-SHINE/i.test(productName);
+  const [studioLook, setStudioLook] = useState<Partial<Record<TryOnRegion, StudioLayer>>>(
+    initialStudioLayer ? { [initialStudioLayer.preset.region]: initialStudioLayer } : {},
+  );
+  const studioLookRef = useRef(studioLook);
+  const isGlossProduct = activeProductFinish === "GLOSS IT BETTER" || /GLOSS|GLOSSY|VINYL|BALM|VELVET-SHINE/i.test(activeProductName);
+
+  useEffect(() => {
+    activePresetRef.current = activePreset;
+    activeGlossRef.current = isGlossProduct;
+  }, [activePreset, isGlossProduct]);
+
+  useEffect(() => {
+    studioLookRef.current = studioLook;
+  }, [studioLook]);
 
   const stopEverything = useCallback(() => {
     if (rafRef.current !== null) window.cancelAnimationFrame(rafRef.current);
@@ -219,13 +306,23 @@ export default function VirtualLipTryOn({
           setFaceDetected(Boolean(points));
           if (points && effectEnabledRef.current) {
             rendererRef.current ??= createMakeupRenderer();
-            rendererRef.current.draw(context, points, canvas.width, canvas.height, {
-              intensity: intensityRef.current,
-              isGloss: isGlossProduct,
-              preset,
-              shadeHex: shadeRef.current.hex,
-              time: timestamp,
-            });
+            const layers = isStudio
+              ? Object.values(studioLookRef.current)
+              : [{
+                  intensity: intensityRef.current,
+                  isGloss: activeGlossRef.current,
+                  preset: activePresetRef.current,
+                  shadeHex: shadeRef.current.hex,
+                }];
+            for (const layer of layers) {
+              rendererRef.current.draw(context, points, canvas.width, canvas.height, {
+                intensity: layer.intensity,
+                isGloss: Boolean(layer.isGloss),
+                preset: layer.preset,
+                shadeHex: layer.shadeHex,
+                time: timestamp,
+              });
+            }
           }
         }
         lastDetectionAt = timestamp;
@@ -280,7 +377,11 @@ export default function VirtualLipTryOn({
             return;
           }
           banubaSessionRef.current = session;
-          await session.applyPreset(preset, shadeRef.current.hex, intensityRef.current);
+          if (isStudio) {
+            await session.applyLook(Object.values(studioLookRef.current));
+          } else {
+            await session.applyPreset(activePresetRef.current, shadeRef.current.hex, intensityRef.current, activeGlossRef.current);
+          }
           setEngine("banuba");
           setFaceDetected(true);
           setStatus("running");
@@ -328,18 +429,84 @@ export default function VirtualLipTryOn({
 
   useEffect(() => {
     const session = banubaSessionRef.current;
-    if (session) void session.applyPreset(preset, selectedShade.hex, effectEnabled ? intensity : 0).catch(console.warn);
-  }, [effectEnabled, intensity, preset, selectedShade]);
+    if (!session) return;
+    if (isStudio) {
+      void session.applyLook(effectEnabled ? Object.values(studioLook) : []).catch(console.warn);
+    } else {
+      void session.applyPreset(activePreset, selectedShade.hex, effectEnabled ? intensity : 0, isGlossProduct).catch(console.warn);
+    }
+  }, [activePreset, effectEnabled, intensity, isGlossProduct, isStudio, selectedShade, studioLook]);
 
   function selectShade(shade: LipTryOnShade) {
     shadeRef.current = shade;
     setSelectedShade(shade);
+    if (isStudio) {
+      setStudioLook((look) => ({
+        ...look,
+        [activePreset.region]: {
+          intensity,
+          isGloss: isGlossProduct,
+          preset: activePreset,
+          productName: activeProductName,
+          shadeHex: shade.hex,
+        },
+      }));
+    }
   }
 
   function selectIntensity(value: number) {
     intensityRef.current = value;
     setIntensity(value);
     setIntensityOpen(false);
+    if (isStudio) {
+      setStudioLook((look) => {
+        const layer = look[activePreset.region];
+        return layer ? { ...look, [activePreset.region]: { ...layer, intensity: value } } : look;
+      });
+    }
+  }
+
+  function selectStudioProduct(nextProduct: StudioTryOnProduct) {
+    const firstShade = nextProduct.preset.shades[0];
+    const nextGloss = nextProduct.finish === "GLOSS IT BETTER" || /GLOSS|GLOSSY|VINYL|BALM|VELVET-SHINE/i.test(nextProduct.name);
+    setActiveStudioProductName(nextProduct.name);
+    setStudioCategory(nextProduct.category);
+    setRevelaMode("brows");
+    setSelectedShade(firstShade);
+    shadeRef.current = firstShade;
+    setIntensity(INTENSITY_LEVELS[0]);
+    intensityRef.current = INTENSITY_LEVELS[0];
+    setStudioLook((look) => ({
+      ...look,
+      [nextProduct.preset.region]: {
+        intensity: INTENSITY_LEVELS[0],
+        isGloss: nextGloss,
+        preset: nextProduct.preset,
+        productName: nextProduct.name,
+        shadeHex: firstShade.hex,
+      },
+    }));
+  }
+
+  function selectRevelaMode(nextMode: "brows" | "eyelashes") {
+    if (nextMode === revelaMode) return;
+    const previousRegion = revelaMode;
+    const nextPreset = { ...basePreset, region: nextMode };
+    setRevelaMode(nextMode);
+    if (isStudio) {
+      setStudioLook((look) => {
+        const nextLook = { ...look };
+        if (nextLook[previousRegion]?.productName === activeProductName) delete nextLook[previousRegion];
+        nextLook[nextMode] = {
+          intensity,
+          isGloss: false,
+          preset: nextPreset,
+          productName: activeProductName,
+          shadeHex: selectedShade.hex,
+        };
+        return nextLook;
+      });
+    }
   }
 
   async function switchCamera() {
@@ -382,7 +549,7 @@ export default function VirtualLipTryOn({
   }
 
   function saveBlob(blob: Blob) {
-    const safeProductName = productName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const safeProductName = (isStudio ? "timephoria-full-look" : activeProductName).toLowerCase().replace(/[^a-z0-9]+/g, "-");
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -439,9 +606,9 @@ export default function VirtualLipTryOn({
 
   return (
     <section
-      aria-label={`${productName}, virtual try-on`}
+      aria-label={`${isStudio ? "Timephoria Full Look Studio" : activeProductName}, virtual try-on`}
       aria-modal="true"
-      className={`virtual-tryon ${isClosing ? "closing" : ""} ${isFullscreen ? "fullscreen" : ""}`}
+      className={`virtual-tryon ${isStudio ? "studio" : ""} ${isClosing ? "closing" : ""} ${isFullscreen ? "fullscreen" : ""}`}
       data-engine={engine}
       ref={tryOnRef}
       role="dialog"
@@ -466,18 +633,52 @@ export default function VirtualLipTryOn({
 
         {status === "running" ? (
           <div className="tryon-camera-ui">
+            {isStudio ? (
+              <div className="tryon-studio-picker">
+                <div className="tryon-studio-heading">
+                  <strong>{copy.studioTitle}</strong>
+                  <span>{Object.keys(studioLook).length} {copy.look}</span>
+                  <button onClick={() => setStudioLook({})} type="button">{copy.resetLook}</button>
+                </div>
+                <div className="tryon-studio-tabs" role="tablist">
+                  {(["eyes", "lips"] as StudioCategory[]).map((category) => (
+                    <button aria-selected={studioCategory === category} key={category} onClick={() => setStudioCategory(category)} role="tab" type="button">
+                      {category === "eyes" ? copy.eyes : copy.lips}
+                    </button>
+                  ))}
+                </div>
+                <div className="tryon-studio-products">
+                  {studioProducts?.filter(({ category }) => category === studioCategory).map((studioProduct) => (
+                    <button aria-pressed={activeProductName === studioProduct.name} key={studioProduct.name} onClick={() => selectStudioProduct(studioProduct)} type="button">
+                      {studioProduct.name.replace(/^(TIMEPHORIA\s+)?/, "")}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {isRevela ? (
+              <div className="tryon-mode-switch" aria-label="Revela application mode">
+                <button aria-pressed={revelaMode === "brows"} onClick={() => selectRevelaMode("brows")} type="button">{copy.brows}</button>
+                <button aria-pressed={revelaMode === "eyelashes"} onClick={() => selectRevelaMode("eyelashes")} type="button">{copy.lashes}</button>
+              </div>
+            ) : null}
+
             <div className="tryon-shade-list" aria-label={copy.shade}>
-              {shades.map((shadeItem) => (
-                <button aria-label={`${shadeItem.code} ${shadeItem.name}`} aria-pressed={selectedShade.code === shadeItem.code} className={selectedShade.code === shadeItem.code ? "selected" : ""} key={`${shadeItem.code}-${shadeItem.name}`} onClick={() => selectShade(shadeItem)} type="button">
-                  <i style={{ backgroundColor: shadeItem.hex }} />
-                </button>
-              ))}
+              <div className="tryon-shade-track">
+                {shades.map((shadeItem) => (
+                  <button aria-label={`${shadeItem.code} ${shadeItem.name}`} aria-pressed={selectedShade.code === shadeItem.code} className={selectedShade.code === shadeItem.code ? "selected" : ""} key={`${shadeItem.code}-${shadeItem.name}`} onClick={() => selectShade(shadeItem)} type="button">
+                    <i style={{ backgroundColor: shadeItem.hex }} />
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="tryon-lower-controls">
               <button aria-pressed={effectEnabled} className="tryon-selected-shade" onClick={toggleEffect} type="button">
                 <span>{copy.shade}</span>
                 <strong>{selectedShade.code} {selectedShade.name}</strong>
+                {isStudio ? <em>{activeProductName}</em> : null}
                 <small>{effectEnabled ? copy.effectOn : copy.effectOff}</small>
               </button>
 
