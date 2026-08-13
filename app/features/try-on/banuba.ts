@@ -80,13 +80,17 @@ export async function createBanubaSession(
         `Makeup.lashes("${rgb(shadeHex, alpha * 0.72)}")`,
         `Eyelashes.color("${rgb(shadeHex, alpha * 0.92)}")`,
       ],
-      blush: [`Makeup.blushes("${color}")`],
-      contour: [`Makeup.contour("${color}")`],
-      concealer: ["EyeBagsRemoval.enable()", `Skin.softening(${(alpha * 0.12).toFixed(2)})`],
+      blush: [`Makeup.blushes("${rgb(shadeHex, Math.min(1, alpha * 1.08))}")`],
+      contour: [`Makeup.contour("${rgb(shadeHex, Math.min(1, alpha * 1.05))}")`],
+      concealer: [
+        "EyeBagsRemoval.enable()",
+        `Skin.softening(${Math.max(0.2, alpha * 0.34).toFixed(2)})`,
+        `Makeup.highlighter("${rgb(shadeHex, Math.min(0.58, alpha * 0.62))}")`,
+      ],
       foundation: [
-        `Skin.color("${rgb(shadeHex, alpha * (preset.coverage ?? 0.5))}")`,
-        `Skin.softening(${(alpha * (preset.finish === "matte" ? 0.3 : 0.18)).toFixed(2)})`,
-        `Softlight.strength(${preset.finish === "glow" ? (alpha * 0.18).toFixed(2) : "0"})`,
+        `Skin.color("${rgb(shadeHex, Math.min(0.92, alpha * (preset.coverage ?? 0.62) * 1.24))}")`,
+        `Skin.softening(${(alpha * (preset.finish === "matte" ? 0.34 : 0.22)).toFixed(2)})`,
+        `Softlight.strength(${preset.finish === "glow" ? (alpha * 0.28).toFixed(2) : preset.finish === "satin" ? (alpha * 0.12).toFixed(2) : "0"})`,
       ],
     };
     if (preset.shimmer) {

@@ -242,13 +242,16 @@
 .tryon-studio-dock.open .tryon-studio-rail button.active { background: linear-gradient(145deg,rgba(255,255,255,.68),rgba(95,95,95,.62)); color: #111; filter: drop-shadow(0 0 7px rgba(255,255,255,.7)); transform: translateX(var(--studio-drawer-width)); z-index: 2; }
 .tryon-studio-rail button.reset { background: linear-gradient(145deg,rgba(255,87,137,.65),rgba(56,17,31,.64)); height: 58px; }
 .tryon-studio-drawer {
-  animation: studio-drawer-in 240ms cubic-bezier(.22,1,.36,1) both;
+  animation: studio-drawer-expand 280ms cubic-bezier(.22,1,.36,1) both;
   backdrop-filter: blur(20px);
   background: linear-gradient(100deg,rgba(28,28,28,.74),rgba(255,255,255,.24));
   border: 1px solid rgba(255,255,255,.27);
   border-left: 0;
-  border-radius: 0 16px 16px 0;
+  border-radius: 0;
+  border-right: 0;
+  box-sizing: border-box;
   left: 0;
+  min-height: 63px;
   overflow: hidden;
   padding: 7px 8px 6px;
   position: absolute;
@@ -269,7 +272,7 @@
 @keyframes tryon-pulse { from { opacity: .45; transform: scale(.86); } to { opacity: 1; transform: scale(1); } }
 @keyframes tryon-slide-up { from { transform: translateY(102%); } to { transform: translateY(0); } }
 @keyframes tryon-slide-down { from { transform: translateY(0); } to { transform: translateY(105%); } }
-@keyframes studio-drawer-in { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes studio-drawer-expand { from { clip-path: inset(0 100% 0 0); opacity: .4; } to { clip-path: inset(0); opacity: 1; } }
 
 @media (max-width: 390px) {
   .tryon-floating-nav { gap: 5px; padding: 8px; }

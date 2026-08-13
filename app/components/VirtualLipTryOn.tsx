@@ -393,8 +393,7 @@ export default function VirtualLipTryOn({
     setFaceDetected(false);
     try {
       if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) throw new Error("unsupported");
-      const needsMappedComplexionMask = activePresetRef.current.region === "foundation" || activePresetRef.current.region === "concealer";
-      if (isBanubaConfigured && banubaContainerRef.current && !isStudio && !needsMappedComplexionMask) {
+      if (isBanubaConfigured && banubaContainerRef.current) {
         try {
           const session = await createBanubaSession(banubaContainerRef.current, facingMode);
           if (!mountedRef.current) {
