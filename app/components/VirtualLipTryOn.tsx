@@ -702,7 +702,12 @@ export default function VirtualLipTryOn({
                   <div className={`tryon-studio-drawer ${studioCategory}`}>
                     <div className="tryon-studio-products">
                       {studioProducts?.filter(({ category }) => category === studioCategory).map((studioProduct) => (
-                        <button aria-pressed={activeProductName === studioProduct.name} key={studioProduct.name} onClick={() => selectStudioProduct(studioProduct)} type="button">
+                        <button
+                          aria-pressed={Object.values(studioLook).some(({ productName }) => productName === studioProduct.name)}
+                          key={studioProduct.name}
+                          onClick={() => selectStudioProduct(studioProduct)}
+                          type="button"
+                        >
                           {studioProduct.name}
                         </button>
                       ))}

@@ -218,7 +218,15 @@
 .tryon-mode-switch button { background: transparent; border: 0; border-radius: 999px; color: #fff; cursor: pointer; font-size: 8px; font-weight: 900; padding: 7px 12px; }
 .tryon-mode-switch button[aria-pressed="true"] { background: #fff; color: #111; }
 
-.tryon-studio-dock { --studio-drawer-width: min(330px,calc(100vw - 56px)); left: 0; pointer-events: auto; position: absolute; top: max(104px,calc(env(safe-area-inset-top) + 94px)); z-index: 3; }
+.tryon-studio-dock {
+  --studio-drawer-end: rgba(194,194,196,.72);
+  --studio-drawer-width: min(330px,calc(100vw - 56px));
+  left: 0;
+  pointer-events: auto;
+  position: absolute;
+  top: max(104px,calc(env(safe-area-inset-top) + 94px));
+  z-index: 3;
+}
 .tryon-studio-rail { align-items: flex-start; display: flex; flex-direction: column; gap: 5px; }
 .tryon-studio-rail button {
   backdrop-filter: blur(18px);
@@ -239,17 +247,30 @@
   width: 43px;
   writing-mode: vertical-rl;
 }
-.tryon-studio-dock.open .tryon-studio-rail button.active { background: linear-gradient(145deg,rgba(255,255,255,.68),rgba(95,95,95,.62)); color: #111; filter: drop-shadow(0 0 7px rgba(255,255,255,.7)); transform: translateX(var(--studio-drawer-width)); z-index: 2; }
+.tryon-studio-dock.open .tryon-studio-rail button.active {
+  backdrop-filter: none;
+  background: linear-gradient(90deg,var(--studio-drawer-end),rgba(242,242,244,.76));
+  border-color: rgba(255,255,255,.3);
+  border-left: 0;
+  border-radius: 0 16px 16px 0;
+  box-shadow: 10px 8px 20px rgba(0,0,0,.27);
+  color: #111;
+  filter: none;
+  transform: translateX(calc(var(--studio-drawer-width) - 2px));
+  z-index: 2;
+}
 .tryon-studio-rail button.reset { background: linear-gradient(145deg,rgba(255,87,137,.65),rgba(56,17,31,.64)); height: 58px; }
 .tryon-studio-drawer {
   animation: studio-drawer-expand 280ms cubic-bezier(.22,1,.36,1) both;
   backdrop-filter: blur(20px);
-  background: linear-gradient(100deg,rgba(28,28,28,.74),rgba(255,255,255,.24));
+  background: linear-gradient(90deg,rgba(28,28,28,.76) 0%,rgba(116,116,118,.66) 72%,var(--studio-drawer-end) 100%);
   border: 1px solid rgba(255,255,255,.27);
   border-left: 0;
   border-radius: 0;
   border-right: 0;
   box-sizing: border-box;
+  box-shadow: 0 10px 20px rgba(0,0,0,.25);
+  height: 63px;
   left: 0;
   min-height: 63px;
   overflow: hidden;
