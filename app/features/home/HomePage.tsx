@@ -22,7 +22,7 @@ import type {
   SiteView,
 } from "../catalog/types";
 import { useStoreDirectory } from "../stores/useStoreDirectory";
-import { lipTryOnShades } from "../../lip-try-on-shades";
+import { tryOnPresets } from "../try-on/try-on-presets";
 import {
   categoryCopy,
   faqItemsSpanish,
@@ -1016,10 +1016,10 @@ export default function Home() {
           <VirtualLipTryOn
             language={language}
             onClose={closeTryOn}
+            preset={tryOnPresets[activeTryOnProduct.name]}
             productFinish={activeTryOnProduct.finish}
             productImage={productThumbnail(activeTryOnProduct)}
             productName={activeTryOnProduct.name}
-            shades={lipTryOnShades[activeTryOnProduct.name]}
           />
         ) : null}
 
@@ -1377,8 +1377,7 @@ export default function Home() {
                   key={product.name}
                   language={language}
                   onTryOn={
-                    product.category === "lips" &&
-                    lipTryOnShades[product.name]?.length
+                    tryOnPresets[product.name]?.shades.length
                       ? setActiveTryOnProduct
                       : undefined
                   }

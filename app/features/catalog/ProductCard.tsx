@@ -27,7 +27,7 @@ const cardCopy: Record<Language, {
   swatchSlides: string;
   swatches: string;
   toneChart: string;
-  tryOn: string;
+  tryOn: Record<Product["category"], string>;
 }> = {
   id: {
     claims: "klaim",
@@ -38,7 +38,7 @@ const cardCopy: Record<Language, {
     swatchSlides: "Slide swatch",
     swatches: "swatch",
     toneChart: "Pilihan warna",
-    tryOn: "COBA DI BIBIRMU",
+    tryOn: { eyes: "COBA DI MATAMU", face: "COBA DI WAJAHMU", lips: "COBA DI BIBIRMU" },
   },
   en: {
     claims: "claims",
@@ -49,7 +49,7 @@ const cardCopy: Record<Language, {
     swatchSlides: "Swatch slides",
     swatches: "swatch",
     toneChart: "Tone chart",
-    tryOn: "TRY IT ON",
+    tryOn: { eyes: "TRY IT ON", face: "TRY IT ON", lips: "TRY IT ON" },
   },
   es: {
     claims: "beneficios",
@@ -60,7 +60,7 @@ const cardCopy: Record<Language, {
     swatchSlides: "Muestras de color",
     swatches: "muestra",
     toneChart: "Guía de tonos",
-    tryOn: "PRUÉBALO EN TUS LABIOS",
+    tryOn: { eyes: "PRUÉBALO EN TUS OJOS", face: "PRUÉBALO EN TU ROSTRO", lips: "PRUÉBALO EN TUS LABIOS" },
   },
   "zh-tw": {
     claims: "產品特色",
@@ -71,7 +71,7 @@ const cardCopy: Record<Language, {
     swatchSlides: "色票輪播",
     swatches: "色票",
     toneChart: "色號表",
-    tryOn: "立即試色",
+    tryOn: { eyes: "眼妝立即試色", face: "臉部立即試妝", lips: "唇彩立即試色" },
   },
 };
 
@@ -121,7 +121,7 @@ export default function ProductCard({
           onClick={() => onTryOn(product)}
           type="button"
         >
-          <span>{copy.tryOn}</span>
+          <span>{copy.tryOn[product.category]}</span>
           <strong>{copy.liveCamera}</strong>
         </button>
       ) : null}

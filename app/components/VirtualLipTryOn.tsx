@@ -1,487 +1,301 @@
 "use client";
 
+/* The try-on backdrop is an existing product asset whose crop is controlled by CSS. */
+/* eslint-disable @next/next/no-img-element */
+
 import type { FaceLandmarker } from "@mediapipe/tasks-vision";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  createLipRenderer,
-  type LipRenderer,
-} from "../features/try-on/lip-renderer";
-import {
-  acquireFaceLandmarker,
-  type FaceLandmarkerLease,
-} from "../features/try-on/mediapipe";
+import { createBanubaSession, isBanubaConfigured, type BanubaSession } from "../features/try-on/banuba";
+import { createMakeupRenderer, type MakeupRenderer } from "../features/try-on/makeup-renderer";
+import { acquireFaceLandmarker, type FaceLandmarkerLease } from "../features/try-on/mediapipe";
+import type { TryOnPreset } from "../features/try-on/try-on-presets";
 import type { LipTryOnShade } from "../lip-try-on-shades";
 import type { Language } from "../features/catalog/types";
 
-type TryOnStatus = "idle" | "loading" | "running" | "error";
+type TryOnStatus = "loading" | "running" | "error";
 type CaptureStatus = "idle" | "saved" | "error";
 type CameraRatio = "9:16" | "4:5";
+type CameraFacing = "environment" | "user";
 
-const INTENSITY_LEVELS = [
-  { value: 0.2 },
-  { value: 0.28 },
-  { value: 0.38 },
-] as const;
+const INTENSITY_LEVELS = [0.2, 0.28, 0.38] as const;
 
-const SHADE_DESCRIPTIONS_SPANISH: Record<string, string> = {
-  "Bold crimson": "Carmesí intenso",
-  "Bright coral pink": "Rosa coral brillante",
-  "Burgundy wine": "Vino borgoña",
-  "Cool-tone pink": "Rosa de subtono frío",
-  "Deep berry plum": "Ciruela frutos rojos profunda",
-  "Deep berry red": "Rojo frutos rojos profundo",
-  "Deep brown": "Café profundo",
-  "Deep coral": "Coral profundo",
-  "Deep red": "Rojo profundo",
-  "Deep red brown": "Café rojizo profundo",
-  "Deep tomato red": "Rojo tomate profundo",
-  "Edgy purple": "Morado atrevido",
-  Mauve: "Malva",
-  "Muted pink": "Rosa apagado",
-  "Muted rosewood": "Palo de rosa apagado",
-  "Neutral burnt rose": "Rosa quemado neutro",
-  "Nude brown": "Café nude",
-  "Nude pink": "Rosa nude",
-  "Orangish red": "Rojo anaranjado",
-  Peach: "Durazno",
-  "Peach pink": "Rosa durazno",
-  "Pink berry": "Rosa frutos rojos",
-  "Pink mauve": "Rosa malva",
-  "Pink plump": "Rosa intenso",
-  Pinkish: "Rosado",
-  "Pinkish coral": "Coral rosado",
-  "Raspberry rose": "Rosa frambuesa",
-  "Rose brown": "Café rosado",
-  "Rose pink": "Rosa clásico",
-  "Rosy cocoa": "Cacao rosado",
-  "Rosy mauve": "Malva rosado",
-  "Ruby red with a purple hint": "Rojo rubí con un toque morado",
-  "Soft pink": "Rosa suave",
-  "Sweet cherry pink": "Rosa cereza dulce",
-  "True warm red": "Rojo cálido puro",
-  "Vibrant orange": "Naranja vibrante",
-  "Vibrant watermelon pink": "Rosa sandía vibrante",
-  "Vivid warm pink": "Rosa cálido vivo",
-};
-
-const SHADE_DESCRIPTIONS_TRADITIONAL_CHINESE: Record<string, string> = {
-  "Bold crimson": "濃郁緋紅",
-  "Bright coral pink": "明亮珊瑚粉",
-  "Burgundy wine": "酒紅色",
-  "Cool-tone pink": "冷調粉紅",
-  "Deep berry plum": "深莓果李子色",
-  "Deep berry red": "深莓果紅",
-  "Deep brown": "深棕色",
-  "Deep coral": "深珊瑚色",
-  "Deep red": "深紅色",
-  "Deep red brown": "深紅棕",
-  "Deep tomato red": "深番茄紅",
-  "Edgy purple": "個性紫",
-  Mauve: "灰紫色",
-  "Muted pink": "低飽和粉紅",
-  "Muted rosewood": "低飽和玫瑰木",
-  "Neutral burnt rose": "中性乾燥玫瑰",
-  "Nude brown": "裸棕色",
-  "Nude pink": "裸粉色",
-  "Orangish red": "橘紅色",
-  Peach: "蜜桃色",
-  "Peach pink": "蜜桃粉",
-  "Pink berry": "莓果粉",
-  "Pink mauve": "粉紫色",
-  "Pink plump": "飽滿粉紅",
-  Pinkish: "偏粉色",
-  "Pinkish coral": "粉珊瑚色",
-  "Raspberry rose": "覆盆莓玫瑰色",
-  "Rose brown": "玫瑰棕",
-  "Rose pink": "玫瑰粉",
-  "Rosy cocoa": "可可玫瑰",
-  "Rosy mauve": "玫瑰灰紫",
-  "Ruby red with a purple hint": "帶紫調的紅寶石色",
-  "Soft pink": "柔粉色",
-  "Sweet cherry pink": "甜櫻桃粉",
-  "True warm red": "純正暖紅",
-  "Vibrant orange": "鮮明橘色",
-  "Vibrant watermelon pink": "鮮明西瓜粉",
-  "Vivid warm pink": "明亮暖粉",
-};
-
-type VirtualLipTryOnProps = {
+type VirtualTryOnProps = {
   language: Language;
   onClose: () => void;
+  preset: TryOnPreset;
   productFinish: string;
   productImage: string;
   productName: string;
-  shades: LipTryOnShade[];
+};
+
+const COPY: Record<Language, {
+  approximation: string;
+  backCamera: string;
+  cameraHint: string;
+  capture: string;
+  captured: string;
+  close: string;
+  effectOff: string;
+  effectOn: string;
+  error: string;
+  flipCamera: string;
+  frontCamera: string;
+  fullscreen: string;
+  intensity: string;
+  loading: string;
+  retry: string;
+  shade: string;
+  swipes: string[];
+  title: string;
+}> = {
+  id: {
+    approximation: "Visualisasi warna. Hasil aktual dapat berbeda karena pencahayaan dan layar.",
+    backCamera: "Kamera belakang aktif",
+    cameraHint: "Izinkan akses kamera saat browser memintanya.",
+    capture: "AMBIL FOTO",
+    captured: "FOTO TERSIMPAN",
+    close: "Tutup virtual try-on",
+    effectOff: "LIHAT TANPA EFEK",
+    effectOn: "HASIL AKTIF",
+    error: "Virtual try-on belum dapat dimulai. Periksa koneksi dan izin kameramu.",
+    flipCamera: "Ganti kamera depan atau belakang",
+    frontCamera: "Kamera depan aktif",
+    fullscreen: "Ubah layar penuh",
+    intensity: "INTENSITAS",
+    loading: "MENYIAPKAN TRY-ON...",
+    retry: "COBA LAGI",
+    shade: "WARNA",
+    swipes: ["1 SAPUAN", "2 SAPUAN", "3 SAPUAN"],
+    title: "COBA PRODUK DI WAJAHMU",
+  },
+  en: {
+    approximation: "Shade visualization only. Results vary with lighting and screen settings.",
+    backCamera: "Back camera active",
+    cameraHint: "Allow camera access when your browser asks.",
+    capture: "CAPTURE",
+    captured: "PHOTO SAVED",
+    close: "Close virtual try-on",
+    effectOff: "VIEW WITHOUT EFFECT",
+    effectOn: "EFFECT ON",
+    error: "Virtual try-on could not start. Check your connection and camera permission.",
+    flipCamera: "Switch front or back camera",
+    frontCamera: "Front camera active",
+    fullscreen: "Toggle fullscreen",
+    intensity: "INTENSITY",
+    loading: "PREPARING TRY-ON...",
+    retry: "TRY AGAIN",
+    shade: "SHADE",
+    swipes: ["1 SWIPE", "2 SWIPES", "3 SWIPES"],
+    title: "TRY IT ON YOUR FACE",
+  },
+  es: {
+    approximation: "Visualización del tono. El resultado puede variar según la luz y la pantalla.",
+    backCamera: "Cámara trasera activa",
+    cameraHint: "Permite el acceso a la cámara cuando tu navegador lo solicite.",
+    capture: "TOMAR FOTO",
+    captured: "FOTO GUARDADA",
+    close: "Cerrar prueba virtual",
+    effectOff: "VER SIN EFECTO",
+    effectOn: "EFECTO ACTIVO",
+    error: "No se pudo iniciar la prueba virtual. Revisa la conexión y los permisos de cámara.",
+    flipCamera: "Cambiar cámara frontal o trasera",
+    frontCamera: "Cámara frontal activa",
+    fullscreen: "Cambiar pantalla completa",
+    intensity: "INTENSIDAD",
+    loading: "PREPARANDO LA PRUEBA...",
+    retry: "INTENTAR DE NUEVO",
+    shade: "TONO",
+    swipes: ["1 PASADA", "2 PASADAS", "3 PASADAS"],
+    title: "PRUÉBALO EN TU ROSTRO",
+  },
+  "zh-tw": {
+    approximation: "色彩為模擬效果，實際結果可能因光線與螢幕而異。",
+    backCamera: "後置鏡頭已啟用",
+    cameraHint: "瀏覽器詢問時，請允許使用鏡頭。",
+    capture: "拍照",
+    captured: "照片已儲存",
+    close: "關閉虛擬試妝",
+    effectOff: "查看原始畫面",
+    effectOn: "試妝效果開啟",
+    error: "無法啟動虛擬試妝，請檢查連線與鏡頭權限。",
+    flipCamera: "切換前後鏡頭",
+    frontCamera: "前置鏡頭已啟用",
+    fullscreen: "切換全螢幕",
+    intensity: "顯色濃度",
+    loading: "正在準備虛擬試妝...",
+    retry: "再試一次",
+    shade: "色號",
+    swipes: ["1 次塗抹", "2 次塗抹", "3 次塗抹"],
+    title: "在臉上即時試妝",
+  },
 };
 
 export default function VirtualLipTryOn({
   language,
   onClose,
+  preset,
   productFinish,
   productImage,
   productName,
-  shades,
-}: VirtualLipTryOnProps) {
+}: VirtualTryOnProps) {
+  const shades = preset.shades;
   const initialShade = shades[0];
+  const copy = COPY[language];
+  const tryOnRef = useRef<HTMLElement>(null);
+  const banubaContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const tryOnRef = useRef<HTMLElement>(null);
-  const lipRendererRef = useRef<LipRenderer | null>(null);
+  const rendererRef = useRef<MakeupRenderer | null>(null);
   const landmarkerRef = useRef<FaceLandmarker | null>(null);
   const landmarkerLeaseRef = useRef<FaceLandmarkerLease | null>(null);
-  const pendingLandmarkerLeaseRef =
-    useRef<Promise<FaceLandmarkerLease> | null>(null);
+  const pendingLeaseRef = useRef<Promise<FaceLandmarkerLease> | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const banubaSessionRef = useRef<BanubaSession | null>(null);
   const rafRef = useRef<number | null>(null);
   const closeTimerRef = useRef<number | null>(null);
   const captureTimerRef = useRef<number | null>(null);
-  const isClosingRef = useRef(false);
   const mountedRef = useRef(true);
-  const faceDetectedRef = useRef(false);
+  const facingRef = useRef<CameraFacing>("user");
   const shadeRef = useRef(initialShade);
-  const intensityRef = useRef(0.2);
+  const intensityRef = useRef<number>(INTENSITY_LEVELS[0]);
   const effectEnabledRef = useRef(true);
 
-  const [status, setStatus] = useState<TryOnStatus>("idle");
+  const [status, setStatus] = useState<TryOnStatus>("loading");
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedShade, setSelectedShade] = useState(initialShade);
-  const [intensity, setIntensity] = useState(0.2);
+  const [intensity, setIntensity] = useState<number>(INTENSITY_LEVELS[0]);
+  const [intensityOpen, setIntensityOpen] = useState(false);
   const [effectEnabled, setEffectEnabled] = useState(true);
   const [faceDetected, setFaceDetected] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
   const [captureStatus, setCaptureStatus] = useState<CaptureStatus>("idle");
   const [cameraRatio, setCameraRatio] = useState<CameraRatio>("4:5");
+  const [cameraFacing, setCameraFacing] = useState<CameraFacing>("user");
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isZoomed, setIsZoomed] = useState(false);
-  const isGlossProduct = productFinish === "GLOSS IT BETTER" ||
-    /GLOSS|GLOSSY|VINYL|BALM|VELVET-SHINE/i.test(productName);
-
-  const copy = language === "id"
-    ? {
-        title: "COBA WARNA BIBIRMU",
-        intro: "Lihat warna Timephoria langsung di bibirmu melalui kamera depan.",
-        privacy: "Kamera diproses di perangkatmu. Foto dan video tidak diunggah atau disimpan.",
-        enable: "AKTIFKAN KAMERA",
-        loading: "MENYIAPKAN TRY-ON...",
-        cameraHint: "Izinkan akses kamera saat browser memintanya.",
-        centerFace: "Posisikan wajahmu di tengah kamera",
-        shade: "Warna",
-        scrollHint: "Geser ke kiri untuk melihat warna lain",
-        intensity: "Intensitas warna",
-        effectOn: "HASIL AKTIF",
-        effectOff: "LIHAT TANPA WARNA",
-        retry: "COBA LAGI",
-        capture: "AMBIL FOTO",
-        captured: "FOTO TERSIMPAN",
-        captureError: "COBA LAGI",
-        close: "Tutup virtual try-on",
-        approximation: "Visualisasi warna. Hasil aktual dapat berbeda karena pencahayaan dan layar.",
-        fullscreen: "Layar penuh",
-        exitFullscreen: "Keluar layar penuh",
-        zoomIn: "Perbesar kamera",
-          zoomOut: "Kembalikan zoom",
-          swipes: ["1 SAPUAN", "2 SAPUAN", "3 SAPUAN"],
-          cameraRatio: "Rasio kamera",
-          controls: "Kontrol virtual try-on",
-          tryOnLabel: "virtual try-on",
-      }
-    : language === "es"
-      ? {
-          title: "PRUEBA TU TONO DE LABIAL",
-          intro: "Mira los tonos Timephoria en tus labios con la cámara frontal.",
-          privacy: "El procesamiento ocurre en tu dispositivo. Las fotos y los videos no se suben ni se guardan.",
-          enable: "ACTIVAR CÁMARA",
-          loading: "PREPARANDO LA PRUEBA...",
-          cameraHint: "Permite el acceso a la cámara cuando tu navegador lo solicite.",
-          centerFace: "Centra tu rostro en la cámara",
-          shade: "Tono",
-          scrollHint: "Desliza a la izquierda para explorar otros tonos",
-          intensity: "Intensidad del color",
-          effectOn: "EFECTO ACTIVO",
-          effectOff: "VER SIN COLOR",
-          retry: "INTENTAR DE NUEVO",
-          capture: "TOMAR FOTO",
-          captured: "FOTO GUARDADA",
-          captureError: "INTENTAR DE NUEVO",
-          close: "Cerrar prueba virtual",
-          approximation: "Esta es una visualización del tono. El resultado puede variar según la iluminación y la pantalla.",
-          fullscreen: "Ver en pantalla completa",
-          exitFullscreen: "Salir de pantalla completa",
-          zoomIn: "Acercar cámara",
-          zoomOut: "Restablecer zoom",
-          swipes: ["1 PASADA", "2 PASADAS", "3 PASADAS"],
-          cameraRatio: "Proporción de cámara",
-          controls: "Controles de prueba virtual",
-          tryOnLabel: "prueba virtual",
-        }
-    : language === "zh-tw"
-      ? {
-          title: "試用你的唇彩色號",
-          intro: "使用前置鏡頭，即時預覽 Timephoria 唇彩。",
-          privacy: "所有鏡頭處理皆在你的裝置上完成；照片與影片不會上傳或儲存。",
-          enable: "開啟鏡頭",
-          loading: "正在準備虛擬試色...",
-          cameraHint: "瀏覽器詢問時，請允許使用鏡頭。",
-          centerFace: "請將臉部置於畫面中央",
-          shade: "色號",
-          scrollHint: "向左滑動探索其他色號",
-          intensity: "顯色濃度",
-          effectOn: "試色效果開啟",
-          effectOff: "查看原始唇色",
-          retry: "再試一次",
-          capture: "拍照",
-          captured: "照片已儲存",
-          captureError: "再試一次",
-          close: "關閉虛擬試色",
-          approximation: "色號僅供模擬參考，實際效果可能因光線與螢幕設定而異。",
-          fullscreen: "全螢幕顯示",
-          exitFullscreen: "離開全螢幕",
-          zoomIn: "放大鏡頭",
-          zoomOut: "重設鏡頭縮放",
-          swipes: ["1 次塗抹", "2 次塗抹", "3 次塗抹"],
-          cameraRatio: "鏡頭比例",
-          controls: "虛擬試色控制",
-          tryOnLabel: "虛擬試色",
-        }
-    : {
-        title: "TRY YOUR LIP SHADE",
-        intro: "See Timephoria shades on your lips using your front camera.",
-        privacy: "Camera processing stays on your device. Photos and video are not uploaded or saved.",
-        enable: "ENABLE CAMERA",
-        loading: "PREPARING TRY-ON...",
-        cameraHint: "Allow camera access when your browser asks.",
-        centerFace: "Center your face in the camera",
-        shade: "Shade",
-        scrollHint: "Scroll left to explore shade",
-        intensity: "Color intensity",
-        effectOn: "EFFECT ON",
-        effectOff: "VIEW WITHOUT COLOR",
-        retry: "TRY AGAIN",
-        capture: "CAPTURE",
-        captured: "PHOTO SAVED",
-        captureError: "TRY AGAIN",
-        close: "Close virtual try-on",
-        approximation: "Shade visualization only. Actual results vary with lighting and screen settings.",
-        fullscreen: "Enter fullscreen",
-        exitFullscreen: "Exit fullscreen",
-        zoomIn: "Zoom camera in",
-        zoomOut: "Reset camera zoom",
-        swipes: ["1 SWIPE", "2 SWIPES", "3 SWIPES"],
-        cameraRatio: "Camera ratio",
-        controls: "Virtual try-on controls",
-        tryOnLabel: "virtual try-on",
-      };
-
-  const selectedShadeDescription = selectedShade.description && language === "es"
-    ? SHADE_DESCRIPTIONS_SPANISH[selectedShade.description] ?? selectedShade.description
-    : selectedShade.description && language === "zh-tw"
-      ? SHADE_DESCRIPTIONS_TRADITIONAL_CHINESE[selectedShade.description] ?? selectedShade.description
-      : selectedShade.description;
+  const [isClosing, setIsClosing] = useState(false);
+  const [engine, setEngine] = useState<"banuba" | "mediapipe">("mediapipe");
+  const isGlossProduct = productFinish === "GLOSS IT BETTER" || /GLOSS|GLOSSY|VINYL|BALM|VELVET-SHINE/i.test(productName);
 
   const stopEverything = useCallback(() => {
-    if (rafRef.current !== null) {
-      window.cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-
+    if (rafRef.current !== null) window.cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
-
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-
-    const pendingLandmarkerLease = pendingLandmarkerLeaseRef.current;
-    pendingLandmarkerLeaseRef.current = null;
-    if (pendingLandmarkerLease) {
-      void pendingLandmarkerLease
-        .then((lease) => lease.release())
-        .catch(() => undefined);
-    }
-
+    if (videoRef.current) videoRef.current.srcObject = null;
+    const pending = pendingLeaseRef.current;
+    pendingLeaseRef.current = null;
+    if (pending) void pending.then((lease) => lease.release()).catch(() => undefined);
     landmarkerLeaseRef.current?.release();
     landmarkerLeaseRef.current = null;
     landmarkerRef.current = null;
+    const banubaSession = banubaSessionRef.current;
+    banubaSessionRef.current = null;
+    if (banubaSession) void banubaSession.destroy().catch(() => undefined);
   }, []);
 
   const requestClose = useCallback(() => {
-    if (isClosingRef.current) return;
-    isClosingRef.current = true;
+    if (isClosing) return;
     setIsClosing(true);
-
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    closeTimerRef.current = window.setTimeout(onClose, prefersReducedMotion ? 0 : 420);
-  }, [onClose]);
-
-  useEffect(() => {
-    mountedRef.current = true;
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") requestClose();
-    }
-
-    function handleFullscreenChange() {
-      setIsFullscreen(document.fullscreenElement === tryOnRef.current);
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => {
-      mountedRef.current = false;
-      window.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-      if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current);
-      if (captureTimerRef.current !== null) window.clearTimeout(captureTimerRef.current);
-      stopEverything();
-    };
-  }, [requestClose, stopEverything]);
-
-  function updateFaceDetected(nextValue: boolean) {
-    if (faceDetectedRef.current === nextValue) return;
-    faceDetectedRef.current = nextValue;
-    setFaceDetected(nextValue);
-  }
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    closeTimerRef.current = window.setTimeout(onClose, reducedMotion ? 0 : 420);
+  }, [isClosing, onClose]);
 
   function beginRenderLoop() {
     let lastDetectionAt = 0;
     let lastVideoTime = -1;
-    const frameInterval = 1000 / 24;
-
-    function renderFrame(timestamp: number) {
+    const renderFrame = (timestamp: number) => {
       if (!mountedRef.current) return;
-
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const landmarker = landmarkerRef.current;
-
-      if (
-        video &&
-        canvas &&
-        landmarker &&
-        video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
-        !document.hidden &&
-        timestamp - lastDetectionAt >= frameInterval &&
-        video.currentTime !== lastVideoTime
-      ) {
+      if (video && canvas && landmarker && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && !document.hidden && timestamp - lastDetectionAt >= 1000 / 24 && video.currentTime !== lastVideoTime) {
         if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
         }
-
         const context = canvas.getContext("2d");
         if (context) {
           context.clearRect(0, 0, canvas.width, canvas.height);
-          const result = landmarker.detectForVideo(video, performance.now());
-          const points = result.faceLandmarks[0];
-          updateFaceDetected(Boolean(points));
-
+          const points = landmarker.detectForVideo(video, performance.now()).faceLandmarks[0];
+          setFaceDetected(Boolean(points));
           if (points && effectEnabledRef.current) {
-            if (!lipRendererRef.current) {
-              lipRendererRef.current = createLipRenderer();
-            }
-            lipRendererRef.current.draw(
-              context,
-              points,
-              canvas.width,
-              canvas.height,
-              {
-                shadeHex: shadeRef.current.hex,
-                intensity: intensityRef.current,
-                isGloss: isGlossProduct,
-              },
-            );
+            rendererRef.current ??= createMakeupRenderer();
+            rendererRef.current.draw(context, points, canvas.width, canvas.height, {
+              intensity: intensityRef.current,
+              isGloss: isGlossProduct,
+              preset,
+              shadeHex: shadeRef.current.hex,
+              time: timestamp,
+            });
           }
         }
-
         lastDetectionAt = timestamp;
         lastVideoTime = video.currentTime;
       }
-
       rafRef.current = window.requestAnimationFrame(renderFrame);
-    }
-
+    };
     rafRef.current = window.requestAnimationFrame(renderFrame);
   }
 
-  async function startTryOn() {
+  async function startMediaPipe(facingMode: CameraFacing) {
+    const leasePromise = acquireFaceLandmarker();
+    pendingLeaseRef.current = leasePromise;
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: { facingMode: { ideal: facingMode }, width: { ideal: 1280 }, height: { ideal: 1920 } },
+    });
+    if (!mountedRef.current) {
+      stream.getTracks().forEach((track) => track.stop());
+      return;
+    }
+    streamRef.current = stream;
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+      await videoRef.current.play();
+    }
+    const lease = await leasePromise;
+    pendingLeaseRef.current = null;
+    if (!mountedRef.current) {
+      lease.release();
+      return;
+    }
+    landmarkerLeaseRef.current = lease;
+    landmarkerRef.current = lease.landmarker;
+    setEngine("mediapipe");
+    setStatus("running");
+    beginRenderLoop();
+  }
+
+  async function startTryOn(facingMode: CameraFacing = facingRef.current) {
     stopEverything();
     setStatus("loading");
     setErrorMessage("");
-    updateFaceDetected(false);
-
+    setFaceDetected(false);
     try {
-      if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
-        throw new Error("unsupported");
+      if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) throw new Error("unsupported");
+      if (isBanubaConfigured && banubaContainerRef.current) {
+        try {
+          const session = await createBanubaSession(banubaContainerRef.current, facingMode);
+          if (!mountedRef.current) {
+            await session.destroy();
+            return;
+          }
+          banubaSessionRef.current = session;
+          await session.applyPreset(preset, shadeRef.current.hex, intensityRef.current);
+          setEngine("banuba");
+          setFaceDetected(true);
+          setStatus("running");
+          return;
+        } catch (error) {
+          console.warn("Banuba initialization failed; using the on-device fallback.", error);
+        }
       }
-
-      const landmarkerLeasePromise = acquireFaceLandmarker();
-      pendingLandmarkerLeaseRef.current = landmarkerLeasePromise;
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: {
-          facingMode: { ideal: "user" },
-          width: { ideal: 1280 },
-        },
-      });
-
-      if (!mountedRef.current) {
-        stream.getTracks().forEach((track) => track.stop());
-        stopEverything();
-        return;
-      }
-
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-
-      const landmarkerLease = await landmarkerLeasePromise;
-      if (pendingLandmarkerLeaseRef.current === landmarkerLeasePromise) {
-        pendingLandmarkerLeaseRef.current = null;
-      }
-      if (!mountedRef.current) {
-        landmarkerLease.release();
-        stopEverything();
-        return;
-      }
-
-      landmarkerLeaseRef.current = landmarkerLease;
-      landmarkerRef.current = landmarkerLease.landmarker;
-      setStatus("running");
-      beginRenderLoop();
+      await startMediaPipe(facingMode);
     } catch (error) {
       stopEverything();
       const errorName = error instanceof DOMException ? error.name : "";
-      const errorMessages = language === "id"
-        ? {
-            denied: "Akses kamera ditolak. Izinkan kamera di pengaturan browser lalu coba lagi.",
-            missing: "Kamera depan tidak ditemukan di perangkat ini.",
-            unavailable: "Virtual try-on belum dapat dimulai. Periksa koneksi dan izin kameramu.",
-          }
-        : language === "es"
-          ? {
-              denied: "Se rechazó el acceso a la cámara. Permítelo en la configuración del navegador e inténtalo de nuevo.",
-              missing: "No se encontró una cámara frontal en este dispositivo.",
-              unavailable: "No se pudo iniciar la prueba virtual. Revisa tu conexión y los permisos de la cámara.",
-            }
-          : language === "zh-tw"
-            ? {
-                denied: "鏡頭存取遭拒。請在瀏覽器設定中允許使用鏡頭，然後再試一次。",
-                missing: "此裝置找不到前置鏡頭。",
-                unavailable: "無法啟動虛擬試色。請檢查網路連線與鏡頭權限。",
-              }
-          : {
-              denied: "Camera access was denied. Allow it in your browser settings, then try again.",
-              missing: "A front camera could not be found on this device.",
-              unavailable: "Virtual try-on could not start. Check your connection and camera permission.",
-            };
       const message = errorName === "NotAllowedError"
-        ? errorMessages.denied
-        : errorName === "NotFoundError"
-          ? errorMessages.missing
-          : errorMessages.unavailable;
-
+        ? language === "id" ? "Akses kamera ditolak. Izinkan kamera di pengaturan browser lalu coba lagi." : language === "es" ? "Se rechazó el acceso a la cámara. Permítelo en la configuración del navegador." : language === "zh-tw" ? "鏡頭存取遭拒，請在瀏覽器設定中允許鏡頭。" : "Camera access was denied. Allow it in browser settings, then try again."
+        : copy.error;
       if (mountedRef.current) {
         setErrorMessage(message);
         setStatus("error");
@@ -489,30 +303,71 @@ export default function VirtualLipTryOn({
     }
   }
 
-  function chooseShade(nextShade: LipTryOnShade) {
-    shadeRef.current = nextShade;
-    setSelectedShade(nextShade);
+  useEffect(() => {
+    mountedRef.current = true;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const frame = window.requestAnimationFrame(() => void startTryOn());
+    const handleKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") requestClose(); };
+    const handleFullscreenChange = () => setIsFullscreen(document.fullscreenElement === tryOnRef.current);
+    window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      mountedRef.current = false;
+      document.body.style.overflow = previousOverflow;
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current);
+      if (captureTimerRef.current !== null) window.clearTimeout(captureTimerRef.current);
+      stopEverything();
+    };
+    // Opening the panel is the user action that starts the camera flow.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const session = banubaSessionRef.current;
+    if (session) void session.applyPreset(preset, selectedShade.hex, effectEnabled ? intensity : 0).catch(console.warn);
+  }, [effectEnabled, intensity, preset, selectedShade]);
+
+  function selectShade(shade: LipTryOnShade) {
+    shadeRef.current = shade;
+    setSelectedShade(shade);
   }
 
-  function changeIntensity(nextIntensity: number) {
-    intensityRef.current = nextIntensity;
-    setIntensity(nextIntensity);
+  function selectIntensity(value: number) {
+    intensityRef.current = value;
+    setIntensity(value);
+    setIntensityOpen(false);
+  }
+
+  async function switchCamera() {
+    const nextFacing = facingRef.current === "user" ? "environment" : "user";
+    facingRef.current = nextFacing;
+    setCameraFacing(nextFacing);
+    setStatus("loading");
+    if (banubaSessionRef.current) {
+      try {
+        await banubaSessionRef.current.switchCamera(nextFacing);
+        setStatus("running");
+      } catch {
+        await startTryOn(nextFacing);
+      }
+    } else {
+      await startTryOn(nextFacing);
+    }
   }
 
   async function toggleFullscreen() {
-    const tryOnElement = tryOnRef.current;
-    if (!tryOnElement) return;
-
+    const element = tryOnRef.current;
+    if (!element) return;
     try {
-      if (document.fullscreenElement === tryOnElement) {
-        await document.exitFullscreen();
-      } else if (!document.fullscreenEnabled) {
-        setIsFullscreen((fullscreen) => !fullscreen);
-      } else {
-        await tryOnElement.requestFullscreen();
-      }
+      if (document.fullscreenElement === element) await document.exitFullscreen();
+      else if (document.fullscreenEnabled) await element.requestFullscreen();
+      else setIsFullscreen((value) => !value);
     } catch {
-      setIsFullscreen((fullscreen) => !fullscreen);
+      setIsFullscreen((value) => !value);
     }
   }
 
@@ -526,252 +381,127 @@ export default function VirtualLipTryOn({
     }
   }
 
-  function capturePhoto() {
-    const video = videoRef.current;
-    const overlayCanvas = canvasRef.current;
-    if (!video || !overlayCanvas || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
-      setCaptureStatus("error");
-      return;
-    }
-
-    const outputWidth = 1080;
-    const outputHeight = cameraRatio === "9:16" ? 1920 : 1350;
-    const targetAspectRatio = outputWidth / outputHeight;
-    const sourceWidth = video.videoWidth;
-    const sourceHeight = video.videoHeight;
-    const sourceAspectRatio = sourceWidth / sourceHeight;
-    let cropX = 0;
-    let cropY = 0;
-    let cropWidth = sourceWidth;
-    let cropHeight = sourceHeight;
-
-    if (sourceAspectRatio > targetAspectRatio) {
-      cropWidth = sourceHeight * targetAspectRatio;
-      cropX = (sourceWidth - cropWidth) / 2;
-    } else {
-      cropHeight = sourceWidth / targetAspectRatio;
-      cropY = (sourceHeight - cropHeight) / 2;
-    }
-
-    if (isZoomed) {
-      const zoomScale = 1.22;
-      const zoomedWidth = cropWidth / zoomScale;
-      const zoomedHeight = cropHeight / zoomScale;
-      cropX += (cropWidth - zoomedWidth) / 2;
-      cropY += (cropHeight - zoomedHeight) / 2;
-      cropWidth = zoomedWidth;
-      cropHeight = zoomedHeight;
-    }
-
-    const photoCanvas = document.createElement("canvas");
-    photoCanvas.width = outputWidth;
-    photoCanvas.height = outputHeight;
-    const photoContext = photoCanvas.getContext("2d");
-    if (!photoContext) {
-      setCaptureStatus("error");
-      return;
-    }
-
-    photoContext.save();
-    photoContext.translate(outputWidth, 0);
-    photoContext.scale(-1, 1);
-    photoContext.drawImage(
-      video,
-      cropX,
-      cropY,
-      cropWidth,
-      cropHeight,
-      0,
-      0,
-      outputWidth,
-      outputHeight,
-    );
-    if (effectEnabledRef.current) {
-      photoContext.drawImage(
-        overlayCanvas,
-        cropX,
-        cropY,
-        cropWidth,
-        cropHeight,
-        0,
-        0,
-        outputWidth,
-        outputHeight,
-      );
-    }
-    photoContext.restore();
-
-    photoCanvas.toBlob((blob) => {
-      if (!blob || !mountedRef.current) {
-        if (mountedRef.current) setCaptureStatus("error");
-        return;
-      }
-
-      const safeProductName = productName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      const objectUrl = URL.createObjectURL(blob);
-      const downloadLink = document.createElement("a");
-      downloadLink.href = objectUrl;
-      downloadLink.download = `${safeProductName}-${selectedShade.code}-try-on.jpg`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      downloadLink.remove();
-      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-
-      setCaptureStatus("saved");
-      if (captureTimerRef.current !== null) window.clearTimeout(captureTimerRef.current);
-      captureTimerRef.current = window.setTimeout(() => setCaptureStatus("idle"), 1800);
-    }, "image/jpeg", 0.94);
+  function saveBlob(blob: Blob) {
+    const safeProductName = productName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${safeProductName}-${selectedShade.code}-try-on.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setCaptureStatus("saved");
+    if (captureTimerRef.current !== null) window.clearTimeout(captureTimerRef.current);
+    captureTimerRef.current = window.setTimeout(() => setCaptureStatus("idle"), 1800);
   }
 
-
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      void startTryOn();
-    });
-    return () => window.cancelAnimationFrame(frame);
-    // Opening the product try-on is the user action that starts the camera flow.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  async function capturePhoto() {
+    try {
+      if (banubaSessionRef.current) {
+        saveBlob(await banubaSessionRef.current.capture());
+        return;
+      }
+      const video = videoRef.current;
+      const overlay = canvasRef.current;
+      if (!video || !overlay || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) throw new Error("no frame");
+      const outputWidth = 1080;
+      const outputHeight = cameraRatio === "9:16" ? 1920 : 1350;
+      const targetRatio = outputWidth / outputHeight;
+      const sourceRatio = video.videoWidth / video.videoHeight;
+      let sx = 0;
+      let sy = 0;
+      let sw = video.videoWidth;
+      let sh = video.videoHeight;
+      if (sourceRatio > targetRatio) {
+        sw = video.videoHeight * targetRatio;
+        sx = (video.videoWidth - sw) / 2;
+      } else {
+        sh = video.videoWidth / targetRatio;
+        sy = (video.videoHeight - sh) / 2;
+      }
+      const photo = document.createElement("canvas");
+      photo.width = outputWidth;
+      photo.height = outputHeight;
+      const context = photo.getContext("2d");
+      if (!context) throw new Error("no canvas");
+      if (cameraFacing === "user") {
+        context.translate(outputWidth, 0);
+        context.scale(-1, 1);
+      }
+      context.drawImage(video, sx, sy, sw, sh, 0, 0, outputWidth, outputHeight);
+      if (effectEnabledRef.current) context.drawImage(overlay, sx, sy, sw, sh, 0, 0, outputWidth, outputHeight);
+      photo.toBlob((blob) => blob ? saveBlob(blob) : setCaptureStatus("error"), "image/jpeg", 0.94);
+    } catch {
+      setCaptureStatus("error");
+    }
+  }
 
   return (
     <section
-      aria-label={`${productName}, ${copy.tryOnLabel}`}
+      aria-label={`${productName}, virtual try-on`}
       aria-modal="true"
       className={`virtual-tryon ${isClosing ? "closing" : ""} ${isFullscreen ? "fullscreen" : ""}`}
       ref={tryOnRef}
       role="dialog"
     >
-      <header className="tryon-header">
-        <nav className="tryon-floating-nav" aria-label={copy.controls}>
-          <div className="tryon-ratio-selector" aria-label={copy.cameraRatio}>
-            {(["9:16", "4:5"] as CameraRatio[]).map((ratio) => (
-              <button
-                aria-pressed={cameraRatio === ratio}
-                key={ratio}
-                onClick={() => setCameraRatio(ratio)}
-                type="button"
-              >
-                {ratio}
-              </button>
-            ))}
-          </div>
-          <button
-            aria-label={isZoomed ? copy.zoomOut : copy.zoomIn}
-            aria-pressed={isZoomed}
-            className="tryon-icon-control"
-            onClick={() => setIsZoomed((zoomed) => !zoomed)}
-            type="button"
-          >
-            {isZoomed ? "1×" : "+"}
-          </button>
-          <button
-            aria-label={isFullscreen ? copy.exitFullscreen : copy.fullscreen}
-            aria-pressed={isFullscreen}
-            className="tryon-icon-control"
-            onClick={toggleFullscreen}
-            type="button"
-          >
-            {isFullscreen ? "↙" : "↗"}
-          </button>
-          <button aria-label={copy.close} className="tryon-close" onClick={requestClose} type="button">
-            X
-          </button>
-        </nav>
-      </header>
+      <div className={`tryon-stage ${status} ${cameraFacing === "environment" ? "back-camera" : "front-camera"}`}>
+        <img className="tryon-product-backdrop" src={productImage} alt="" />
+        <video aria-hidden="true" className={`tryon-video ${engine === "banuba" ? "hidden" : ""}`} muted playsInline ref={videoRef} />
+        <canvas aria-hidden="true" className={`tryon-canvas ${engine === "banuba" ? "hidden" : ""}`} ref={canvasRef} />
+        <div aria-hidden={engine !== "banuba"} className={`tryon-banuba ${engine === "banuba" ? "active" : ""}`} ref={banubaContainerRef} />
 
-      <div className={`tryon-stage ${status} ratio-${cameraRatio.replace(":", "-")} ${isZoomed ? "zoomed" : ""}`}>
-        {/* The existing local product thumbnail is a decorative camera-stage backdrop. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="tryon-product-backdrop" src={productImage} alt="" aria-hidden="true" />
-        <video ref={videoRef} className="tryon-video" muted playsInline />
-        <canvas ref={canvasRef} className="tryon-canvas" aria-hidden="true" />
+        <header className="tryon-floating-nav" aria-label="Virtual try-on controls">
+          <button aria-pressed={cameraRatio === "9:16"} onClick={() => setCameraRatio("9:16")} type="button">9:16</button>
+          <button aria-pressed={cameraRatio === "4:5"} onClick={() => setCameraRatio("4:5")} type="button">4:5</button>
+          <button aria-label={copy.flipCamera} disabled={status !== "running"} onClick={() => void switchCamera()} title={cameraFacing === "user" ? copy.frontCamera : copy.backCamera} type="button">↻</button>
+          <button aria-label={copy.fullscreen} aria-pressed={isFullscreen} onClick={() => void toggleFullscreen()} type="button">↗</button>
+          <button aria-label={copy.close} className="tryon-close" onClick={requestClose} type="button">×</button>
+        </header>
 
-        {status === "idle" || status === "loading" ? (
-          <div className="tryon-status-panel" aria-live="polite">
-            <i aria-hidden="true" />
-            <strong>{copy.loading}</strong>
-            <span>{copy.cameraHint}</span>
-          </div>
-        ) : null}
-
-        {status === "running" && !faceDetected ? (
-          <div className="tryon-face-guide" aria-live="polite">
-            <i aria-hidden="true" />
-            <span>{copy.centerFace}</span>
-          </div>
-        ) : null}
+        {status === "loading" ? <div className="tryon-status-panel"><i /><strong>{copy.loading}</strong><span>{copy.cameraHint}</span></div> : null}
+        {status === "error" ? <div className="tryon-status-panel error" role="alert"><strong>{errorMessage}</strong><button onClick={() => void startTryOn()} type="button">{copy.retry}</button></div> : null}
+        {status === "running" && engine === "mediapipe" && !faceDetected ? <div className="tryon-face-guide"><i /></div> : null}
 
         {status === "running" ? (
-          <button
-            aria-label={copy.capture}
-            className={`tryon-capture-button ${captureStatus}`}
-            onClick={capturePhoto}
-            type="button"
-          >
-            <i aria-hidden="true" />
-            <span aria-live="polite">
-              {captureStatus === "saved"
-                ? copy.captured
-                : captureStatus === "error"
-                  ? copy.captureError
-                  : copy.capture}
-            </span>
-          </button>
-        ) : null}
+          <div className="tryon-camera-ui">
+            <div className="tryon-shade-list" aria-label={copy.shade}>
+              {shades.map((shadeItem) => (
+                <button aria-label={`${shadeItem.code} ${shadeItem.name}`} aria-pressed={selectedShade.code === shadeItem.code} className={selectedShade.code === shadeItem.code ? "selected" : ""} key={`${shadeItem.code}-${shadeItem.name}`} onClick={() => selectShade(shadeItem)} type="button">
+                  <i style={{ backgroundColor: shadeItem.hex }} />
+                </button>
+              ))}
+            </div>
 
-        {status === "error" ? (
-          <div className="tryon-status-panel error" role="alert">
-            <strong>{errorMessage}</strong>
-            <button onClick={startTryOn} type="button">{copy.retry}</button>
-          </div>
-        ) : null}
-      </div>
-
-      <div className={`tryon-controls ${status === "running" ? "active" : ""}`}>
-        <div className="tryon-selected-shade">
-          <span>{copy.shade}</span>
-          <strong>{selectedShade.code} {selectedShade.name}</strong>
-          {shades.length > 9 ? <em>{copy.scrollHint}</em> : null}
-          {selectedShadeDescription ? <small>{selectedShadeDescription}</small> : null}
-        </div>
-
-        <div className="tryon-shade-list" aria-label={copy.shade}>
-          {shades.map((shadeItem) => (
-            <button
-              aria-label={`${shadeItem.code} ${shadeItem.name}`}
-              aria-pressed={selectedShade.code === shadeItem.code}
-              className={selectedShade.code === shadeItem.code ? "selected" : ""}
-              key={`${shadeItem.code}-${shadeItem.name}`}
-              onClick={() => chooseShade(shadeItem)}
-              title={`${shadeItem.code} ${shadeItem.name}`}
-              type="button"
-            >
-              <i style={{ backgroundColor: shadeItem.hex }} />
-              <span>{shadeItem.code}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="tryon-adjustments">
-          <div className="tryon-intensity-steps" aria-label={copy.intensity}>
-            {INTENSITY_LEVELS.map((level, index) => (
-              <button
-                aria-label={`${copy.swipes[index]}, ${Math.round(level.value * 100)}%`}
-                aria-pressed={intensity === level.value}
-                key={level.value}
-                onClick={() => changeIntensity(level.value)}
-                type="button"
-              >
-                <strong>{copy.swipes[index]}</strong>
+            <div className="tryon-lower-controls">
+              <button aria-pressed={effectEnabled} className="tryon-selected-shade" onClick={toggleEffect} type="button">
+                <span>{copy.shade}</span>
+                <strong>{selectedShade.code} {selectedShade.name}</strong>
+                <small>{effectEnabled ? copy.effectOn : copy.effectOff}</small>
               </button>
-            ))}
-          </div>
-          <button aria-pressed={effectEnabled} onClick={toggleEffect} type="button">
-            {effectEnabled ? copy.effectOn : copy.effectOff}
-          </button>
-        </div>
 
-        <p>{copy.approximation}</p>
+              <button className={`tryon-capture-button ${captureStatus}`} onClick={() => void capturePhoto()} type="button">
+                <i />
+                <span>{captureStatus === "saved" ? copy.captured : copy.capture}</span>
+              </button>
+
+              <div className="tryon-intensity-menu">
+                {intensityOpen ? (
+                  <div className="tryon-intensity-options">
+                    {[2, 1, 0].map((index) => (
+                      <button aria-pressed={intensity === INTENSITY_LEVELS[index]} key={INTENSITY_LEVELS[index]} onClick={() => selectIntensity(INTENSITY_LEVELS[index])} type="button">{copy.swipes[index]}</button>
+                    ))}
+                  </div>
+                ) : null}
+                <button aria-expanded={intensityOpen} className="tryon-intensity-trigger" onClick={() => setIntensityOpen((open) => !open)} type="button">
+                  <span>{copy.intensity}</span>
+                  <strong>{copy.swipes[INTENSITY_LEVELS.indexOf(intensity as typeof INTENSITY_LEVELS[number])]} <b>⌃</b></strong>
+                </button>
+              </div>
+            </div>
+            <p className="tryon-approximation">{copy.approximation}{preset.shimmer ? " ✦" : ""}</p>
+          </div>
+        ) : null}
       </div>
     </section>
   );
