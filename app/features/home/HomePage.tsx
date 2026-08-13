@@ -914,11 +914,12 @@ export default function Home() {
     const studioCatalog = [
       ...products.filter((product) => product.category === "eyes"),
       ...products.filter((product) => product.category === "lips"),
+      ...products.filter((product) => product.category === "face"),
     ];
     return studioCatalog.flatMap((product) => {
       const productPreset = tryOnPresets[product.name];
       return productPreset ? [{
-        category: product.category as "eyes" | "lips",
+        category: product.category,
         finish: product.finish,
         image: productThumbnail(product),
         name: product.name,

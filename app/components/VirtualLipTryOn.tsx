@@ -16,7 +16,7 @@ type TryOnStatus = "loading" | "running" | "error";
 type CaptureStatus = "idle" | "saved" | "error";
 type CameraRatio = "9:16" | "4:5";
 type CameraFacing = "environment" | "user";
-type StudioCategory = "eyes" | "lips";
+type StudioCategory = "eyes" | "face" | "lips";
 
 export type StudioTryOnProduct = {
   category: StudioCategory;
@@ -50,6 +50,7 @@ const COPY: Record<Language, {
   effectOff: string;
   effectOn: string;
   eyes: string;
+  face: string;
   error: string;
   flipCamera: string;
   frontCamera: string;
@@ -77,6 +78,7 @@ const COPY: Record<Language, {
     effectOff: "LIHAT TANPA EFEK",
     effectOn: "HASIL AKTIF",
     eyes: "MATA",
+    face: "WAJAH",
     error: "Virtual try-on belum dapat dimulai. Periksa koneksi dan izin kameramu.",
     flipCamera: "Ganti kamera depan atau belakang",
     frontCamera: "Kamera depan aktif",
@@ -104,6 +106,7 @@ const COPY: Record<Language, {
     effectOff: "VIEW WITHOUT EFFECT",
     effectOn: "EFFECT ON",
     eyes: "EYES",
+    face: "FACE",
     error: "Virtual try-on could not start. Check your connection and camera permission.",
     flipCamera: "Switch front or back camera",
     frontCamera: "Front camera active",
@@ -131,6 +134,7 @@ const COPY: Record<Language, {
     effectOff: "VER SIN EFECTO",
     effectOn: "EFECTO ACTIVO",
     eyes: "OJOS",
+    face: "ROSTRO",
     error: "No se pudo iniciar la prueba virtual. Revisa la conexión y los permisos de cámara.",
     flipCamera: "Cambiar cámara frontal o trasera",
     frontCamera: "Cámara frontal activa",
@@ -158,6 +162,7 @@ const COPY: Record<Language, {
     effectOff: "查看原始畫面",
     effectOn: "試妝效果開啟",
     eyes: "眼妝",
+    face: "臉部",
     error: "無法啟動虛擬試妝，請檢查連線與鏡頭權限。",
     flipCamera: "切換前後鏡頭",
     frontCamera: "前置鏡頭已啟用",
@@ -670,7 +675,7 @@ export default function VirtualLipTryOn({
             {isStudio ? (
               <div className={`tryon-studio-dock ${studioDrawerOpen ? "open" : ""}`}>
                 <nav className="tryon-studio-rail" aria-label={copy.studioTitle}>
-                  <button aria-disabled="true" className="soon" disabled type="button">FACE</button>
+                  <button aria-expanded={studioDrawerOpen && studioCategory === "face"} className={studioCategory === "face" ? "active" : ""} onClick={() => toggleStudioCategory("face")} type="button">{copy.face}</button>
                   <button aria-expanded={studioDrawerOpen && studioCategory === "eyes"} className={studioCategory === "eyes" ? "active" : ""} onClick={() => toggleStudioCategory("eyes")} type="button">{copy.eyes}</button>
                   <button aria-expanded={studioDrawerOpen && studioCategory === "lips"} className={studioCategory === "lips" ? "active" : ""} onClick={() => toggleStudioCategory("lips")} type="button">{copy.lips}</button>
                   <button className="reset" onClick={() => setStudioLook({})} type="button">RESET</button>

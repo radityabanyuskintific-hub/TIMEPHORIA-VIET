@@ -231,31 +231,32 @@
   cursor: pointer;
   font-size: 9px;
   font-weight: 900;
-  height: 50px;
+  height: 63px;
   padding: 0;
   text-orientation: mixed;
   transform: translateX(0);
   transition: filter 180ms ease,transform 180ms ease;
-  width: 34px;
+  width: 43px;
   writing-mode: vertical-rl;
 }
 .tryon-studio-rail button.active { background: linear-gradient(145deg,rgba(255,255,255,.68),rgba(95,95,95,.62)); color: #111; filter: drop-shadow(0 0 7px rgba(255,255,255,.7)); }
-.tryon-studio-rail button.reset { background: linear-gradient(145deg,rgba(255,87,137,.65),rgba(56,17,31,.64)); height: 46px; }
-.tryon-studio-rail button:disabled { cursor: not-allowed; opacity: .5; }
+.tryon-studio-rail button.reset { background: linear-gradient(145deg,rgba(255,87,137,.65),rgba(56,17,31,.64)); height: 58px; }
 .tryon-studio-drawer {
+  animation: studio-drawer-in 240ms cubic-bezier(.22,1,.36,1) both;
   backdrop-filter: blur(20px);
   background: linear-gradient(100deg,rgba(28,28,28,.74),rgba(255,255,255,.24));
   border: 1px solid rgba(255,255,255,.27);
   border-left: 0;
   border-radius: 0 16px 16px 0;
-  left: 34px;
+  left: 43px;
   overflow: hidden;
   padding: 7px 8px 6px;
   position: absolute;
   width: min(330px,calc(100vw - 48px));
 }
-.tryon-studio-drawer.eyes { top: 55px; }
-.tryon-studio-drawer.lips { top: 110px; }
+.tryon-studio-drawer.face { top: 0; }
+.tryon-studio-drawer.eyes { top: 68px; }
+.tryon-studio-drawer.lips { top: 136px; }
 .tryon-studio-products { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .tryon-studio-products::-webkit-scrollbar { display: none; }
 .tryon-studio-products button { background: rgba(25,25,25,.25); border: 1px solid rgba(255,255,255,.3); border-radius: 999px; color: #fff; cursor: pointer; flex: 0 0 86px; font-size: 7px; line-height: 1.1; min-height: 38px; padding: 6px 8px; white-space: normal; }
@@ -268,6 +269,7 @@
 @keyframes tryon-pulse { from { opacity: .45; transform: scale(.86); } to { opacity: 1; transform: scale(1); } }
 @keyframes tryon-slide-up { from { transform: translateY(102%); } to { transform: translateY(0); } }
 @keyframes tryon-slide-down { from { transform: translateY(0); } to { transform: translateY(105%); } }
+@keyframes studio-drawer-in { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
 
 @media (max-width: 390px) {
   .tryon-floating-nav { gap: 5px; padding: 8px; }
