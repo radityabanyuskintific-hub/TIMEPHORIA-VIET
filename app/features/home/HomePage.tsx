@@ -42,14 +42,12 @@ const PROMO_SEEN_SESSION_KEY = "timephoria:mega-promo-seen";
 
 const studioNavigationCopy: Record<Language, {
   cta: string;
-  detail: string;
-  eyebrow: string;
   title: string;
 }> = {
-  id: { cta: "BUKA STUDIO", detail: "Gabungkan riasan mata dan bibir dalam satu kamera.", eyebrow: "BARU · VIRTUAL MAKEUP", title: "FULL LOOK STUDIO" },
-  en: { cta: "OPEN STUDIO", detail: "Layer eye and lip makeup in one live camera.", eyebrow: "NEW · VIRTUAL MAKEUP", title: "FULL LOOK STUDIO" },
-  es: { cta: "ABRIR ESTUDIO", detail: "Combina maquillaje de ojos y labios en una sola cámara.", eyebrow: "NUEVO · MAQUILLAJE VIRTUAL", title: "FULL LOOK STUDIO" },
-  "zh-tw": { cta: "開啟工作室", detail: "在同一個即時鏡頭中疊加眼妝與唇妝。", eyebrow: "全新 · 虛擬彩妝", title: "完整妝容工作室" },
+  id: { cta: "Coba sekarang!", title: "FULL STUDIO LOOK" },
+  en: { cta: "Try now!", title: "FULL STUDIO LOOK" },
+  es: { cta: "¡Pruébalo ahora!", title: "FULL STUDIO LOOK" },
+  "zh-tw": { cta: "立即試妝！", title: "完整妝容工作室" },
 };
 
 const promos: Promo[] = [
@@ -1372,10 +1370,8 @@ export default function Home() {
                 }}
                 type="button"
               >
-                <span>{studioCopy.eyebrow}</span>
                 <strong>{studioCopy.title}</strong>
-                <small>{studioCopy.detail}</small>
-                <b>{studioCopy.cta} →</b>
+                <em>{studioCopy.cta}</em>
               </button>
               <button
                 className={finish === "All" ? "selected" : ""}

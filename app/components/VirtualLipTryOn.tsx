@@ -64,7 +64,7 @@ const COPY: Record<Language, {
   studioTitle: string;
   retry: string;
   shade: string;
-  swipes: string[];
+  intensityLevels: string[];
   title: string;
 }> = {
   id: {
@@ -91,7 +91,7 @@ const COPY: Record<Language, {
     studioTitle: "FULL LOOK STUDIO",
     retry: "COBA LAGI",
     shade: "WARNA",
-    swipes: ["1 SAPUAN", "2 SAPUAN", "3 SAPUAN"],
+    intensityLevels: ["RENDAH", "SEDANG", "TINGGI"],
     title: "COBA PRODUK DI WAJAHMU",
   },
   en: {
@@ -118,7 +118,7 @@ const COPY: Record<Language, {
     studioTitle: "FULL LOOK STUDIO",
     retry: "TRY AGAIN",
     shade: "SHADE",
-    swipes: ["1 SWIPE", "2 SWIPES", "3 SWIPES"],
+    intensityLevels: ["LOW", "MEDIUM", "HIGH"],
     title: "TRY IT ON YOUR FACE",
   },
   es: {
@@ -145,7 +145,7 @@ const COPY: Record<Language, {
     studioTitle: "ESTUDIO DE LOOK COMPLETO",
     retry: "INTENTAR DE NUEVO",
     shade: "TONO",
-    swipes: ["1 PASADA", "2 PASADAS", "3 PASADAS"],
+    intensityLevels: ["BAJA", "MEDIA", "ALTA"],
     title: "PRUÉBALO EN TU ROSTRO",
   },
   "zh-tw": {
@@ -172,7 +172,7 @@ const COPY: Record<Language, {
     studioTitle: "完整妝容工作室",
     retry: "再試一次",
     shade: "色號",
-    swipes: ["1 次塗抹", "2 次塗抹", "3 次塗抹"],
+    intensityLevels: ["低", "中", "高"],
     title: "在臉上即時試妝",
   },
 };
@@ -189,6 +189,7 @@ export default function VirtualLipTryOn({
   const isStudio = Boolean(studioProducts?.length);
   const firstStudioProduct = studioProducts?.[0];
   const [studioCategory, setStudioCategory] = useState<StudioCategory>(firstStudioProduct?.category ?? "eyes");
+  const [studioDrawerOpen, setStudioDrawerOpen] = useState(false);
   const [activeStudioProductName, setActiveStudioProductName] = useState(firstStudioProduct?.name ?? productName);
   const [revelaMode, setRevelaMode] = useState<"brows" | "eyelashes">("brows");
   const activeStudioProduct = studioProducts?.find(({ name }) => name === activeStudioProductName) ?? firstStudioProduct;
@@ -488,6 +489,15 @@ export default function VirtualLipTryOn({
     }));
   }
 
+  function toggleStudioCategory(nextCategory: StudioCategory) {
+    if (studioCategory === nextCategory) {
+      setStudioDrawerOpen((open) => !open);
+      return;
+    }
+    setStudioCategory(nextCategory);
+    setStudioDrawerOpen(true);
+  }
+
   function selectRevelaMode(nextMode: "brows" | "eyelashes") {
     if (nextMode === revelaMode) return;
     const previousRegion = revelaMode;
@@ -566,7 +576,29 @@ export default function VirtualLipTryOn({
   async function capturePhoto() {
     try {
       if (banubaSessionRef.current) {
-        saveBlob(await banubaSessionRef.current.capture());
+        const sourceBlob = await banubaSessionRef.current.capture();
+        const bitmap = await createImageBitmap(sourceBlob);
+        const outputWidth = 1080;
+        const outputHeight = cameraRatio === "9:16" ? 1920 : 1350;
+        const targetRatio = outputWidth / outputHeight;
+        const sourceRatio = bitmap.width / bitmap.height;
+        let sx = 0;
+        let sy = 0;
+        let sw = bitmap.width;
+        let sh = bitmap.height;
+        if (sourceRatio > targetRatio) {
+          sw = bitmap.height * targetRatio;
+          sx = (bitmap.width - sw) / 2;
+        } else {
+          sh = bitmap.width / targetRatio;
+          sy = (bitmap.height - sh) / 2;
+        }
+        const photo = document.createElement("canvas");
+        photo.width = outputWidth;
+        photo.height = outputHeight;
+        photo.getContext("2d")?.drawImage(bitmap, sx, sy, sw, sh, 0, 0, outputWidth, outputHeight);
+        bitmap.close();
+        photo.toBlob((blob) => blob ? saveBlob(blob) : setCaptureStatus("error"), "image/jpeg", 0.94);
         return;
       }
       const video = videoRef.current;
@@ -613,11 +645,13 @@ export default function VirtualLipTryOn({
       ref={tryOnRef}
       role="dialog"
     >
-      <div className={`tryon-stage ${status} ${cameraFacing === "environment" ? "back-camera" : "front-camera"}`}>
-        <img className="tryon-product-backdrop" src={productImage} alt="" />
-        <video aria-hidden="true" className={`tryon-video ${engine === "banuba" ? "hidden" : ""}`} muted playsInline ref={videoRef} />
-        <canvas aria-hidden="true" className={`tryon-canvas ${engine === "banuba" ? "hidden" : ""}`} ref={canvasRef} />
-        <div aria-hidden={engine !== "banuba"} className={`tryon-banuba ${engine === "banuba" ? "active" : ""}`} ref={banubaContainerRef} />
+      <div className={`tryon-stage ratio-${cameraRatio.replace(":", "-")} ${status} ${cameraFacing === "environment" ? "back-camera" : "front-camera"}`}>
+        <div className="tryon-media-frame">
+          <img className="tryon-product-backdrop" src={productImage} alt="" />
+          <video aria-hidden="true" className={`tryon-video ${engine === "banuba" ? "hidden" : ""}`} muted playsInline ref={videoRef} />
+          <canvas aria-hidden="true" className={`tryon-canvas ${engine === "banuba" ? "hidden" : ""}`} ref={canvasRef} />
+          <div aria-hidden={engine !== "banuba"} className={`tryon-banuba ${engine === "banuba" ? "active" : ""}`} ref={banubaContainerRef} />
+        </div>
 
         <header className="tryon-floating-nav" aria-label="Virtual try-on controls">
           <button aria-pressed={cameraRatio === "9:16"} onClick={() => setCameraRatio("9:16")} type="button">9:16</button>
@@ -634,26 +668,25 @@ export default function VirtualLipTryOn({
         {status === "running" ? (
           <div className="tryon-camera-ui">
             {isStudio ? (
-              <div className="tryon-studio-picker">
-                <div className="tryon-studio-heading">
-                  <strong>{copy.studioTitle}</strong>
-                  <span>{Object.keys(studioLook).length} {copy.look}</span>
-                  <button onClick={() => setStudioLook({})} type="button">{copy.resetLook}</button>
-                </div>
-                <div className="tryon-studio-tabs" role="tablist">
-                  {(["eyes", "lips"] as StudioCategory[]).map((category) => (
-                    <button aria-selected={studioCategory === category} key={category} onClick={() => setStudioCategory(category)} role="tab" type="button">
-                      {category === "eyes" ? copy.eyes : copy.lips}
-                    </button>
-                  ))}
-                </div>
-                <div className="tryon-studio-products">
-                  {studioProducts?.filter(({ category }) => category === studioCategory).map((studioProduct) => (
-                    <button aria-pressed={activeProductName === studioProduct.name} key={studioProduct.name} onClick={() => selectStudioProduct(studioProduct)} type="button">
-                      {studioProduct.name.replace(/^(TIMEPHORIA\s+)?/, "")}
-                    </button>
-                  ))}
-                </div>
+              <div className={`tryon-studio-dock ${studioDrawerOpen ? "open" : ""}`}>
+                <nav className="tryon-studio-rail" aria-label={copy.studioTitle}>
+                  <button aria-disabled="true" className="soon" disabled type="button">FACE</button>
+                  <button aria-expanded={studioDrawerOpen && studioCategory === "eyes"} className={studioCategory === "eyes" ? "active" : ""} onClick={() => toggleStudioCategory("eyes")} type="button">{copy.eyes}</button>
+                  <button aria-expanded={studioDrawerOpen && studioCategory === "lips"} className={studioCategory === "lips" ? "active" : ""} onClick={() => toggleStudioCategory("lips")} type="button">{copy.lips}</button>
+                  <button className="reset" onClick={() => setStudioLook({})} type="button">RESET</button>
+                </nav>
+                {studioDrawerOpen ? (
+                  <div className={`tryon-studio-drawer ${studioCategory}`}>
+                    <div className="tryon-studio-products">
+                      {studioProducts?.filter(({ category }) => category === studioCategory).map((studioProduct) => (
+                        <button aria-pressed={activeProductName === studioProduct.name} key={studioProduct.name} onClick={() => selectStudioProduct(studioProduct)} type="button">
+                          {studioProduct.name}
+                        </button>
+                      ))}
+                    </div>
+                    <small>▶ SWIPE FOR MORE</small>
+                  </div>
+                ) : null}
               </div>
             ) : null}
 
@@ -691,13 +724,13 @@ export default function VirtualLipTryOn({
                 {intensityOpen ? (
                   <div className="tryon-intensity-options">
                     {[2, 1, 0].map((index) => (
-                      <button aria-pressed={intensity === INTENSITY_LEVELS[index]} key={INTENSITY_LEVELS[index]} onClick={() => selectIntensity(INTENSITY_LEVELS[index])} type="button">{copy.swipes[index]}</button>
+                      <button aria-pressed={intensity === INTENSITY_LEVELS[index]} key={INTENSITY_LEVELS[index]} onClick={() => selectIntensity(INTENSITY_LEVELS[index])} type="button">{copy.intensityLevels[index]}</button>
                     ))}
                   </div>
                 ) : null}
                 <button aria-expanded={intensityOpen} className="tryon-intensity-trigger" onClick={() => setIntensityOpen((open) => !open)} type="button">
                   <span>{copy.intensity}</span>
-                  <strong>{copy.swipes[INTENSITY_LEVELS.indexOf(intensity as typeof INTENSITY_LEVELS[number])]} <b>⌃</b></strong>
+                  <strong>{copy.intensityLevels[INTENSITY_LEVELS.indexOf(intensity as typeof INTENSITY_LEVELS[number])]} <b>⌃</b></strong>
                 </button>
               </div>
             </div>
