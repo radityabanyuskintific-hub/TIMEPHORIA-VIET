@@ -42,11 +42,18 @@ function eyeShadowPath(context: CanvasRenderingContext2D, points: NormalizedLand
   context.closePath();
 }
 
-function fillSoft(context: CanvasRenderingContext2D, color: string, alpha: number, blur: number, drawPath: () => void) {
+function fillSoft(
+  context: CanvasRenderingContext2D,
+  color: string,
+  alpha: number,
+  blur: number,
+  drawPath: () => void,
+  composite: GlobalCompositeOperation = "multiply",
+) {
   context.save();
   context.filter = `blur(${blur}px)`;
   context.globalAlpha = alpha;
-  context.globalCompositeOperation = "multiply";
+  context.globalCompositeOperation = composite;
   context.fillStyle = color;
   context.beginPath();
   drawPath();
@@ -120,10 +127,10 @@ export function createMakeupRenderer() {
 
       if (options.preset.region === "foundation") {
         const coverage = options.preset.coverage ?? 0.5;
-        fillSoft(context, options.shadeHex, alpha * coverage, options.preset.finish === "matte" ? 9 : 12, () => {
+        fillSoft(context, options.shadeHex, alpha * coverage * 0.72, options.preset.finish === "matte" ? 7 : 10, () => {
           path(context, points, FACE_OVAL, width, height);
           context.closePath();
-        });
+        }, "source-over");
         context.save();
         context.globalCompositeOperation = "destination-out";
         context.filter = "blur(4px)";
@@ -142,9 +149,9 @@ export function createMakeupRenderer() {
           const topY = Math.min(...eyePoints.map(({ y }) => y));
           const bottomY = Math.max(...eyePoints.map(({ y }) => y)) + (maxX - minX) * 0.22;
           context.save();
-          context.filter = "blur(6px)";
-          context.globalAlpha = alpha * (options.preset.coverage ?? 0.58);
-          context.globalCompositeOperation = "soft-light";
+          context.filter = "blur(5px)";
+          context.globalAlpha = alpha * (options.preset.coverage ?? 0.58) * 0.72;
+          context.globalCompositeOperation = "source-over";
           context.fillStyle = options.shadeHex;
           context.beginPath();
           context.moveTo(minX, topY);

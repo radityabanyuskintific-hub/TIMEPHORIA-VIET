@@ -218,7 +218,7 @@
 .tryon-mode-switch button { background: transparent; border: 0; border-radius: 999px; color: #fff; cursor: pointer; font-size: 8px; font-weight: 900; padding: 7px 12px; }
 .tryon-mode-switch button[aria-pressed="true"] { background: #fff; color: #111; }
 
-.tryon-studio-dock { left: 0; pointer-events: auto; position: absolute; top: max(104px,calc(env(safe-area-inset-top) + 94px)); z-index: 3; }
+.tryon-studio-dock { --studio-drawer-width: min(330px,calc(100vw - 56px)); left: 0; pointer-events: auto; position: absolute; top: max(104px,calc(env(safe-area-inset-top) + 94px)); z-index: 3; }
 .tryon-studio-rail { align-items: flex-start; display: flex; flex-direction: column; gap: 5px; }
 .tryon-studio-rail button {
   backdrop-filter: blur(18px);
@@ -235,11 +235,11 @@
   padding: 0;
   text-orientation: mixed;
   transform: translateX(0);
-  transition: filter 180ms ease,transform 180ms ease;
+  transition: filter 240ms ease,transform 280ms cubic-bezier(.22,1,.36,1);
   width: 43px;
   writing-mode: vertical-rl;
 }
-.tryon-studio-rail button.active { background: linear-gradient(145deg,rgba(255,255,255,.68),rgba(95,95,95,.62)); color: #111; filter: drop-shadow(0 0 7px rgba(255,255,255,.7)); }
+.tryon-studio-dock.open .tryon-studio-rail button.active { background: linear-gradient(145deg,rgba(255,255,255,.68),rgba(95,95,95,.62)); color: #111; filter: drop-shadow(0 0 7px rgba(255,255,255,.7)); transform: translateX(var(--studio-drawer-width)); z-index: 2; }
 .tryon-studio-rail button.reset { background: linear-gradient(145deg,rgba(255,87,137,.65),rgba(56,17,31,.64)); height: 58px; }
 .tryon-studio-drawer {
   animation: studio-drawer-in 240ms cubic-bezier(.22,1,.36,1) both;
@@ -248,11 +248,11 @@
   border: 1px solid rgba(255,255,255,.27);
   border-left: 0;
   border-radius: 0 16px 16px 0;
-  left: 43px;
+  left: 0;
   overflow: hidden;
   padding: 7px 8px 6px;
   position: absolute;
-  width: min(330px,calc(100vw - 48px));
+  width: var(--studio-drawer-width);
 }
 .tryon-studio-drawer.face { top: 0; }
 .tryon-studio-drawer.eyes { top: 68px; }

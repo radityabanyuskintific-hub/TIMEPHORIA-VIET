@@ -28,7 +28,25 @@ export type StudioTryOnProduct = {
 
 type StudioLayer = TryOnEffectLayer & { productName: string };
 
-const INTENSITY_LEVELS = [0.2, 0.28, 0.38] as const;
+const INTENSITY_LEVELS = [0.28, 0.42, 0.58] as const;
+
+const STUDIO_LAYER_ORDER: Record<TryOnRegion, number> = {
+  foundation: 0,
+  concealer: 1,
+  contour: 2,
+  blush: 3,
+  brows: 4,
+  eyeshadow: 5,
+  eyeliner: 6,
+  eyelashes: 7,
+  lips: 8,
+};
+
+function orderedStudioLayers(look: Partial<Record<TryOnRegion, StudioLayer>>) {
+  return Object.values(look).sort(
+    (left, right) => STUDIO_LAYER_ORDER[left.preset.region] - STUDIO_LAYER_ORDER[right.preset.region],
+  );
+}
 
 type VirtualTryOnProps = {
   language: Language;
@@ -313,7 +331,7 @@ export default function VirtualLipTryOn({
           if (points && effectEnabledRef.current) {
             rendererRef.current ??= createMakeupRenderer();
             const layers = isStudio
-              ? Object.values(studioLookRef.current)
+              ? orderedStudioLayers(studioLookRef.current)
               : [{
                   intensity: intensityRef.current,
                   isGloss: activeGlossRef.current,
@@ -375,7 +393,8 @@ export default function VirtualLipTryOn({
     setFaceDetected(false);
     try {
       if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) throw new Error("unsupported");
-      if (isBanubaConfigured && banubaContainerRef.current) {
+      const needsMappedComplexionMask = activePresetRef.current.region === "foundation" || activePresetRef.current.region === "concealer";
+      if (isBanubaConfigured && banubaContainerRef.current && !isStudio && !needsMappedComplexionMask) {
         try {
           const session = await createBanubaSession(banubaContainerRef.current, facingMode);
           if (!mountedRef.current) {
@@ -384,7 +403,7 @@ export default function VirtualLipTryOn({
           }
           banubaSessionRef.current = session;
           if (isStudio) {
-            await session.applyLook(Object.values(studioLookRef.current));
+            await session.applyLook(orderedStudioLayers(studioLookRef.current));
           } else {
             await session.applyPreset(activePresetRef.current, shadeRef.current.hex, intensityRef.current, activeGlossRef.current);
           }
@@ -437,7 +456,7 @@ export default function VirtualLipTryOn({
     const session = banubaSessionRef.current;
     if (!session) return;
     if (isStudio) {
-      void session.applyLook(effectEnabled ? Object.values(studioLook) : []).catch(console.warn);
+      void session.applyLook(effectEnabled ? orderedStudioLayers(studioLook) : []).catch(console.warn);
     } else {
       void session.applyPreset(activePreset, selectedShade.hex, effectEnabled ? intensity : 0, isGlossProduct).catch(console.warn);
     }
@@ -675,9 +694,9 @@ export default function VirtualLipTryOn({
             {isStudio ? (
               <div className={`tryon-studio-dock ${studioDrawerOpen ? "open" : ""}`}>
                 <nav className="tryon-studio-rail" aria-label={copy.studioTitle}>
-                  <button aria-expanded={studioDrawerOpen && studioCategory === "face"} className={studioCategory === "face" ? "active" : ""} onClick={() => toggleStudioCategory("face")} type="button">{copy.face}</button>
-                  <button aria-expanded={studioDrawerOpen && studioCategory === "eyes"} className={studioCategory === "eyes" ? "active" : ""} onClick={() => toggleStudioCategory("eyes")} type="button">{copy.eyes}</button>
-                  <button aria-expanded={studioDrawerOpen && studioCategory === "lips"} className={studioCategory === "lips" ? "active" : ""} onClick={() => toggleStudioCategory("lips")} type="button">{copy.lips}</button>
+                  <button aria-expanded={studioDrawerOpen && studioCategory === "face"} className={studioDrawerOpen && studioCategory === "face" ? "active" : ""} onClick={() => toggleStudioCategory("face")} type="button">{copy.face}</button>
+                  <button aria-expanded={studioDrawerOpen && studioCategory === "eyes"} className={studioDrawerOpen && studioCategory === "eyes" ? "active" : ""} onClick={() => toggleStudioCategory("eyes")} type="button">{copy.eyes}</button>
+                  <button aria-expanded={studioDrawerOpen && studioCategory === "lips"} className={studioDrawerOpen && studioCategory === "lips" ? "active" : ""} onClick={() => toggleStudioCategory("lips")} type="button">{copy.lips}</button>
                   <button className="reset" onClick={() => setStudioLook({})} type="button">RESET</button>
                 </nav>
                 {studioDrawerOpen ? (
