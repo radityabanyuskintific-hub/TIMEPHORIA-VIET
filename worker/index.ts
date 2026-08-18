@@ -6,6 +6,7 @@ import {
   MEDIAPIPE_VERSIONED_BASE_PATH,
 } from "../app/features/try-on/mediapipe-config";
 import { BANUBA_VERSIONED_BASE_PATH } from "../app/features/try-on/banuba-config";
+import { SECURITY_HEADERS } from "../security-headers";
 
 interface Env {
   ASSETS: Fetcher;
@@ -22,6 +23,17 @@ interface Env {
 interface ExecutionContext {
   waitUntil(promise: Promise<unknown>): void;
   passThroughOnException(): void;
+}
+
+function secureAssetResponse(response: Response): Response {
+  const headers = new Headers(response.headers);
+  for (const { key, value } of SECURITY_HEADERS) headers.set(key, value);
+
+  return new Response(response.body, {
+    headers,
+    status: response.status,
+    statusText: response.statusText,
+  });
 }
 
 // Image security config. SVG sources with .svg extension auto-skip the
@@ -44,14 +56,13 @@ const worker = {
 
       if (assetResponse.ok) {
         headers.set("Cache-Control", MEDIAPIPE_BROWSER_CACHE_CONTROL);
-        headers.set("X-Content-Type-Options", "nosniff");
       }
 
-      return new Response(assetResponse.body, {
+      return secureAssetResponse(new Response(assetResponse.body, {
         headers,
         status: assetResponse.status,
         statusText: assetResponse.statusText,
-      });
+      }));
     }
 
     if (url.pathname === "/_vinext/image") {
