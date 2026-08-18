@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: "/",
+        headers: SECURITY_HEADERS,
+      },
+      {
         source: "/:path*",
         headers: SECURITY_HEADERS,
       },
