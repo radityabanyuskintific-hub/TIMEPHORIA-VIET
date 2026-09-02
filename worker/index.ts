@@ -5,7 +5,6 @@ import {
   MEDIAPIPE_BROWSER_CACHE_CONTROL,
   MEDIAPIPE_VERSIONED_BASE_PATH,
 } from "../app/features/try-on/mediapipe-config";
-import { BANUBA_VERSIONED_BASE_PATH } from "../app/features/try-on/banuba-config";
 import { SECURITY_HEADERS } from "../security-headers";
 
 interface Env {
@@ -48,8 +47,7 @@ const worker = {
 
     if (
       (request.method === "GET" || request.method === "HEAD") &&
-      (url.pathname.startsWith(`${MEDIAPIPE_VERSIONED_BASE_PATH}/`) ||
-        url.pathname.startsWith(`${BANUBA_VERSIONED_BASE_PATH}/`))
+      url.pathname.startsWith(`${MEDIAPIPE_VERSIONED_BASE_PATH}/`)
     ) {
       const assetResponse = await env.ASSETS.fetch(request);
       const headers = new Headers(assetResponse.headers);

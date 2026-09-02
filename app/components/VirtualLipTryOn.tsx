@@ -5,7 +5,6 @@
 
 import type { FaceLandmarker } from "@mediapipe/tasks-vision";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createBanubaSession, isBanubaConfigured, type BanubaSession, type TryOnEffectLayer } from "../features/try-on/banuba";
 import { createMakeupRenderer, type MakeupRenderer } from "../features/try-on/makeup-renderer";
 import { acquireFaceLandmarker, type FaceLandmarkerLease } from "../features/try-on/mediapipe";
 import type { TryOnPreset, TryOnRegion } from "../features/try-on/try-on-presets";
@@ -26,7 +25,13 @@ export type StudioTryOnProduct = {
   preset: TryOnPreset;
 };
 
-type StudioLayer = TryOnEffectLayer & { productName: string };
+type StudioLayer = {
+  intensity: number;
+  isGloss: boolean;
+  preset: TryOnPreset;
+  productName: string;
+  shadeHex: string;
+};
 
 const INTENSITY_LEVELS = [0.28, 0.42, 0.58] as const;
 
@@ -228,7 +233,6 @@ export default function VirtualLipTryOn({
   const initialShade = shades[0];
   const copy = COPY[language];
   const tryOnRef = useRef<HTMLElement>(null);
-  const banubaContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<MakeupRenderer | null>(null);
@@ -236,7 +240,6 @@ export default function VirtualLipTryOn({
   const landmarkerLeaseRef = useRef<FaceLandmarkerLease | null>(null);
   const pendingLeaseRef = useRef<Promise<FaceLandmarkerLease> | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const banubaSessionRef = useRef<BanubaSession | null>(null);
   const rafRef = useRef<number | null>(null);
   const closeTimerRef = useRef<number | null>(null);
   const captureTimerRef = useRef<number | null>(null);
@@ -270,7 +273,6 @@ export default function VirtualLipTryOn({
   const [cameraFacing, setCameraFacing] = useState<CameraFacing>("user");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [engine, setEngine] = useState<"banuba" | "mediapipe">("mediapipe");
   const [studioLook, setStudioLook] = useState<Partial<Record<TryOnRegion, StudioLayer>>>(
     initialStudioLayer ? { [initialStudioLayer.preset.region]: initialStudioLayer } : {},
   );
@@ -298,9 +300,6 @@ export default function VirtualLipTryOn({
     landmarkerLeaseRef.current?.release();
     landmarkerLeaseRef.current = null;
     landmarkerRef.current = null;
-    const banubaSession = banubaSessionRef.current;
-    banubaSessionRef.current = null;
-    if (banubaSession) void banubaSession.destroy().catch(() => undefined);
   }, []);
 
   const requestClose = useCallback(() => {
@@ -381,7 +380,6 @@ export default function VirtualLipTryOn({
     }
     landmarkerLeaseRef.current = lease;
     landmarkerRef.current = lease.landmarker;
-    setEngine("mediapipe");
     setStatus("running");
     beginRenderLoop();
   }
@@ -393,27 +391,6 @@ export default function VirtualLipTryOn({
     setFaceDetected(false);
     try {
       if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) throw new Error("unsupported");
-      if (isBanubaConfigured && banubaContainerRef.current) {
-        try {
-          const session = await createBanubaSession(banubaContainerRef.current, facingMode);
-          if (!mountedRef.current) {
-            await session.destroy();
-            return;
-          }
-          banubaSessionRef.current = session;
-          if (isStudio) {
-            await session.applyLook(orderedStudioLayers(studioLookRef.current));
-          } else {
-            await session.applyPreset(activePresetRef.current, shadeRef.current.hex, intensityRef.current, activeGlossRef.current);
-          }
-          setEngine("banuba");
-          setFaceDetected(true);
-          setStatus("running");
-          return;
-        } catch (error) {
-          console.warn("Banuba initialization failed; using the on-device fallback.", error);
-        }
-      }
       await startMediaPipe(facingMode);
     } catch (error) {
       stopEverything();
@@ -450,16 +427,6 @@ export default function VirtualLipTryOn({
     // Opening the panel is the user action that starts the camera flow.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    const session = banubaSessionRef.current;
-    if (!session) return;
-    if (isStudio) {
-      void session.applyLook(effectEnabled ? orderedStudioLayers(studioLook) : []).catch(console.warn);
-    } else {
-      void session.applyPreset(activePreset, selectedShade.hex, effectEnabled ? intensity : 0, isGlossProduct).catch(console.warn);
-    }
-  }, [activePreset, effectEnabled, intensity, isGlossProduct, isStudio, selectedShade, studioLook]);
 
   function selectShade(shade: LipTryOnShade) {
     shadeRef.current = shade;
@@ -555,16 +522,7 @@ export default function VirtualLipTryOn({
     facingRef.current = nextFacing;
     setCameraFacing(nextFacing);
     setStatus("loading");
-    if (banubaSessionRef.current) {
-      try {
-        await banubaSessionRef.current.switchCamera(nextFacing);
-        setStatus("running");
-      } catch {
-        await startTryOn(nextFacing);
-      }
-    } else {
-      await startTryOn(nextFacing);
-    }
+    await startTryOn(nextFacing);
   }
 
   async function toggleFullscreen() {
@@ -606,32 +564,6 @@ export default function VirtualLipTryOn({
 
   async function capturePhoto() {
     try {
-      if (banubaSessionRef.current) {
-        const sourceBlob = await banubaSessionRef.current.capture();
-        const bitmap = await createImageBitmap(sourceBlob);
-        const outputWidth = 1080;
-        const outputHeight = cameraRatio === "9:16" ? 1920 : 1350;
-        const targetRatio = outputWidth / outputHeight;
-        const sourceRatio = bitmap.width / bitmap.height;
-        let sx = 0;
-        let sy = 0;
-        let sw = bitmap.width;
-        let sh = bitmap.height;
-        if (sourceRatio > targetRatio) {
-          sw = bitmap.height * targetRatio;
-          sx = (bitmap.width - sw) / 2;
-        } else {
-          sh = bitmap.width / targetRatio;
-          sy = (bitmap.height - sh) / 2;
-        }
-        const photo = document.createElement("canvas");
-        photo.width = outputWidth;
-        photo.height = outputHeight;
-        photo.getContext("2d")?.drawImage(bitmap, sx, sy, sw, sh, 0, 0, outputWidth, outputHeight);
-        bitmap.close();
-        photo.toBlob((blob) => blob ? saveBlob(blob) : setCaptureStatus("error"), "image/jpeg", 0.94);
-        return;
-      }
       const video = videoRef.current;
       const overlay = canvasRef.current;
       if (!video || !overlay || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) throw new Error("no frame");
@@ -672,16 +604,15 @@ export default function VirtualLipTryOn({
       aria-label={`${isStudio ? "Timephoria Full Look Studio" : activeProductName}, virtual try-on`}
       aria-modal="true"
       className={`virtual-tryon ${isStudio ? "studio" : ""} ${isClosing ? "closing" : ""} ${isFullscreen ? "fullscreen" : ""}`}
-      data-engine={engine}
+      data-engine="mediapipe"
       ref={tryOnRef}
       role="dialog"
     >
       <div className={`tryon-stage ratio-${cameraRatio.replace(":", "-")} ${status} ${cameraFacing === "environment" ? "back-camera" : "front-camera"}`}>
         <div className="tryon-media-frame">
           <img className="tryon-product-backdrop" src={productImage} alt="" />
-          <video aria-hidden="true" className={`tryon-video ${engine === "banuba" ? "hidden" : ""}`} muted playsInline ref={videoRef} />
-          <canvas aria-hidden="true" className={`tryon-canvas ${engine === "banuba" ? "hidden" : ""}`} ref={canvasRef} />
-          <div aria-hidden={engine !== "banuba"} className={`tryon-banuba ${engine === "banuba" ? "active" : ""}`} ref={banubaContainerRef} />
+          <video aria-hidden="true" className="tryon-video" muted playsInline ref={videoRef} />
+          <canvas aria-hidden="true" className="tryon-canvas" ref={canvasRef} />
         </div>
 
         <header className="tryon-floating-nav" aria-label="Virtual try-on controls">
@@ -694,7 +625,7 @@ export default function VirtualLipTryOn({
 
         {status === "loading" ? <div className="tryon-status-panel"><i /><strong>{copy.loading}</strong><span>{copy.cameraHint}</span></div> : null}
         {status === "error" ? <div className="tryon-status-panel error" role="alert"><strong>{errorMessage}</strong><button onClick={() => void startTryOn()} type="button">{copy.retry}</button></div> : null}
-        {status === "running" && engine === "mediapipe" && !faceDetected ? <div className="tryon-face-guide"><i /></div> : null}
+        {status === "running" && !faceDetected ? <div className="tryon-face-guide"><i /></div> : null}
 
         {status === "running" ? (
           <div className="tryon-camera-ui">

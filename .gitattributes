@@ -1,3 +1,0 @@
-public/vendor/banuba/**/*.data -diff -text
-public/vendor/banuba/**/*.wasm -diff -text
-public/vendor/banuba/**/*.zip -diff -text

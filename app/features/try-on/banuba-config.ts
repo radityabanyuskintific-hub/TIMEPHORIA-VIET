@@ -1,3 +1,0 @@
-export const BANUBA_ASSET_VERSION = "v1.18.4";
-export const BANUBA_VERSIONED_BASE_PATH = `/vendor/banuba/${BANUBA_ASSET_VERSION}`;
-export const BANUBA_ASSET_ROUTE_PATTERN = `${BANUBA_VERSIONED_BASE_PATH}/*`;

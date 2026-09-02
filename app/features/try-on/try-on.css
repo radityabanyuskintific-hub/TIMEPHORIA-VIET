@@ -34,18 +34,14 @@
 .tryon-media-frame { background: #000; left: 50%; max-height: 100%; overflow: hidden; position: absolute; top: 50%; transform: translate(-50%,-50%); transition: aspect-ratio 260ms ease,width 260ms ease; width: 100%; }
 .tryon-stage.ratio-4-5 .tryon-media-frame { aspect-ratio: 4 / 5; }
 .tryon-stage.ratio-9-16 .tryon-media-frame { aspect-ratio: 9 / 16; }
-.tryon-product-backdrop,.tryon-video,.tryon-canvas,.tryon-banuba { height: 100%; inset: 0; position: absolute; width: 100%; }
+.tryon-product-backdrop,.tryon-video,.tryon-canvas { height: 100%; inset: 0; position: absolute; width: 100%; }
 .tryon-product-backdrop { filter: brightness(.42) saturate(.8); object-fit: cover; opacity: .58; }
-.tryon-video,.tryon-canvas,.tryon-banuba canvas { object-fit: cover; }
+.tryon-video,.tryon-canvas { object-fit: cover; }
 .tryon-video,.tryon-canvas { opacity: 0; transform: scaleX(-1); }
 .tryon-stage.back-camera .tryon-video,.tryon-stage.back-camera .tryon-canvas { transform: none; }
 .tryon-stage.loading .tryon-video,.tryon-stage.running .tryon-video,.tryon-stage.running .tryon-canvas { opacity: 1; }
 .tryon-stage.loading .tryon-product-backdrop,.tryon-stage.running .tryon-product-backdrop { opacity: 0; }
-.tryon-video.hidden,.tryon-canvas.hidden { display: none; }
 .tryon-canvas { filter: blur(.5px); pointer-events: none; z-index: 1; }
-.tryon-banuba { display: none; z-index: 1; }
-.tryon-banuba.active { display: block; }
-.tryon-banuba canvas { height: 100% !important; width: 100% !important; }
 
 .tryon-stage::after {
   background: linear-gradient(180deg,rgba(0,0,0,.28),transparent 24%,transparent 60%,rgba(0,0,0,.76));

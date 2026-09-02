@@ -4,7 +4,6 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import hostingConfig from "./.openai/hosting.json" with { type: "json" };
 import { sites } from "./build/sites-vite-plugin.ts";
 import { MEDIAPIPE_ASSET_ROUTE_PATTERN } from "./app/features/try-on/mediapipe-config.ts";
-import { BANUBA_ASSET_ROUTE_PATTERN } from "./app/features/try-on/banuba-config.ts";
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
@@ -15,7 +14,8 @@ const localBindingConfig = {
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
   assets: {
-    run_worker_first: [BANUBA_ASSET_ROUTE_PATTERN, MEDIAPIPE_ASSET_ROUTE_PATTERN],
+    binding: "ASSETS",
+    run_worker_first: [MEDIAPIPE_ASSET_ROUTE_PATTERN],
   },
   d1_databases: d1
     ? [
