@@ -3,7 +3,6 @@ import { defineConfig } from "vite";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import hostingConfig from "./.openai/hosting.json" with { type: "json" };
 import { sites } from "./build/sites-vite-plugin.ts";
-import { MEDIAPIPE_ASSET_ROUTE_PATTERN } from "./app/features/try-on/mediapipe-config.ts";
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
@@ -15,7 +14,7 @@ const localBindingConfig = {
   compatibility_flags: ["nodejs_compat"],
   assets: {
     binding: "ASSETS",
-    run_worker_first: [MEDIAPIPE_ASSET_ROUTE_PATTERN],
+    run_worker_first: true,
   },
   d1_databases: d1
     ? [
