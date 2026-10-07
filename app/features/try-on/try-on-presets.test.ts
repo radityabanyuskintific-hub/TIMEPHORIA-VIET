@@ -1,21 +1,34 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { skuMaster } from "../../sku-master.ts";
 import { tryOnPresets } from "./try-on-presets.ts";
 
-test("provides try-on presets for lip, face, and eye products", () => {
-  assert.equal(tryOnPresets["STELLAR DUST LIP STAIN"].region, "lips");
-  assert.equal(tryOnPresets["LUMINA MATTE CUSHION"].region, "foundation");
-  assert.equal(tryOnPresets["DUNE EYELINER"].region, "eyeliner");
-  assert.equal(tryOnPresets["SUPERNOVA SETTING SPRAY"], undefined);
-  assert.ok(tryOnPresets["PANDORA CHEEK LIQUID BLUSH"].shades.length >= 7);
+test("keeps the active Watsons and Guardian SKU sets distinct", () => {
+  const variants = Object.values(skuMaster).flat();
+  assert.equal(variants.length, 71);
+  assert.equal(variants.filter((variant) => variant.retailers.includes("guardian")).length, 57);
+  assert.equal(new Set(variants.map((variant) => variant.sku)).size, variants.length);
+  assert.equal(skuMaster["SUPERNOVA SETTING SPRAY"][0].sku, "TDW106000");
+  assert.deepEqual(
+    skuMaster["STELLAR DUST LIP STAIN"].filter((variant) => !variant.retailers.includes("guardian")).map((variant) => variant.sku),
+    ["TCC102404", "TCC102402", "TCC102401", "TCC102009"],
+  );
 });
 
-test("marks Illumina as a multi-shade shimmer eyeshadow", () => {
-  const illumina = tryOnPresets["ILLUMINA EYESHADOW STICK"];
-  assert.equal(illumina.region, "eyeshadow");
-  assert.equal(illumina.shimmer, true);
-  assert.deepEqual(
-    illumina.shades.map((shade) => shade.name),
-    ["Champagne", "Rose chrome", "Copper", "Galaxy", "Moonlit"],
-  );
+test("offers only listed SKU shades in try-on", () => {
+  assert.equal(tryOnPresets["STELLAR DUST LIP STAIN"].region, "lips");
+  assert.equal(tryOnPresets["LUMINA MATTE CUSHION"].region, "foundation");
+  assert.equal(tryOnPresets["DUNE EYELINER"], undefined);
+  assert.equal(tryOnPresets["SUPERNOVA SETTING SPRAY"], undefined);
+  assert.equal(tryOnPresets["PANDORA CHEEK LIQUID BLUSH"].shades.length, 4);
+
+  for (const [productName, preset] of Object.entries(tryOnPresets)) {
+    const listed = skuMaster[productName].filter((variant) => variant.shadeName);
+    assert.deepEqual(
+      preset.shades.map((shade) => [shade.sku, shade.code, shade.name]),
+      listed.map((variant) => [variant.sku, variant.shadeCode, variant.shadeName]),
+      productName,
+    );
+    assert.ok(preset.shades.every((shade) => /^#[0-9A-F]{6}$/i.test(shade.hex)), productName);
+  }
 });

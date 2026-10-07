@@ -61,6 +61,37 @@ function fillSoft(
   context.restore();
 }
 
+function featheredOval(
+  context: CanvasRenderingContext2D,
+  color: string,
+  x: number,
+  y: number,
+  radiusX: number,
+  radiusY: number,
+  angle: number,
+  opacity: number,
+) {
+  const red = Number.parseInt(color.slice(1, 3), 16);
+  const green = Number.parseInt(color.slice(3, 5), 16);
+  const blue = Number.parseInt(color.slice(5, 7), 16);
+  const tint = (alpha: number) => `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+
+  context.save();
+  context.translate(x, y);
+  context.rotate(angle);
+  context.scale(radiusX, radiusY);
+  const gradient = context.createRadialGradient(0, 0, 0, 0, 0, 1);
+  gradient.addColorStop(0, tint(opacity));
+  gradient.addColorStop(0.35, tint(opacity * 0.68));
+  gradient.addColorStop(0.72, tint(opacity * 0.18));
+  gradient.addColorStop(1, tint(0));
+  context.fillStyle = gradient;
+  context.beginPath();
+  context.arc(0, 0, 1, 0, Math.PI * 2);
+  context.fill();
+  context.restore();
+}
+
 function drawSparkles(context: CanvasRenderingContext2D, points: NormalizedLandmark[], eye: number[], width: number, height: number, time: number, intensity: number) {
   const eyePoints = eye.map((index) => point(points, index, width, height));
   const minX = Math.min(...eyePoints.map((item) => item.x));
@@ -162,44 +193,45 @@ export function createMakeupRenderer() {
           context.restore();
         }
       } else if (options.preset.region === "blush") {
-        for (const cheek of [point(points, 50, width, height), point(points, 280, width, height)]) {
-          const radius = Math.abs(points[454].x - points[234].x) * width * 0.13;
-          const gradient = context.createRadialGradient(cheek.x, cheek.y, 0, cheek.x, cheek.y, radius);
-          gradient.addColorStop(0, options.shadeHex);
-          gradient.addColorStop(1, "transparent");
-          context.save();
-          context.globalAlpha = alpha;
-          context.globalCompositeOperation = "multiply";
-          context.fillStyle = gradient;
-          context.fillRect(cheek.x - radius, cheek.y - radius, radius * 2, radius * 2);
-          context.restore();
+        const faceWidth = Math.hypot(
+          (points[454].x - points[234].x) * width,
+          (points[454].y - points[234].y) * height,
+        );
+        for (const [appleIndex, outerIndex] of [[50, 123], [280, 352]]) {
+          const apple = point(points, appleIndex, width, height);
+          const outer = point(points, outerIndex, width, height);
+          const angle = Math.atan2(apple.y - outer.y, apple.x - outer.x);
+          featheredOval(
+            context,
+            options.shadeHex,
+            apple.x * 0.76 + outer.x * 0.24,
+            apple.y * 0.76 + outer.y * 0.24 - faceWidth * 0.025,
+            faceWidth * 0.21,
+            faceWidth * 0.11,
+            angle,
+            0.075 + options.intensity * 0.23,
+          );
         }
       } else if (options.preset.region === "contour") {
-        context.save();
-        context.strokeStyle = options.shadeHex;
-        context.globalAlpha = alpha * 0.48;
-        context.globalCompositeOperation = "soft-light";
-        context.filter = "blur(7px)";
-        context.lineCap = "round";
-        context.lineWidth = Math.abs(points[454].x - points[234].x) * width * 0.028;
-        for (const indices of [
-          [234, 123, 50, 205],
-          [454, 352, 280, 425],
-          [127, 162, 21, 54],
-          [356, 389, 251, 284],
-          [136, 150, 152, 379, 365],
-        ]) {
-          context.beginPath();
-          path(context, points, indices, width, height);
-          context.stroke();
+        const faceWidth = Math.hypot(
+          (points[454].x - points[234].x) * width,
+          (points[454].y - points[234].y) * height,
+        );
+        for (const [outerIndex, innerIndex] of [[123, 205], [352, 425]]) {
+          const outer = point(points, outerIndex, width, height);
+          const inner = point(points, innerIndex, width, height);
+          const span = Math.hypot(inner.x - outer.x, inner.y - outer.y);
+          featheredOval(
+            context,
+            options.shadeHex,
+            (outer.x + inner.x) / 2,
+            (outer.y + inner.y) / 2 + faceWidth * 0.025,
+            span * 0.73,
+            faceWidth * 0.075,
+            Math.atan2(inner.y - outer.y, inner.x - outer.x),
+            0.075 + options.intensity * 0.18,
+          );
         }
-        context.lineWidth *= 0.48;
-        for (const indices of [[168, 6, 197, 5], [168, 6, 195, 5]]) {
-          context.beginPath();
-          path(context, points, indices, width, height);
-          context.stroke();
-        }
-        context.restore();
       } else if (options.preset.region === "brows") {
         context.save();
         context.strokeStyle = options.shadeHex;

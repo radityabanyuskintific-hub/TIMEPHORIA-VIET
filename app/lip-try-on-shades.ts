@@ -2,6 +2,7 @@ export type LipTryOnShade = {
   code: string;
   name: string;
   hex: string;
+  sku?: string;
   description?: string;
 };
 
@@ -9,8 +10,8 @@ function shade(code: string, name: string, hex: string, description?: string): L
   return { code, name, hex, description };
 }
 
-// Shade names follow the Indonesia-facing product education deck. Hex values are
-// display approximations sampled from the supplied shade charts, not lab color data.
+// Baseline display colors come from the Indonesia-facing shade charts.
+// The SKU master selects which variants appear in try-on.
 export const lipTryOnShades: Record<string, LipTryOnShade[]> = {
   "STELLAR DUST LIP STAIN": [
     shade("01", "Calyptra", "#B85D61", "Nude brown"),

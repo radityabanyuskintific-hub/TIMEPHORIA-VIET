@@ -23,6 +23,7 @@ import type {
 } from "../catalog/types";
 import { useStoreDirectory } from "../stores/useStoreDirectory";
 import { tryOnPresets } from "../try-on/try-on-presets";
+import { skuMaster, shadeLabel } from "../../sku-master";
 import {
   categoryCopy,
   faqItemsSpanish,
@@ -239,7 +240,7 @@ const categories: Record<
   },
 };
 
-const products: Product[] = [
+const productDetails: Omit<Product, "shades">[] = [
   {
     name: "LUMINA MATTE CUSHION",
     shortName: "LUMINA MATTE CUSHION",
@@ -251,16 +252,6 @@ const products: Product[] = [
     description:
       "A lightweight full-coverage cushion with a natural flawless finish for up to 12 hours. Color-locking pigment helps absorb excess oil and prevent oxidation.",
     claims: ["Full coverage", "12H fresh skin", "Oil control"],
-    shades: [
-      "000 Bare",
-      "001 Creme",
-      "002 Birch",
-      "003 Fawn",
-      "003W Warm Fawn",
-      "004 Beige",
-      "05 Tan",
-      "06 Cacao",
-    ],
   },
   {
     name: "OPTIMA POWDER FOUNDATION",
@@ -273,7 +264,6 @@ const products: Product[] = [
     description:
       "Ultra-lightweight powder foundation for perfect cover and blur in one swipe. Flux-Matte technology gives up to 16 hours of oil control.",
     claims: ["Blur matte", "Full coverage", "16H oil control"],
-    shades: ["01 Ivory", "02 Light", "03 Medium", "04 Natural", "05 Sand", "06 Tan"],
   },
   {
     name: "SUPERNOVA SETTING SPRAY",
@@ -286,7 +276,6 @@ const products: Product[] = [
     description:
       "Ultra-fine setting spray that instantly mattifies, blurs pores, and keeps makeup fresh, smudge-proof, and shine-free for up to 12 hours.",
     claims: ["Get set matte", "Airbrushed finish", "12H hold"],
-    shades: ["Universal"],
   },
   {
     name: "UTOPIA GLOW CUSHION",
@@ -299,7 +288,6 @@ const products: Product[] = [
     description:
       "A hydrating glow cushion that creates a soft-blurring base makeup look with sun protection and a comfortable luminous finish.",
     claims: ["SPF50 PA+++", "Hydrating glow", "Soft-blur base"],
-    shades: ["Light", "Natural", "Medium", "Warm", "Tan"],
   },
   {
     name: "FIXION SKIN TINT STICK",
@@ -312,7 +300,6 @@ const products: Product[] = [
     description:
       "Creamy skin tint stick with medium-to-full coverage in one swipe. It blends into a satin second-skin finish for up to 8 hours.",
     claims: ["One-swipe base", "8H wear", "Satin finish"],
-    shades: ["01 Creme", "02 Birch", "03 Fawn", "04 Beige", "05 Tan", "06 Cacao"],
   },
   {
     name: "VALORA CONCEALER",
@@ -325,7 +312,6 @@ const products: Product[] = [
     description:
       "High-coverage concealer that blurs dark circles and imperfections with a lightweight crease-resistant finish lasting up to 12 hours.",
     claims: ["High coverage", "12H crease resistant", "Soft matte"],
-    shades: ["01 Light", "02 Neutral", "03 Medium", "04 Warm", "05 Tan"],
   },
   {
     name: "PANDORA CHEEK LIQUID BLUSH",
@@ -338,7 +324,6 @@ const products: Product[] = [
     description:
       "High color payoff liquid blush with an ultra-blendable lightweight feel, dewy-to-soft-matte finish, and all-day wear.",
     claims: ["Highly pigmented", "Ultra-blendable", "Long-lasting"],
-    shades: ["Peony", "Rosy", "Coral", "Berry", "Mauve", "Terracotta", "Nude"],
   },
   {
     name: "ECLIPSE 2 IN 1 FACE CONTOUR",
@@ -351,7 +336,6 @@ const products: Product[] = [
     description:
       "Dual-ended contour stick with a built-in hygienic brush, ultra-creamy blendable formula, and silky powder-soft finish.",
     claims: ["Dual-ended", "Cream-to-powder", "Built-in brush"],
-    shades: ["Warm contour", "Neutral contour", "Deep contour"],
   },
   {
     name: "ORBITA 3 IN 1 BLURRING POT",
@@ -364,7 +348,6 @@ const products: Product[] = [
     description:
       "Multifunction bouncy velvet mud for eyes, cheeks, and lips with a cloud-like blurring effect and intense buildable color.",
     claims: ["Blurring", "High pigment", "Built-in applicator"],
-    shades: ["Nude orbit", "Rose orbit", "Coral orbit", "Berry orbit"],
   },
   {
     name: "STELLAR DUST LIP STAIN",
@@ -377,7 +360,6 @@ const products: Product[] = [
     description:
       "Hybrid lip emulsion with rich one-swipe coverage, long-lasting transfer-proof color, and comfortable hydration.",
     claims: ["High shine", "12H long-lasting", "Transfer-proof"],
-    shades: ["Nude comet", "Rose star", "Coral flare", "Berry nova", "Red orbit"],
   },
   {
     name: "NEBULA LIP CREAM",
@@ -390,7 +372,6 @@ const products: Product[] = [
     description:
       "Velvet-matte lip color with a lightweight creamy texture, color-lock technology, hydration, and blurred lip lines.",
     claims: ["Blurs", "Smooth", "High pigment"],
-    shades: ["Soft nude", "Warm rose", "Spiced coral", "Mocha", "Deep berry"],
   },
   {
     name: "ETERNAL LIP MATTE",
@@ -403,7 +384,6 @@ const products: Product[] = [
     description:
       "Highly pigmented matte lip color with intense one-swipe coverage, feather-light texture, and comfortable non-drying wear.",
     claims: ["Long wear", "High pigment", "Transfer-proof"],
-    shades: ["Bare rose", "Brick time", "Mauve eclipse", "Ruby", "Cocoa"],
   },
   {
     name: "LUNARA 3D LIP GLOSS",
@@ -416,7 +396,6 @@ const products: Product[] = [
     description:
       "Cushiony gel lip gloss with hyper-shine color, mirror finish, cooling feel, and 3D plumping effect.",
     claims: ["High shine", "3D plump", "24H hydration"],
-    shades: ["Clear frost", "Pink ice", "Peach beam", "Berry glass"],
   },
   {
     name: "MILKYWAY MELTING LIP BALM",
@@ -429,24 +408,6 @@ const products: Product[] = [
     description:
       "A 5D shine melting balm with a refreshing cooling sensation that glides on like butter, delivering vibrant color and a mirror-like glossy finish while nourishing lips.",
     claims: ["5D Shine", "Melts Like Butter", "Nourish"],
-    shades: [
-      "001 Ardent",
-      "002 Moondrip",
-      "003 Bella",
-      "004 Noirelle",
-      "005 Muse",
-      "006 Galacta",
-      "007 Roselle",
-      "008 Caelia",
-      "009 Vesper",
-      "010 Ravelle",
-      "011 Topazia",
-      "012 Amberra",
-      "013 Creamira",
-      "014 Stellune",
-      "015 Kyra",
-      "016 Venara",
-    ],
   },
   {
     name: "APHRODITE EVERLASTING GLOSSY TINT",
@@ -459,18 +420,6 @@ const products: Product[] = [
     description:
       "A juicy glossy tint with vibrant color payoff, glass-like shine, and a lasting water-lock stain while keeping lips comfortable and hydrated.",
     claims: ["Juicy Tint", "Water Lock Stain", "Ultra Comfort"],
-    shades: [
-      "001 Freya",
-      "002 Thea",
-      "003 Thalassa",
-      "004 Amora",
-      "005 Isadora",
-      "006 Juno",
-      "007 Heatflare",
-      "008 Clio",
-      "009 Sora",
-      "010 Cyprus",
-    ],
   },
   {
     name: "ELIXIR VELVET-SHINE SWITCHING LIP CREAM",
@@ -483,20 +432,6 @@ const products: Product[] = [
     description:
       "A dual-finish lip velvet that creates a soft velvet effect in one layer and enhanced shine when layered, with color-lock wear and cushioned comfort.",
     claims: ["Two Customizable Finish", "High Pigment", "Ultra Comfort"],
-    shades: [
-      "001 Fable",
-      "002 Potion",
-      "003 Rubium",
-      "004 Terranox",
-      "005 Kalion",
-      "006 Cerillium",
-      "007 Eclipta",
-      "008 Fanox",
-      "009 Vinx",
-      "010 Xenon",
-      "011 Auralis",
-      "012 Mauvorious",
-    ],
   },
   {
     name: "SPECTRA LIP VINYL",
@@ -509,7 +444,6 @@ const products: Product[] = [
     description:
       "Shine-lock lip vinyl built for glossy color that sets, stays bright, and resists transfer through the day.",
     claims: ["Stay-shine", "Transfer-proof", "Vinyl gloss"],
-    shades: ["Nude glare", "Rose signal", "Red spectrum", "Deep shine"],
   },
   {
     name: "ORION CLOUD MATTE LIPSTICK",
@@ -522,20 +456,6 @@ const products: Product[] = [
     description:
       "A highly pigmented blurring matte lipstick that glides on smoothly, diffuses lip lines, and sets transfer-proof for up to 12 hours of soft matte wear.",
     claims: ["Soft Blur Matte", "Butter Texture", "Transferproof"],
-    shades: [
-      "001 Axiom",
-      "002 Araminta",
-      "003 Xena",
-      "004 Althea",
-      "005 Elladora",
-      "006 Violetta",
-      "007 Pegasus",
-      "008 Vela",
-      "009 Lunette",
-      "010 Serpentis",
-      "011 Enchanta",
-      "012 Narcissa",
-    ],
   },
   {
     name: "ALTERA LIP TINT",
@@ -548,7 +468,6 @@ const products: Product[] = [
     description:
       "Innovative lip color that shifts from glossy to soft blurry finish with pure blur technology and weightless hydration.",
     claims: ["Gloss-to-blur", "Long stain", "Hydrating"],
-    shades: ["Soft pink", "Apricot", "Warm rose", "Berry mist"],
   },
   {
     name: "AION SUPERSTAIN LIP TATTOO INK",
@@ -561,22 +480,6 @@ const products: Product[] = [
     description:
       "An intense watery gel lip tattoo ink with 3x concentrated pigments, rich full-pigment coverage, and a vibrant stain that lasts up to 24 hours.",
     claims: ["High Pigment", "Non Peel", "Longlasting"],
-    shades: [
-      "001 Helia",
-      "002 Calliope",
-      "003 Eliara",
-      "004 Nyssa",
-      "005 Ione",
-      "006 Delphina",
-      "007 Theia",
-      "008 Astrelle",
-      "009 Chrysa",
-      "010 Aera",
-      "011 Calina",
-      "012 Elistra",
-      "013 Lunelle",
-      "014 Rosia",
-    ],
   },
   {
     name: "GENESIS EYEBROW PENCIL",
@@ -589,7 +492,6 @@ const products: Product[] = [
     description:
       "Slanted oval-tip eyebrow pencil with powder-to-wax payoff for soft natural definition that stays through sweat and humidity.",
     claims: ["Good pigment", "Smooth", "Waterproof"],
-    shades: ["Ash brown", "Natural brown", "Dark brown", "Grey brown"],
   },
   {
     name: "DUNE EYELINER",
@@ -602,7 +504,6 @@ const products: Product[] = [
     description:
       "Thin precise applicator with an easy-set formula for smooth intense color, waterproof wear, and clean lines all day.",
     claims: ["Thin", "Precise", "Waterproof"],
-    shades: ["Black", "Brown"],
   },
   {
     name: "REVELA BROW MASCARA",
@@ -615,7 +516,6 @@ const products: Product[] = [
     description:
       "Anti-clump tinted brow gel with a 30 degree fine-tip brush for intense color, waterproof hold, and up to 12 hours of definition.",
     claims: ["Good pigment", "Hold", "Longwear"],
-    shades: ["Soft brown", "Natural brown", "Dark brown"],
   },
   {
     name: "ILLUMINA EYESHADOW STICK",
@@ -628,7 +528,6 @@ const products: Product[] = [
     description:
       "Jelly eyeshadow stick with lightweight high-impact sparkle, hydra-metallic shine, cool cushion feel, and crease-free wear.",
     claims: ["Jelly texture", "High pigment", "Long-lasting shine"],
-    shades: ["Champagne", "Rose chrome", "Copper", "Galaxy", "Moonlit"],
   },
   {
     name: "NAVI EYESHADOW PALETTE",
@@ -641,9 +540,15 @@ const products: Product[] = [
     description:
       "An 8-shade eyeshadow palette with matte, satin, and shimmer finishes that blend seamlessly for long-lasting day-to-night looks with minimal fallout.",
     claims: ["High Pigment", "Effortless Blend", "Longwear"],
-    shades: ["Abyss Brown Palette", "Siren Pink Palette"],
   },
 ];
+
+const products: Product[] = productDetails.map((product) => ({
+  ...product,
+  shades: (skuMaster[product.name] ?? [])
+    .filter((variant) => variant.shadeName)
+    .map(shadeLabel),
+}));
 
 const productAssetSlugs: Record<string, string> = {
   "ALTERA LIP TINT": "altera-tint",

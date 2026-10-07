@@ -1,4 +1,5 @@
 import { lipTryOnShades, type LipTryOnShade } from "../../lip-try-on-shades.ts";
+import { skuMaster } from "../../sku-master.ts";
 
 export type TryOnRegion =
   | "brows"
@@ -139,4 +140,47 @@ for (const [productName, shades] of Object.entries(lipTryOnShades)) {
   presets[productName] = { region: "lips", shades };
 }
 
-export const tryOnPresets = presets;
+// The SKU workbook has no color values. These are display-only approximations.
+const skuHexOverrides: Record<string, string> = {
+  TSH119007: "#E6628D",
+  TSH119005: "#8F3042",
+  TSH119003: "#DB8580",
+  TSH119002: "#A96355",
+  TCC102404: "#B25466",
+  TCC102402: "#D65D64",
+  TCC102401: "#B9415A",
+  TGG107003: "#85543A",
+  TGG107001: "#C49172",
+  TGG107002: "#9B6A56",
+  TCC140017: "#813B45",
+  TQD113000: "#EFC3A7",
+  TZX10501NW: "#E7B795",
+  TZX10502N: "#DDA985",
+  TZX10503N: "#CB936F",
+};
+
+export const tryOnPresets: Record<string, TryOnPreset> = {};
+
+for (const [productName, variants] of Object.entries(skuMaster)) {
+  const preset = presets[productName];
+  if (!preset) continue;
+
+  tryOnPresets[productName] = {
+    ...preset,
+    shades: variants.filter((variant) => variant.shadeName).map((variant) => {
+      const previous = preset.shades.find(
+        (item) => item.name.toLowerCase() === variant.shadeName.toLowerCase(),
+      );
+      const hex = skuHexOverrides[variant.sku] ?? previous?.hex;
+      if (!hex) throw new Error(`Missing try-on color for SKU ${variant.sku}`);
+
+      return {
+        ...previous,
+        code: variant.shadeCode,
+        name: variant.shadeName,
+        hex,
+        sku: variant.sku,
+      };
+    }),
+  };
+}
