@@ -727,7 +727,7 @@ function promoVisual(promo: Promo) {
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("lips");
   const [view, setView] = useState<SiteView>("home");
-  const [language, setLanguage] = useState<Language>("vi");
+  const [language, setLanguage] = useState<Language>("en");
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [finish, setFinish] = useState("All");
   const [promoIndex, setPromoIndex] = useState(0);
@@ -1402,9 +1402,9 @@ export default function Home() {
             </button>
             <div className="language-menu-options" role="menu">
               {([
+                ["en", "EN"],
                 ["vi", "Tiếng Việt"],
                 ["id", "ID"],
-                ["en", "EN"],
                 ["es", "ES"],
                 ["zh-tw", "繁中"],
               ] as const).map(([option, label]) => (

@@ -22,7 +22,7 @@ const isVercelDeployment = process.env.VERCEL === "1";
 export const metadata: Metadata = {
   title: "Timephoria Product Universe",
   description:
-    "Khám phá sản phẩm Timephoria và thử màu trang điểm trực tuyến.",
+    "Explore Timephoria products and try on makeup shades online.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
+    <html lang="en">
       <body className={`${montserrat.variable} ${notoSansTC.variable} antialiased`}>
         {children}
         {isVercelDeployment ? (
