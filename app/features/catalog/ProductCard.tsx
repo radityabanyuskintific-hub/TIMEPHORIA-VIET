@@ -29,6 +29,17 @@ const cardCopy: Record<Language, {
   toneChart: string;
   tryOn: Record<Product["category"], string>;
 }> = {
+  vi: {
+    claims: "đặc điểm",
+    finishAndShades: "XEM HIỆU ỨNG VÀ MÀU SẮC",
+    liveCamera: "CAMERA TRỰC TIẾP",
+    productImage: "hình ảnh sản phẩm",
+    swatch: "Xem bảng màu",
+    swatchSlides: "Các bảng màu",
+    swatches: "màu thử",
+    toneChart: "Bảng màu",
+    tryOn: { eyes: "THỬ TRÊN MẮT", face: "THỬ TRÊN MẶT", lips: "THỬ TRÊN MÔI" },
+  },
   id: {
     claims: "klaim",
     finishAndShades: "LIHAT HASIL DAN WARNA",

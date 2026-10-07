@@ -91,6 +91,34 @@ const COPY: Record<Language, {
   intensityLevels: string[];
   title: string;
 }> = {
+  vi: {
+    approximation: "Màu sắc chỉ mang tính tham khảo. Kết quả có thể khác theo ánh sáng và màn hình.",
+    backCamera: "Đang dùng camera sau",
+    cameraHint: "Cho phép truy cập camera khi trình duyệt yêu cầu.",
+    capture: "CHỤP ẢNH",
+    captured: "ĐÃ LƯU ẢNH",
+    close: "Đóng thử trang điểm",
+    effectOff: "XEM KHÔNG CÓ HIỆU ỨNG",
+    effectOn: "ĐANG BẬT HIỆU ỨNG",
+    eyes: "MẮT",
+    face: "MẶT",
+    error: "Không thể bắt đầu thử trang điểm. Hãy kiểm tra kết nối và quyền truy cập camera.",
+    flipCamera: "Đổi camera trước hoặc sau",
+    frontCamera: "Đang dùng camera trước",
+    fullscreen: "Bật hoặc tắt toàn màn hình",
+    intensity: "ĐỘ ĐẬM",
+    lashes: "LÔNG MI",
+    loading: "ĐANG CHUẨN BỊ...",
+    look: "LỚP TRANG ĐIỂM",
+    lips: "MÔI",
+    brows: "CHÂN MÀY",
+    resetLook: "XÓA",
+    studioTitle: "THỬ TRANG ĐIỂM TOÀN MẶT",
+    retry: "THỬ LẠI",
+    shade: "MÀU",
+    intensityLevels: ["NHẸ", "VỪA", "ĐẬM"],
+    title: "THỬ TRỰC TIẾP TRÊN KHUÔN MẶT",
+  },
   id: {
     approximation: "Visualisasi warna. Hasil aktual dapat berbeda karena pencahayaan dan layar.",
     backCamera: "Kamera belakang aktif",
@@ -112,7 +140,7 @@ const COPY: Record<Language, {
     look: "LOOK AKTIF",
     lips: "BIBIR",
     brows: "ALIS",
-    resetLook: "HAPUS SEMUA",
+    resetLook: "RESET",
     studioTitle: "FULL LOOK STUDIO",
     retry: "COBA LAGI",
     shade: "WARNA",
@@ -140,7 +168,7 @@ const COPY: Record<Language, {
     look: "ACTIVE LOOK",
     lips: "LIPS",
     brows: "BROWS",
-    resetLook: "RESET ALL",
+    resetLook: "RESET",
     studioTitle: "FULL LOOK STUDIO",
     retry: "TRY AGAIN",
     shade: "SHADE",
@@ -168,7 +196,7 @@ const COPY: Record<Language, {
     look: "LOOK ACTIVO",
     lips: "LABIOS",
     brows: "CEJAS",
-    resetLook: "BORRAR TODO",
+    resetLook: "BORRA",
     studioTitle: "ESTUDIO DE LOOK COMPLETO",
     retry: "INTENTAR DE NUEVO",
     shade: "TONO",
@@ -196,7 +224,7 @@ const COPY: Record<Language, {
     look: "目前妝容",
     lips: "唇妝",
     brows: "眉毛",
-    resetLook: "全部清除",
+    resetLook: "清除",
     studioTitle: "完整妝容工作室",
     retry: "再試一次",
     shade: "色號",
@@ -396,7 +424,7 @@ export default function VirtualLipTryOn({
       stopEverything();
       const errorName = error instanceof DOMException ? error.name : "";
       const message = errorName === "NotAllowedError"
-        ? language === "id" ? "Akses kamera ditolak. Izinkan kamera di pengaturan browser lalu coba lagi." : language === "es" ? "Se rechazó el acceso a la cámara. Permítelo en la configuración del navegador." : language === "zh-tw" ? "鏡頭存取遭拒，請在瀏覽器設定中允許鏡頭。" : "Camera access was denied. Allow it in browser settings, then try again."
+        ? language === "vi" ? "Quyền truy cập camera bị từ chối. Hãy cho phép camera trong cài đặt trình duyệt rồi thử lại." : language === "id" ? "Akses kamera ditolak. Izinkan kamera di pengaturan browser lalu coba lagi." : language === "es" ? "Se rechazó el acceso a la cámara. Permítelo en la configuración del navegador." : language === "zh-tw" ? "鏡頭存取遭拒，請在瀏覽器設定中允許鏡頭。" : "Camera access was denied. Allow it in browser settings, then try again."
         : copy.error;
       if (mountedRef.current) {
         setErrorMessage(message);
@@ -635,7 +663,7 @@ export default function VirtualLipTryOn({
                   <button aria-expanded={studioDrawerOpen && studioCategory === "face"} className={studioDrawerOpen && studioCategory === "face" ? "active" : ""} onClick={() => toggleStudioCategory("face")} type="button">{copy.face}</button>
                   <button aria-expanded={studioDrawerOpen && studioCategory === "eyes"} className={studioDrawerOpen && studioCategory === "eyes" ? "active" : ""} onClick={() => toggleStudioCategory("eyes")} type="button">{copy.eyes}</button>
                   <button aria-expanded={studioDrawerOpen && studioCategory === "lips"} className={studioDrawerOpen && studioCategory === "lips" ? "active" : ""} onClick={() => toggleStudioCategory("lips")} type="button">{copy.lips}</button>
-                  <button className="reset" onClick={() => setStudioLook({})} type="button">RESET</button>
+                  <button className="reset" onClick={() => setStudioLook({})} type="button">{copy.resetLook}</button>
                 </nav>
                 {studioDrawerOpen ? (
                   <div className={`tryon-studio-drawer ${studioCategory}`}>

@@ -14,6 +14,7 @@ import {
   productTranslationsSpanish,
   productTranslationsTraditionalChinese,
 } from "../catalog/product-copy";
+import { finishTranslationsVietnamese, productTranslationsVietnamese } from "../catalog/product-copy-vi";
 import type {
   CategoryKey,
   Language,
@@ -37,6 +38,7 @@ import {
   giveawayDisclaimerTraditionalChinese,
   termsItemsTraditionalChinese,
 } from "./home-copy-zh-tw";
+import { faqItemsVietnamese, giveawayDisclaimerVietnamese, termsItemsVietnamese } from "./home-copy-vi";
 
 const ENABLE_INTRO_LOADER = false;
 const PROMO_SEEN_SESSION_KEY = "timephoria:mega-promo-seen";
@@ -45,6 +47,7 @@ const studioNavigationCopy: Record<Language, {
   cta: string;
   title: string;
 }> = {
+  vi: { cta: "Thử ngay!", title: "THỬ TRANG ĐIỂM TOÀN MẶT" },
   id: { cta: "Coba sekarang!", title: "FULL STUDIO LOOK" },
   en: { cta: "Try now!", title: "FULL STUDIO LOOK" },
   es: { cta: "¡Pruébalo ahora!", title: "FULL STUDIO LOOK" },
@@ -724,7 +727,7 @@ function promoVisual(promo: Promo) {
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("lips");
   const [view, setView] = useState<SiteView>("home");
-  const [language, setLanguage] = useState<Language>("id");
+  const [language, setLanguage] = useState<Language>("vi");
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [finish, setFinish] = useState("All");
   const [promoIndex, setPromoIndex] = useState(0);
@@ -835,6 +838,7 @@ export default function Home() {
   const currentPromo = activePromo ?? promos[promoIndex];
   const megaPromo = promos[0];
   const isIndonesian = language === "id";
+  const isVietnamese = language === "vi";
   const isSpanish = language === "es";
   const isTraditionalChinese = language === "zh-tw";
   const copy = uiCopy[language];
@@ -855,6 +859,7 @@ export default function Home() {
   }
 
   function translatedFinish(value: string) {
+    if (isVietnamese) return finishTranslationsVietnamese[value] ?? value;
     if (isIndonesian) return finishTranslations[value] ?? value;
     if (isSpanish) return finishTranslationsSpanish[value] ?? value;
     if (isTraditionalChinese) return finishTranslationsTraditionalChinese[value] ?? value;
@@ -1102,7 +1107,9 @@ export default function Home() {
               <h2>{copy.faq}</h2>
             </header>
             <div className="faq-list">
-              {(isIndonesian
+              {(isVietnamese
+                ? faqItemsVietnamese
+                : isIndonesian
                 ? faqItems
                 : isSpanish
                   ? faqItemsSpanish
@@ -1121,7 +1128,9 @@ export default function Home() {
             <section className="terms-section">
               <h3>{copy.terms}</h3>
               <ol>
-                {(isIndonesian
+                {(isVietnamese
+                  ? termsItemsVietnamese
+                  : isIndonesian
                   ? termsItems
                   : isSpanish
                     ? termsItemsSpanish
@@ -1133,7 +1142,9 @@ export default function Home() {
               </ol>
               <aside className="giveaway-disclaimer">
                 <strong>{copy.disclaimer}</strong>
-                <p>{isIndonesian
+                <p>{isVietnamese
+                  ? giveawayDisclaimerVietnamese
+                  : isIndonesian
                   ? giveawayDisclaimer
                   : isSpanish
                     ? giveawayDisclaimerSpanish
@@ -1308,7 +1319,9 @@ export default function Home() {
               {visibleProducts.map((product) => (
                 <ProductCard
                   claims={
-                    isIndonesian
+                    isVietnamese
+                      ? productTranslationsVietnamese[product.name]?.claims ?? product.claims
+                      : isIndonesian
                       ? productTranslations[product.name]?.claims ??
                         product.claims
                       : isSpanish
@@ -1320,7 +1333,9 @@ export default function Home() {
                       : product.claims
                   }
                   description={
-                    isIndonesian
+                    isVietnamese
+                      ? productTranslationsVietnamese[product.name]?.description ?? product.description
+                      : isIndonesian
                       ? productTranslations[product.name]?.description ??
                         product.description
                       : isSpanish
@@ -1387,6 +1402,7 @@ export default function Home() {
             </button>
             <div className="language-menu-options" role="menu">
               {([
+                ["vi", "Tiếng Việt"],
                 ["id", "ID"],
                 ["en", "EN"],
                 ["es", "ES"],

@@ -45,6 +45,49 @@ type UiCopy = {
 };
 
 export const uiCopy: Record<Language, UiCopy> = {
+  vi: {
+    all: "Tất cả",
+    allRegions: "Tất cả khu vực",
+    appLabel: "Trang web Timephoria",
+    artworkAlt: "hình ảnh chương trình khuyến mãi",
+    availableStores: "CỬA HÀNG ÁP DỤNG",
+    back: "Quay lại",
+    backHome: "Về trang chủ",
+    brandDescription: "Khám phá sản phẩm Timephoria trong thế giới làm đẹp lấy cảm hứng từ tương lai.",
+    brandLabel: "Câu chuyện thương hiệu Timephoria",
+    brandTagline: "Vẻ đẹp không giới hạn",
+    categoryIntro: "Khám phá màu sắc, kết cấu và hiệu ứng trang điểm Timephoria cho từng phong cách.",
+    chooseFinish: "CHỌN HIỆU ỨNG",
+    chooseProduct: "CHỌN SẢN PHẨM",
+    chooseRegion: "Chọn khu vực",
+    closePromo: "Đóng thông tin khuyến mãi",
+    disclaimer: "Lưu ý",
+    faq: "Câu hỏi thường gặp",
+    giveawayTitle: "CHƯƠNG TRÌNH TẶNG QUÀ TIMEPHORIA SEOUL & BANGKOK",
+    joinNow: "THAM GIA NGAY",
+    loading: "ĐANG TẢI...",
+    loadingStores: "Đang tải danh sách cửa hàng...",
+    navLabel: "Danh mục sản phẩm",
+    noStores: "Không tìm thấy cửa hàng.",
+    otherPromos: "Cuộn để xem các chương trình khác",
+    productFilters: "Bộ lọc sản phẩm",
+    productsIntro: "Khám phá sản phẩm Timephoria cho phong cách của bạn.",
+    promoSelector: "Chọn chương trình khuyến mãi",
+    promoSlides: "Các chương trình khuyến mãi",
+    retry: "THỬ LẠI",
+    searchStore: "Tìm tên cửa hàng",
+    searchStorePlaceholder: "Tìm tên cửa hàng...",
+    storeError: "Không thể tải danh sách cửa hàng.",
+    storeIntro: "Tìm cửa hàng áp dụng chương trình Timephoria này.",
+    storeUnit: "cửa hàng",
+    terms: "Điều khoản và điều kiện",
+    translate: "Ngôn ngữ",
+    translateLabel: "Chọn ngôn ngữ",
+    viewFaq: "XEM CÂU HỎI THƯỜNG GẶP",
+    viewProducts: "Xem sản phẩm",
+    viewPromoDetails: "Chạm để xem chi tiết",
+    viewStores: "XEM CỬA HÀNG ÁP DỤNG",
+  },
   id: {
     all: "Semua",
     allRegions: "Semua wilayah",
@@ -225,6 +268,11 @@ export const categoryCopy: Record<Language, Record<CategoryKey, {
   intro: string;
   label: string;
 }>> = {
+  vi: {
+    lips: { label: "Môi", eyebrow: "Thế giới son môi", headline: "Chọn hiệu ứng môi yêu thích", intro: "Từ sắc son đậm đến độ bóng trong trẻo và chất son lì mềm mịn." },
+    eyes: { label: "Mắt", eyebrow: "Trang điểm mắt", headline: "Tạo điểm nhấn cho đôi mắt", intro: "Kẻ mắt, định hình chân mày và khám phá những sắc mắt nổi bật." },
+    face: { label: "Mặt", eyebrow: "Trang điểm khuôn mặt", headline: "Nền, má hồng và tạo khối", intro: "Hoàn thiện lớp nền, thêm sắc má và tạo đường nét cho khuôn mặt." },
+  },
   id: {
     lips: { label: "Bibir", eyebrow: "Semesta bibir", headline: "Temukan hasil akhir favoritmu", intro: uiCopy.id.categoryIntro },
     eyes: { label: "Mata", eyebrow: "Semesta mata", headline: "Bentuk, angkat, dan pancarkan", intro: uiCopy.id.categoryIntro },
@@ -244,6 +292,35 @@ export const categoryCopy: Record<Language, Record<CategoryKey, {
     lips: { label: "唇妝", eyebrow: "唇彩宇宙", headline: "找到你的理想唇妝", intro: "從高顯色、水亮光澤到柔焦絲絨與長效不沾染，滿足每一種唇妝風格。" },
     eyes: { label: "眼妝", eyebrow: "迷人眼界", headline: "勾勒、提亮、聚焦目光", intro: "防水線條、俐落眉型、果凍光澤與長效眼彩，打造有神雙眸。" },
     face: { label: "臉部", eyebrow: "立體輪廓", headline: "底妝、頰彩與修容", intro: "從底妝、頰彩到修容與柔焦，完整每一道臉部彩妝步驟。" },
+  },
+};
+
+const promoCopyVietnamese: Record<string, Partial<Promo>> = {
+  "CUMA BELI 1 TIMEPHORIA BISA JALAN-JALAN KE SEOUL & BANGKOK!": {
+    title: "MUA 1 SẢN PHẨM TIMEPHORIA, CÓ CƠ HỘI ĐẾN SEOUL HOẶC BANGKOK!",
+    selectorLabel: "Quà tặng Timephoria",
+    kicker: "Cơ hội du lịch Seoul & Bangkok",
+    detail: "THAM GIA RÚT THĂM VỚI TỔNG GIÁ TRỊ GIẢI THƯỞNG HÀNG TRĂM TRIỆU RUPIAH.",
+    discount: "THAM GIA RÚT THĂM",
+    registrationLabel: "THAM GIA NGAY",
+  },
+  "Complexion Match": {
+    title: "Chọn màu nền phù hợp",
+    kicker: "Ưu đãi sản phẩm nền",
+    detail: "Mua phấn nước hoặc phấn nền và nhận ưu đãi khi mua cùng xịt khóa nền.",
+    discount: "ƯU ĐÃI COMBO",
+  },
+  "Eye Stay Set": {
+    title: "Bộ trang điểm mắt",
+    kicker: "Lựa chọn chống nước",
+    detail: "Khám phá giá ưu đãi cho sản phẩm chân mày và kẻ mắt.",
+    discount: "GIÁ COMBO",
+  },
+  "Face Dimension": {
+    title: "Tạo nét khuôn mặt",
+    kicker: "Tạo khối và má hồng",
+    detail: "Ưu đãi dành cho Pandora Cheek và các sản phẩm trang điểm mặt Eclipse Spark.",
+    discount: "GIẢM 15%",
   },
 };
 
@@ -306,6 +383,7 @@ const promoCopyTraditionalChinese: Record<string, Partial<Promo>> = {
 };
 
 export function localizePromo(promo: Promo, language: Language): Promo {
+  if (language === "vi") return { ...promo, ...promoCopyVietnamese[promo.title] };
   if (language === "es") return { ...promo, ...promoCopySpanish[promo.title] };
   if (language === "zh-tw") return { ...promo, ...promoCopyTraditionalChinese[promo.title] };
   return promo;

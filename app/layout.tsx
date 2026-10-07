@@ -7,7 +7,7 @@ import "./features/try-on/try-on.css";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   weight: ["300", "400", "500", "600", "700", "800"],
 });
 
@@ -22,7 +22,7 @@ const isVercelDeployment = process.env.VERCEL === "1";
 export const metadata: Metadata = {
   title: "Timephoria Product Universe",
   description:
-    "Pengalaman web edukasi produk Timephoria dengan tampilan portrait-first.",
+    "Khám phá sản phẩm Timephoria và thử màu trang điểm trực tuyến.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
+    <html lang="vi">
       <body className={`${montserrat.variable} ${notoSansTC.variable} antialiased`}>
         {children}
         {isVercelDeployment ? (
